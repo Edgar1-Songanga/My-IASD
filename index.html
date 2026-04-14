@@ -4,36 +4,38 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IASD Digital Platform</title>
-
 <style>
 :root{
   --primary:#003366;
   --accent:#f5a623;
   --bg:#f5f7fb;
   --card:#ffffff;
+  --danger:#c0392b;
+  --success:#27ae60;
 }
-
-*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui;}
-
-body{background:var(--bg);}
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif}
+body{background:var(--bg);color:#222}
+.hidden{display:none!important}
 
 /* LOGIN */
 #login{
-  height:100vh;
+  min-height:100vh;
   display:flex;
   align-items:center;
   justify-content:center;
   background:linear-gradient(135deg,#003366,#0055a5);
+  padding:20px;
 }
-
 .login-box{
   background:#fff;
-  width:90%;
-  max-width:360px;
-  padding:25px;
+  width:100%;
+  max-width:380px;
+  padding:28px;
   border-radius:16px;
   box-shadow:0 10px 30px rgba(0,0,0,.2);
 }
+.login-box h3{text-align:center;margin-bottom:8px;color:var(--primary)}
+.login-box p{text-align:center;font-size:14px;color:#666;margin-bottom:16px}
 
 input,select,textarea{
   width:100%;
@@ -42,7 +44,10 @@ input,select,textarea{
   border-radius:10px;
   border:1px solid #ddd;
   outline:none;
+  font-size:15px;
 }
+input:focus,select:focus,textarea:focus{border-color:var(--primary)}
+textarea{resize:vertical;min-height:80px}
 
 button{
   width:100%;
@@ -54,40 +59,96 @@ button{
   color:#fff;
   font-weight:600;
   cursor:pointer;
+  font-size:15px;
 }
+button.secondary{background:#6c757d}
+button.danger{background:var(--danger)}
+button.success{background:var(--success)}
+button:disabled{opacity:.5;cursor:not-allowed}
 
 /* APP */
-#app{display:none;}
+#app{display:none;min-height:100vh;display:flex;flex-direction:column}
 
 /* HEADER */
 header{
   background:var(--primary);
   color:#fff;
-  padding:14px;
+  padding:14px 16px;
   display:flex;
   justify-content:space-between;
   align-items:center;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+header.left{display:flex;flex-direction:column;gap:2px}
+header.left #title{font-weight:700;font-size:17px}
+header.left #userLabel{font-size:12px;opacity:.9}
+header button{
+  width:auto;
+  padding:8px 12px;
+  margin:0;
+  background:rgba(255,255,255,.2);
+  font-size:13px;
 }
 
-/* DASHBOARD */
-.container{padding:15px;padding-bottom:80px;}
+/* CONTAINER */
+.container{padding:15px;padding-bottom:90px;flex:1}
 
 .grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:10px;
+  gap:12px;
+  margin-top:12px;
 }
+.grid-1{grid-template-columns:1fr}
 
 .card{
   background:var(--card);
-  padding:15px;
+  padding:16px;
   border-radius:14px;
   box-shadow:0 6px 15px rgba(0,0,0,0.06);
+  transition:.2s;
 }
+.card:hover{transform:translateY(-2px)}
+.card h3{margin-bottom:8px;color:var(--primary);font-size:16px}
+.card h4{margin:12px 0 6px;font-size:15px}
+.card p{font-size:14px;line-height:1.5;color:#444}
+.card small{color:#777;font-size:12px}
+.card.clickable{cursor:pointer}
 
 /* MODULES */
-.module{display:none;}
-.active{display:block;}
+.module{display:none}
+.module.active{display:block;animation:fade.2s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+/* TABLES */
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+  font-size:14px;
+}
+th,td{
+  text-align:left;
+  padding:8px;
+  border-bottom:1px solid #eee;
+}
+th{background:#f8f9fa;font-weight:600}
+td.actions{display:flex;gap:6px}
+td button{padding:6px 10px;margin:0;font-size:13px}
+
+/* TABS */
+.tabs{display:flex;gap:8px;margin:12px 0;border-bottom:2px solid #eee}
+.tabs button{
+  flex:1;
+  background:none;
+  color:#666;
+  border-radius:8px 8px 0 0;
+  margin:0;
+  border-bottom:2px solid transparent;
+}
+.tabs button.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:700}
 
 /* MENU */
 nav{
@@ -97,222 +158,516 @@ nav{
   background:#fff;
   display:flex;
   border-top:1px solid #eee;
+  box-shadow:0 -2px 10px rgba(0,0,0,.05);
 }
-
 nav button{
   flex:1;
   background:none;
-  color:#333;
-  padding:12px;
+  color:#666;
+  padding:10px 4px;
+  margin:0;
+  border-radius:0;
+  font-size:11px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
 }
+nav button.active{color:var(--primary)}
+nav button span.icon{font-size:20px}
 
-/* ANIMATION */
-.card{transition:.2s;}
-.card:hover{transform:translateY(-2px);}
+/* BADGES */
+.badge{
+  display:inline-block;
+  padding:3px 8px;
+  border-radius:6px;
+  font-size:11px;
+  font-weight:600;
+  background:#eee;
+  color:#333;
+}
+.badge.pastor{background:#e3f2fd;color:#1565c0}
+.badge.tesoureiro{background:#fff3e0;color:#ef6c00}
+.badge.secretario{background:#e8f5e9;color:#2e7d32}
+.badge.membro{background:#f3e5f5;color:#6a1b9a}
+
+/* EMPTY */
+.empty{
+  text-align:center;
+  padding:30px 20px;
+  color:#888;
+  font-size:14px;
+}
 </style>
 </head>
-
 <body>
 
 <!-- LOGIN -->
 <div id="login">
-<div class="login-box">
-<h3>IASD Platform</h3>
-
-<input id="name" placeholder="Nome">
-<select id="role">
-<option value="pastor">Pastor</option>
-<option value="secretario">Secretário</option>
-<option value="tesoureiro">Tesoureiro</option>
-<option value="membro">Membro</option>
-</select>
-
-<input id="church" placeholder="Igreja">
-
-<button onclick="login()">Entrar</button>
-</div>
+  <div class="login-box">
+    <h3>IASD Platform</h3>
+    <p>Gestão integrada da igreja</p>
+    <input id="name" placeholder="Nome completo" maxlength="50">
+    <select id="role">
+      <option value="">Selecione o cargo</option>
+      <option value="pastor">Pastor</option>
+      <option value="secretario">Secretário</option>
+      <option value="tesoureiro">Tesoureiro</option>
+      <option value="membro">Membro</option>
+    </select>
+    <input id="church" placeholder="Nome da Igreja" maxlength="60">
+    <button onclick="login()">Entrar</button>
+  </div>
 </div>
 
 <!-- APP -->
 <div id="app">
+  <header>
+    <div class="left">
+      <span id="title">Dashboard</span>
+      <span id="userLabel"></span>
+    </div>
+    <button onclick="logout()">Sair</button>
+  </header>
 
-<header>
-<span id="title">Dashboard</span>
-<span id="userLabel"></span>
-</header>
+  <div class="container">
+    <!-- HOME -->
+    <div id="home" class="module active">
+      <div class="card">
+        <h3 id="welcome">Bem-vindo</h3>
+        <p id="sessionInfo"></p>
+      </div>
 
-<div class="container">
+      <div class="grid">
+        <div class="card clickable" onclick="nav('devocional')">📖 <b>Devocional</b></div>
+        <div class="card clickable" onclick="nav('hinario')">🎵 <b>Hinário</b></div>
+        <div class="card clickable" onclick="nav('messages')">📢 <b>Mural</b></div>
+        <div class="card clickable" onclick="nav('relatorios')">📊 <b>Relatórios</b></div>
+        <div class="card clickable admin-only" onclick="nav('tesouraria')">💰 <b>Tesouraria</b></div>
+        <div class="card clickable admin-only" onclick="nav('secretaria')">📝 <b>Secretaria</b></div>
+      </div>
+    </div>
 
-<!-- HOME -->
-<div id="home" class="module active">
+    <!-- DEVOCIONAL -->
+    <div id="devocional" class="module">
+      <div class="card">
+        <h3>Devocional do Dia</h3>
+        <h4 id="devTitulo"></h4>
+        <p id="devTexto"></p>
+        <small id="devVerso"></small>
+      </div>
+      <button class="secondary" onclick="nav('home')">Voltar</button>
+    </div>
 
-<div class="card">
-<h3 id="welcome">Bem-vindo</h3>
-<p id="sessionInfo"></p>
-</div>
+    <!-- HINÁRIO -->
+    <div id="hinario" class="module">
+      <div class="card">
+        <h3>Hinário Adventista</h3>
+        <input id="buscaHino" placeholder="Buscar por número ou título" oninput="renderHinos()">
+      </div>
+      <div id="listaHinos"></div>
+      <button class="secondary" onclick="nav('home')">Voltar</button>
+    </div>
 
-<div class="grid">
-<div class="card">📖 Devocional</div>
-<div class="card">🎵 Hinário</div>
-<div class="card">📡 Lives</div>
-<div class="card">📊 Relatórios</div>
-</div>
+    <!-- MENSAGENS -->
+    <div id="messages" class="module">
+      <div class="card">
+        <textarea id="msgInput" placeholder="Compartilhe uma mensagem espiritual" maxlength="500"></textarea>
+        <button onclick="sendMessage()">Publicar no Mural</button>
+      </div>
+      <div id="feed"></div>
+    </div>
 
-</div>
+    <!-- TESOURARIA -->
+    <div id="tesouraria" class="module">
+      <div class="card">
+        <h3>Lançar Entrada</h3>
+        <select id="tipoFin">
+          <option value="dizimo">Dízimo</option>
+          <option value="oferta">Oferta</option>
+          <option value="projeto">Projeto Especial</option>
+        </select>
+        <input id="valorFin" type="number" placeholder="Valor R$" min="0" step="0.01">
+        <input id="obsFin" placeholder="Observação opcional" maxlength="100">
+        <button class="success" onclick="addFinanceiro()">Registrar</button>
+      </div>
+      <div class="card">
+        <h3>Entradas da Igreja</h3>
+        <div id="tabelaFin"></div>
+      </div>
+    </div>
 
-<!-- MENSAGENS -->
-<div id="messages" class="module">
+    <!-- SECRETARIA -->
+    <div id="secretaria" class="module">
+      <div class="card">
+        <h3>Cadastrar Membro</h3>
+        <input id="membroNome" placeholder="Nome completo" maxlength="50">
+        <input id="membroData" type="date">
+        <select id="membroStatus">
+          <option value="ativo">Ativo</option>
+          <option value="visitante">Visitante</option>
+          <option value="batizado">Batizado</option>
+        </select>
+        <button class="success" onclick="addMembro()">Salvar Membro</button>
+      </div>
+      <div class="card">
+        <h3>Membros da Igreja</h3>
+        <div id="tabelaMembros"></div>
+      </div>
+    </div>
 
-<div class="card" id="msgBox">
-<textarea id="msgInput" placeholder="Mensagem espiritual"></textarea>
-<button onclick="sendMessage()">Publicar</button>
-</div>
+    <!-- RELATÓRIOS -->
+    <div id="relatorios" class="module">
+      <div class="card">
+        <h3>Resumo da Igreja</h3>
+        <div id="resumoGeral"></div>
+      </div>
+      <div class="card">
+        <h3>Financeiro</h3>
+        <div id="resumoFin"></div>
+      </div>
+      <button onclick="window.print()">Imprimir / Salvar PDF</button>
+    </div>
 
-<div id="feed"></div>
+    <!-- PERFIL -->
+    <div id="profile" class="module">
+      <div class="card">
+        <h3>Meu Perfil</h3>
+        <textarea id="bio" placeholder="Biografia espiritual" maxlength="300"></textarea>
+        <button onclick="saveProfile()">Guardar Perfil</button>
+      </div>
+      <div id="profileView"></div>
+    </div>
+  </div>
 
-</div>
-
-<!-- PERFIL -->
-<div id="profile" class="module">
-
-<div class="card">
-<input id="bio" placeholder="Biografia espiritual">
-<button onclick="saveProfile()">Guardar Perfil</button>
-</div>
-
-<div id="profileView"></div>
-
-</div>
-
-</div>
-
-<!-- MENU -->
-<nav>
-<button onclick="nav('home')">🏠</button>
-<button onclick="nav('messages')">📢</button>
-<button onclick="nav('profile')">👤</button>
-</nav>
-
+  <!-- MENU -->
+  <nav>
+    <button onclick="nav('home')" id="nav-home"><span class="icon">🏠</span>Início</button>
+    <button onclick="nav('messages')" id="nav-messages"><span class="icon">📢</span>Mural</button>
+    <button onclick="nav('hinario')" id="nav-hinario"><span class="icon">🎵</span>Hinos</button>
+    <button onclick="nav('profile')" id="nav-profile"><span class="icon">👤</span>Perfil</button>
+  </nav>
 </div>
 
 <script>
-
-/* ===== "FAKE BACKEND" ===== */
-let DB = JSON.parse(localStorage.getItem("iasd_db")) || {
+/* ===== BANCO DE DADOS LOCAL ===== */
+let DB = JSON.parse(localStorage.getItem("iasd_db_v2")) || {
   users: [],
   messages: [],
-  profiles: []
+  profiles: [],
+  financeiro: [],
+  membros: []
 };
-
 let session = null;
 
-/* LOGIN */
+/* ===== DADOS FIXOS ===== */
+const DEVOCIONAIS = [
+  {titulo:"Confiança em Deus", texto:"Entrega o teu caminho ao Senhor; confia nele, e ele tudo fará.", verso:"Salmos 37:5"},
+  {titulo:"Força na Fraqueza", texto:"A minha graça te basta, porque o meu poder se aperfeiçoa na fraqueza.", verso:"2 Coríntios 12:9"},
+  {titulo:"Paz Verdadeira", texto:"Deixo-vos a paz, a minha paz vos dou; não vo-la dou como o mundo a dá.", verso:"João 14:27"},
+  {titulo:"Esperança Viva", texto:"Bendito seja o Deus e Pai de nosso Senhor Jesus Cristo, que nos regenerou para uma viva esperança.", verso:"1 Pedro 1:3"}
+];
+
+const HINOS = [
+  {num:1, titulo:"Cantai ao Senhor", letra:"Cantai ao Senhor um cântico novo..."},
+  {num:15, titulo:"Saudai o Nome de Jesus", letra:"Saudai o nome de Jesus, ó anjos..."},
+  {num:50, titulo:"Maranata", letra:"Cristo breve virá, oh que alegria..."},
+  {num:125, titulo:"Segurança", letra:"Que segurança tenho em Jesus..."},
+  {num:190, titulo:"Oh, Que Esperança", letra:"Oh, que esperança gloriosa..."},
+  {num:595, titulo:"Chuvas de Bênçãos", letra:"Chuvas de bênçãos teremos..."}
+];
+
+/* ===== UTILS ===== */
+const $ = id => document.getElementById(id);
+const escapeHTML = str => str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const save = () => localStorage.setItem("iasd_db_v2", JSON.stringify(DB));
+const formatMoney = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const formatDate = d => new Date(d).toLocaleDateString('pt-BR');
+
+/* ===== SESSÃO ===== */
 function login(){
+  if(!name.value.trim() ||!role.value ||!church.value.trim()){
+    return alert("Preencha todos os campos");
+  }
 
   session = {
-    name:name.value,
-    role:role.value,
-    church:church.value
+    id: Date.now(),
+    name: name.value.trim(),
+    role: role.value,
+    church: church.value.trim()
   };
 
-  localStorage.setItem("session",JSON.stringify(session));
+  if(!DB.users.find(u => u.name === session.name && u.church === session.church)){
+    DB.users.push(session);
+  }
 
-  document.getElementById("login").style.display="none";
-  document.getElementById("app").style.display="block";
-
-  userLabel.innerText = session.role+" | "+session.church;
-  sessionInfo.innerText = session.name+" - "+session.church;
-
-  renderMessages();
-  renderProfile();
+  localStorage.setItem("session", JSON.stringify(session));
+  save();
+  initApp();
 }
 
-/* NAV */
-function nav(page){
-  document.querySelectorAll(".module").forEach(m=>m.classList.remove("active"));
-  document.getElementById(page).classList.add("active");
+function logout(){
+  if(confirm("Deseja realmente sair?")){
+    localStorage.removeItem("session");
+    location.reload();
+  }
 }
 
-/* MESSAGES (FILTER BY CHURCH) */
-function sendMessage(){
+function initApp(){
+  $("login").style.display = "none";
+  $("app").style.display = "flex";
 
-  DB.messages.unshift({
-    church:session.church,
-    role:session.role,
-    text:msgInput.value,
-    time:new Date().toLocaleString()
+  $("userLabel").innerHTML = `<span class="badge ${session.role}">${session.role}</span> ${session.church}`;
+  $("sessionInfo").innerText = `${session.name}`;
+  $("welcome").innerText = `Bem-vindo, ${session.name.split(' ')[0]}`;
+
+  // Esconde módulos admin pra membros
+  document.querySelectorAll('.admin-only').forEach(el => {
+    el.classList.toggle('hidden',!['pastor','secretario','tesoureiro'].includes(session.role));
   });
 
+  renderDevocional();
+  renderMessages();
+  renderProfile();
+  renderFinanceiro();
+  renderMembros();
+  renderRelatorios();
+  renderHinos();
+}
+
+function nav(page){
+  const titles = {
+    home:"Dashboard", messages:"Mural", devocional:"Devocional", hinario:"Hinário",
+    tesouraria:"Tesouraria", secretaria:"Secretaria", relatorios:"Relatórios", profile:"Perfil"
+  };
+
+  // Bloqueio de acesso
+  if(['tesouraria'].includes(page) &&!['tesoureiro','pastor'].includes(session.role)){
+    return alert("Acesso restrito à tesouraria");
+  }
+  if(['secretaria'].includes(page) &&!['secretario','pastor'].includes(session.role)){
+    return alert("Acesso restrito à secretaria");
+  }
+
+  $("title").innerText = titles[page] || "IASD";
+  document.querySelectorAll(".module").forEach(m => m.classList.remove("active"));
+  $(page).classList.add("active");
+
+  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+  $("nav-"+page)?.classList.add("active");
+}
+
+/* ===== DEVOCIONAL ===== */
+function renderDevocional(){
+  const hoje = new Date().getDate() % DEVOCIONAIS.length;
+  const dev = DEVOCIONAIS[hoje];
+  $("devTitulo").innerText = dev.titulo;
+  $("devTexto").innerText = dev.texto;
+  $("devVerso").innerText = dev.verso;
+}
+
+/* ===== HINÁRIO ===== */
+function renderHinos(){
+  const busca = $("buscaHino").value.toLowerCase();
+  const filtrados = HINOS.filter(h =>
+    h.num.toString().includes(busca) || h.titulo.toLowerCase().includes(busca)
+  );
+
+  $("listaHinos").innerHTML = filtrados.length? filtrados.map(h => `
+    <div class="card">
+      <h4>${h.num} - ${h.titulo}</h4>
+      <p>${h.letra}</p>
+    </div>
+  `).join('') : `<div class="empty">Nenhum hino encontrado</div>`;
+}
+
+/* ===== MURAL ===== */
+function sendMessage(){
+  const texto = $("msgInput").value.trim();
+  if(!texto) return alert("Escreva uma mensagem");
+
+  DB.messages.unshift({
+    id: Date.now(),
+    church: session.church,
+    name: session.name,
+    role: session.role,
+    text: texto,
+    time: new Date().toISOString()
+  });
+
+  $("msgInput").value = "";
   save();
   renderMessages();
 }
 
 function renderMessages(){
-
-  feed.innerHTML="";
-
-  DB.messages
-  .filter(m=>m.church===session.church)
-  .forEach(m=>{
-    feed.innerHTML+=`
-      <div class="card">
-        <b>${m.role}</b><br>
-        ${m.text}<br>
-        <small>${m.time}</small>
-      </div>
-    `;
-  });
-
+  const msgs = DB.messages.filter(m => m.church === session.church);
+  $("feed").innerHTML = msgs.length? msgs.map(m => `
+    <div class="card">
+      <p><span class="badge ${m.role}">${m.role}</span> <b>${escapeHTML(m.name)}</b></p>
+      <p style="margin:8px 0">${escapeHTML(m.text)}</p>
+      <small>${new Date(m.time).toLocaleString('pt-BR')}</small>
+    </div>
+  `).join('') : `<div class="empty">Nenhuma mensagem ainda. Seja o primeiro!</div>`;
 }
 
-/* PROFILE */
+/* ===== TESOURARIA ===== */
+function addFinanceiro(){
+  const valor = parseFloat($("valorFin").value);
+  if(!valor || valor <= 0) return alert("Informe um valor válido");
+
+  DB.financeiro.unshift({
+    id: Date.now(),
+    church: session.church,
+    tipo: $("tipoFin").value,
+    valor: valor,
+    obs: $("obsFin").value.trim(),
+    por: session.name,
+    data: new Date().toISOString()
+  });
+
+  $("valorFin").value = "";
+  $("obsFin").value = "";
+  save();
+  renderFinanceiro();
+  renderRelatorios();
+}
+
+function delFinanceiro(id){
+  if(!confirm("Excluir lançamento?")) return;
+  DB.financeiro = DB.financeiro.filter(f => f.id!== id);
+  save();
+  renderFinanceiro();
+  renderRelatorios();
+}
+
+function renderFinanceiro(){
+  const dados = DB.financeiro.filter(f => f.church === session.church);
+  const total = dados.reduce((s,f) => s + f.valor, 0);
+
+  $("tabelaFin").innerHTML = dados.length? `
+    <p><b>Total: ${formatMoney(total)}</b></p>
+    <table>
+      <tr><th>Data</th><th>Tipo</th><th>Valor</th><th>Ações</th></tr>
+      ${dados.map(f => `
+        <tr>
+          <td>${formatDate(f.data)}</td>
+          <td>${f.tipo}</td>
+          <td>${formatMoney(f.valor)}</td>
+          <td class="actions">
+            <button class="danger" onclick="delFinanceiro(${f.id})">X</button>
+          </td>
+        </tr>
+      `).join('')}
+    </table>
+  ` : `<div class="empty">Nenhum lançamento</div>`;
+}
+
+/* ===== SECRETARIA ===== */
+function addMembro(){
+  if(!$("membroNome").value.trim()) return alert("Informe o nome");
+
+  DB.membros.push({
+    id: Date.now(),
+    church: session.church,
+    nome: $("membroNome").value.trim(),
+    data: $("membroData").value,
+    status: $("membroStatus").value,
+    cadastradoPor: session.name
+  });
+
+  $("membroNome").value = "";
+  $("membroData").value = "";
+  save();
+  renderMembros();
+  renderRelatorios();
+}
+
+function delMembro(id){
+  if(!confirm("Excluir membro?")) return;
+  DB.membros = DB.membros.filter(m => m.id!== id);
+  save();
+  renderMembros();
+  renderRelatorios();
+}
+
+function renderMembros(){
+  const dados = DB.membros.filter(m => m.church === session.church);
+  $("tabelaMembros").innerHTML = dados.length? `
+    <table>
+      <tr><th>Nome</th><th>Status</th><th>Data</th><th>Ações</th></tr>
+      ${dados.map(m => `
+        <tr>
+          <td>${escapeHTML(m.nome)}</td>
+          <td>${m.status}</td>
+          <td>${m.data? formatDate(m.data) : '-'}</td>
+          <td class="actions">
+            <button class="danger" onclick="delMembro(${m.id})">X</button>
+          </td>
+        </tr>
+      `).join('')}
+    </table>
+  ` : `<div class="empty">Nenhum membro cadastrado</div>`;
+}
+
+/* ===== RELATÓRIOS ===== */
+function renderRelatorios(){
+  const membros = DB.membros.filter(m => m.church === session.church);
+  const fin = DB.financeiro.filter(f => f.church === session.church);
+  const msgs = DB.messages.filter(m => m.church === session.church);
+
+  $("resumoGeral").innerHTML = `
+    <p><b>Membros cadastrados:</b> ${membros.length}</p>
+    <p><b>Ativos:</b> ${membros.filter(m => m.status === 'ativo').length}</p>
+    <p><b>Batizados:</b> ${membros.filter(m => m.status === 'batizado').length}</p>
+    <p><b>Mensagens no mural:</b> ${msgs.length}</p>
+  `;
+
+  const totalDiz = fin.filter(f => f.tipo === 'dizimo').reduce((s,f) => s + f.valor, 0);
+  const totalOf = fin.filter(f => f.tipo === 'oferta').reduce((s,f) => s + f.valor, 0);
+  const totalProj = fin.filter(f => f.tipo === 'projeto').reduce((s,f) => s + f.valor, 0);
+
+  $("resumoFin").innerHTML = `
+    <p><b>Total Dízimos:</b> ${formatMoney(totalDiz)}</p>
+    <p><b>Total Ofertas:</b> ${formatMoney(totalOf)}</p>
+    <p><b>Total Projetos:</b> ${formatMoney(totalProj)}</p>
+    <p><b>TOTAL GERAL:</b> ${formatMoney(totalDiz + totalOf + totalProj)}</p>
+  `;
+}
+
+/* ===== PERFIL ===== */
 function saveProfile(){
-
   let profile = {
-    church:session.church,
-    bio:bio.value,
-    name:session.name,
-    role:session.role
+    church: session.church,
+    bio: $("bio").value.trim(),
+    name: session.name,
+    role: session.role
   };
-
-  DB.profiles = DB.profiles.filter(p=>p.church!==session.church);
+  DB.profiles = DB.profiles.filter(p =>!(p.church === session.church && p.name === session.name));
   DB.profiles.push(profile);
-
   save();
   renderProfile();
+  alert("Perfil salvo!");
 }
 
 function renderProfile(){
-
-  let p = DB.profiles.find(x=>x.church===session.church);
-
-  profileView.innerHTML = p ? `
+  let p = DB.profiles.find(x => x.church === session.church && x.name === session.name);
+  $("bio").value = p?.bio || "";
+  $("profileView").innerHTML = p? `
     <div class="card">
-      <h3>${p.name}</h3>
-      <p>${p.role}</p>
-      <p>${p.bio}</p>
+      <h3>${escapeHTML(p.name)}</h3>
+      <p><span class="badge ${p.role}">${p.role}</span></p>
+      <p style="margin-top:8px">${escapeHTML(p.bio) || 'Sem biografia'}</p>
     </div>
   ` : "";
 }
 
-/* SAVE */
-function save(){
-  localStorage.setItem("iasd_db",JSON.stringify(DB));
-}
-
-/* INIT SESSION RESTORE */
+/* ===== INIT ===== */
 let saved = localStorage.getItem("session");
 if(saved){
   session = JSON.parse(saved);
-  document.getElementById("login").style.display="none";
-  document.getElementById("app").style.display="block";
-  userLabel.innerText = session.role+" | "+session.church;
-  sessionInfo.innerText = session.name+" - "+session.church;
-  renderMessages();
-  renderProfile();
+  initApp();
 }
-
 </script>
-
 </body>
-  </html>
+          </html>
