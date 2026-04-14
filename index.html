@@ -9,72 +9,83 @@
 
 <style>
 :root{
-  --primary:#002D5E;
-  --accent:#C5A059;
-  --bg:#f4f6f8;
-  --card:#fff;
+--primary:#002D5E;
+--accent:#C5A059;
+--bg:#f4f6f8;
+--card:#fff;
+--text:#1e293b;
 }
 
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter';}
 
-body{background:var(--bg);display:flex;height:100vh;}
+body{display:flex;height:100vh;background:var(--bg);color:var(--text);}
 
 /* SIDEBAR */
 aside{
-  width:260px;
-  background:#fff;
-  padding:20px;
+width:260px;
+background:#fff;
+padding:20px;
+border-right:1px solid #eee;
+overflow:auto;
 }
 
 .nav-item{
-  padding:12px;
-  border-radius:8px;
-  cursor:pointer;
-  margin-bottom:8px;
+padding:12px;
+border-radius:10px;
+margin-bottom:8px;
+cursor:pointer;
 }
 
-.nav-item:hover{background:#eee;}
-.active{background:var(--primary);color:#fff;}
+.nav-item:hover{background:#f1f5f9;}
+.nav-item.active{background:var(--primary);color:#fff;}
 
 /* MAIN */
 main{flex:1;display:flex;flex-direction:column;}
 
 header{
-  padding:15px;
-  background:var(--primary);
-  color:#fff;
-  display:flex;
-  justify-content:space-between;
+background:rgba(255,255,255,0.7);
+backdrop-filter:blur(10px);
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+border-bottom:1px solid #eee;
 }
 
 .container{
-  padding:20px;
-  overflow:auto;
+padding:20px;
+overflow:auto;
 }
 
+/* CARD */
 .card{
-  background:#fff;
-  padding:15px;
-  border-radius:12px;
-  margin-bottom:10px;
+background:var(--card);
+padding:15px;
+border-radius:14px;
+margin-bottom:15px;
+box-shadow:0 5px 15px rgba(0,0,0,0.05);
+}
+
+input,textarea,select{
+width:100%;
+padding:10px;
+margin-top:8px;
+border-radius:8px;
+border:1px solid #ddd;
 }
 
 button{
-  padding:10px;
-  border:none;
-  background:var(--primary);
-  color:#fff;
-  border-radius:8px;
-  cursor:pointer;
+margin-top:8px;
+padding:10px;
+border:none;
+background:var(--primary);
+color:#fff;
+border-radius:8px;
+cursor:pointer;
 }
 
-input,textarea{
-  width:100%;
-  padding:10px;
-  margin-top:8px;
-  border-radius:8px;
-  border:1px solid #ddd;
-}
+.view{display:none;}
+.view.active{display:block;}
 
 </style>
 </head>
@@ -86,14 +97,17 @@ input,textarea{
 <h3>UNA Digital</h3>
 
 <div class="nav-item active" onclick="nav('feed', this)">Feed</div>
-<div class="nav-item" onclick="nav('perfil', this)">Perfil</div>
+<div class="nav-item" onclick="nav('sec', this)">Secretaria</div>
+<div class="nav-item" onclick="nav('fin', this)">Tesouraria</div>
+<div class="nav-item" onclick="nav('admin', this)">Administração</div>
+<div class="nav-item" onclick="nav('biblia', this)">Bíblia</div>
+<div class="nav-item" onclick="nav('chatbot', this)">Guia</div>
 <div class="nav-item" onclick="nav('radio', this)">Rádio</div>
 <div class="nav-item" onclick="nav('devocional', this)">Devocional</div>
 <div class="nav-item" onclick="nav('licao', this)">Lição</div>
 
 </aside>
 
-<!-- MAIN -->
 <main>
 
 <header>
@@ -104,50 +118,83 @@ input,textarea{
 <div class="container">
 
 <!-- FEED -->
-<div id="feed" class="view">
-
+<div id="feed" class="view active">
 <div class="card">
 <textarea id="postText" placeholder="Partilhar mensagem..."></textarea>
 <button onclick="createPost()">Publicar</button>
 </div>
-
 <div id="posts"></div>
-
 </div>
 
-<!-- PERFIL -->
-<div id="perfil" class="view" style="display:none;">
+<!-- SECRETARIA -->
+<div id="sec" class="view">
 <div class="card">
-<input id="name" placeholder="Nome">
-<textarea id="bio" placeholder="Bio"></textarea>
-<button onclick="saveProfile()">Guardar</button>
+<input id="memberName" placeholder="Nome membro">
+<button onclick="addMember()">Adicionar</button>
+</div>
+<div id="members"></div>
 </div>
 
-<div id="profileView"></div>
+<!-- TESOURARIA -->
+<div id="fin" class="view">
+<div class="card">
+<input id="donor" placeholder="Nome">
+<input id="amount" placeholder="Valor">
+<select id="type">
+<option>Dízimo</option>
+<option>Oferta</option>
+</select>
+<button onclick="pay()">Registrar</button>
+</div>
+<div id="finance"></div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin" class="view">
+<div class="card">
+<input id="deptName" placeholder="Nome do departamento">
+<button onclick="createDept()">Criar</button>
+</div>
+<div id="deptList"></div>
+</div>
+
+<!-- BIBLIA -->
+<div id="biblia" class="view">
+<div class="card">
+<input id="bibleSearch" placeholder="Ex: João 3:16">
+<button onclick="searchBible()">Buscar</button>
+<div id="bibleResult"></div>
+</div>
+</div>
+
+<!-- CHAT -->
+<div id="chatbot" class="view">
+<div class="card">
+<div id="chatBox"></div>
+<input id="chatInput">
+<button onclick="sendChat()">Enviar</button>
+</div>
 </div>
 
 <!-- RADIO -->
-<div id="radio" class="view" style="display:none;">
+<div id="radio" class="view">
 <div class="card">
-<h3>Rádio Novo Advento</h3>
 <audio controls style="width:100%">
-<source src="https://stream.radiojar.com/4ywdgup3bnzuv" type="audio/mpeg">
+<source src="https://stream.radiojar.com/4ywdgup3bnzuv">
 </audio>
 </div>
 </div>
 
 <!-- DEVOCIONAL -->
-<div id="devocional" class="view" style="display:none;">
+<div id="devocional" class="view">
 <div class="card">
-<h3>Devocional</h3>
-<p>Entrega o teu caminho ao Senhor...</p>
+<p>Entrega o teu caminho ao Senhor.</p>
 </div>
 </div>
 
-<!-- LIÇÃO -->
-<div id="licao" class="view" style="display:none;">
+<!-- LICAO -->
+<div id="licao" class="view">
 <div class="card">
-<h3>Escola Sabatina</h3>
 <p>Lição da semana disponível.</p>
 </div>
 </div>
@@ -158,111 +205,166 @@ input,textarea{
 
 <script>
 
-/* ===== BACKEND SIMULADO ===== */
-let DB = JSON.parse(localStorage.getItem("una_db")) || {
-  users:[],
-  posts:[],
-  profiles:[],
-  follows:[]
+/* DATABASE */
+let DB = JSON.parse(localStorage.getItem("db")) || {
+posts:[], members:[], finances:[], comments:[], follows:[], departments:[]
 };
 
-let session = JSON.parse(localStorage.getItem("session")) || null;
+let session = JSON.parse(localStorage.getItem("session")) || {
+name: prompt("Nome"),
+church: prompt("Igreja")
+};
 
-/* LOGIN SIMPLES */
-if(!session){
-  let name = prompt("Nome:");
-  let church = prompt("Igreja:");
-
-  session = {name, church};
-  localStorage.setItem("session", JSON.stringify(session));
-}
-
-/* USER INFO */
-userInfo.innerText = session.name + " | " + session.church;
+localStorage.setItem("session", JSON.stringify(session));
+userInfo.innerText = session.name+" | "+session.church;
 
 /* NAV */
-function nav(id, el){
-  document.querySelectorAll(".view").forEach(v=>v.style.display="none");
-  document.getElementById(id).style.display="block";
+function nav(id,el){
+document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+document.getElementById(id).classList.add("active");
 
-  document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
-  el.classList.add("active");
+document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+el.classList.add("active");
 }
 
 /* POSTS */
 function createPost(){
-  DB.posts.unshift({
-    user:session.name,
-    church:session.church,
-    text:postText.value,
-    likes:0
-  });
-
-  save();
-  renderPosts();
+DB.posts.unshift({
+id:Date.now(),
+user:session.name,
+church:session.church,
+text:postText.value,
+likes:[]
+});
+save(); renderPosts();
 }
 
-function likePost(i){
-  DB.posts[i].likes++;
-  save();
-  renderPosts();
+function likePost(id){
+let p = DB.posts.find(x=>x.id===id);
+if(!p.likes.includes(session.name)) p.likes.push(session.name);
+save(); renderPosts();
+}
+
+function addComment(id){
+DB.comments.push({
+postId:id,
+user:session.name,
+text:document.getElementById("c-"+id).value
+});
+save(); renderPosts();
 }
 
 function renderPosts(){
-  posts.innerHTML="";
+posts.innerHTML="";
+DB.posts.filter(p=>p.church===session.church).forEach(p=>{
+let comments = DB.comments.filter(c=>c.postId===p.id);
+posts.innerHTML+=`
+<div class="card">
+<b>${p.user}</b><br>${p.text}<br>
+❤️ ${p.likes.length}
+<button onclick="likePost(${p.id})">Curtir</button>
 
-  DB.posts
-  .filter(p=>p.church===session.church)
-  .forEach((p,i)=>{
-    posts.innerHTML+=`
-      <div class="card">
-        <b>${p.user}</b><br>
-        ${p.text}<br><br>
-        ❤️ ${p.likes}
-        <button onclick="likePost(${i})">Curtir</button>
-      </div>
-    `;
-  });
+<input id="c-${p.id}" placeholder="Comentar">
+<button onclick="addComment(${p.id})">Enviar</button>
+
+${comments.map(c=>`<div><b>${c.user}:</b> ${c.text}</div>`).join("")}
+</div>`;
+});
 }
 
-/* PROFILE */
-function saveProfile(){
-  DB.profiles = DB.profiles.filter(p=>p.user!==session.name);
-
-  DB.profiles.push({
-    user:session.name,
-    bio:bio.value
-  });
-
-  save();
-  renderProfile();
+/* SECRETARIA */
+function addMember(){
+DB.members.push({name:memberName.value});
+save(); renderMembers();
 }
 
-function renderProfile(){
-  let p = DB.profiles.find(x=>x.user===session.name);
-
-  profileView.innerHTML = p ? `
-    <div class="card">
-      <h3>${p.user}</h3>
-      <p>${p.bio}</p>
-    </div>
-  ` : "";
+function renderMembers(){
+members.innerHTML="";
+DB.members.forEach(m=>{
+members.innerHTML+=`<div class="card">${m.name}</div>`;
+});
 }
 
-/* STORAGE */
+/* TESOURARIA */
+function pay(){
+DB.finances.push({
+name:donor.value,
+amount:amount.value,
+type:type.value
+});
+save(); renderFinance();
+}
+
+function renderFinance(){
+finance.innerHTML="";
+DB.finances.forEach(f=>{
+finance.innerHTML+=`<div class="card">${f.name} - Kz ${f.amount}</div>`;
+});
+}
+
+/* ADMIN + RELATÓRIOS */
+function createDept(){
+DB.departments.push({
+id:Date.now(),
+name:deptName.value,
+church:session.church,
+data:[]
+});
+save(); renderDepts();
+}
+
+function addDeptData(id){
+let d = DB.departments.find(x=>x.id===id);
+let val = document.getElementById("data-"+id).value;
+d.data.push({text:val,date:new Date().toLocaleDateString()});
+save(); renderDepts();
+}
+
+function generateReport(id){
+let d = DB.departments.find(x=>x.id===id);
+let report=`Relatório ${d.name}\nTotal: ${d.data.length}`;
+alert(report);
+}
+
+function renderDepts(){
+deptList.innerHTML="";
+DB.departments.filter(d=>d.church===session.church).forEach(d=>{
+deptList.innerHTML+=`
+<div class="card">
+<b>${d.name}</b><br>
+Total: ${d.data.length}
+
+<input id="data-${d.id}">
+<button onclick="addDeptData(${d.id})">Adicionar</button>
+
+<button onclick="generateReport(${d.id})">Relatório</button>
+</div>`;
+});
+}
+
+/* BIBLIA */
+const BIBLE={"joao 3:16":"Deus amou o mundo..."};
+function searchBible(){
+bibleResult.innerText=BIBLE[bibleSearch.value.toLowerCase()]||"Não encontrado";
+}
+
+/* CHAT */
+function sendChat(){
+let msg=chatInput.value;
+chatBox.innerHTML+=`<div>Você: ${msg}</div>`;
+chatBox.innerHTML+=`<div>Guia: Confie em Deus</div>`;
+}
+
+/* SAVE */
 function save(){
-  localStorage.setItem("una_db", JSON.stringify(DB));
-}
-
-/* LOGOUT */
-function logout(){
-  localStorage.removeItem("session");
-  location.reload();
+localStorage.setItem("db", JSON.stringify(DB));
 }
 
 /* INIT */
 renderPosts();
-renderProfile();
+renderMembers();
+renderFinance();
+renderDepts();
 
 </script>
 
