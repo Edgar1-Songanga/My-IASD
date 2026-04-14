@@ -2,239 +2,205 @@
 <html lang="pt-AO">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>UNA Digital - Angola</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNA Digital - Church Management</title>
     <link rel="stylesheet" href="https://unpkg.com" />
     <style>
         :root {
-            --primary: #002D5E; --accent: #C5A059; --bg: #F0F2F5;
-            --card: rgba(255, 255, 255, 0.98); --text: #1C1E21;
-            --success: #28A745; --muted: #666;
+            --primary: #002D5E; --accent: #C5A059; --bg: #F4F7F6;
+            --sidebar-w: 260px; --topbar-h: 65px;
+            --card: #ffffff; --text: #333; --muted: #666;
         }
         [data-theme="dark"] {
-            --bg: #121212; --card: rgba(36, 37, 38, 1); --text: #E4E6EB; --muted: #aaa;
+            --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; --muted: #aaa;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; }
-        body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); overflow: hidden; height: 100vh; display: flex; }
 
-        header { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; border-bottom: 3px solid var(--accent); }
-        .header-title h1 { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }
-        .header-title small { font-size: 0.7rem; opacity: 0.8; }
+        /* SIDEBAR */
+        aside {
+            width: var(--sidebar-w); background: var(--primary); color: white;
+            height: 100%; transition: 0.3s; position: relative; z-index: 1001;
+            display: flex; flex-direction: column;
+        }
+        aside.collapsed { width: 0; overflow: hidden; }
+        .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-menu { flex: 1; padding: 15px 0; }
+        .nav-item { 
+            padding: 15px 25px; cursor: pointer; display: flex; align-items: center; gap: 12px;
+            font-size: 0.9rem; transition: 0.2s; border-left: 4px solid transparent;
+        }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); border-left-color: var(--accent); }
 
-        .main-container { flex: 1; overflow-y: auto; position: relative; }
-        .module { min-height: 100%; padding: 20px; display: none; background-size: cover; background-position: center; position: relative; }
-        .module.active { display: block; }
-        .module::before { content: ""; position: absolute; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); z-index: 0; }
+        /* TOPBAR */
+        .topbar {
+            height: var(--topbar-h); background: var(--card); border-bottom: 1px solid #ddd;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 25px;
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 15px; }
+        .menu-toggle { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--primary); }
+        .topbar-right { display: flex; gap: 15px; align-items: center; }
 
-        /* DASHBOARD GRID */
-        .dash-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; position: relative; z-index: 1; }
-        .dash-item { background: var(--card); padding: 25px 15px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid rgba(0,0,0,0.05); transition: 0.3s; }
-        .dash-item:active { transform: scale(0.95); background: var(--bg); }
-        .dash-item b { font-size: 0.75rem; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+        /* MAIN CONTENT */
+        main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; position: relative; }
+        .content-area { padding: 25px; max-width: 1200px; margin: 0 auto; width: 100%; }
 
-        .card { position: relative; z-index: 1; background: var(--card); border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-        .module-title { font-size: 1rem; font-weight: 700; margin-bottom: 15px; border-bottom: 2px solid var(--accent); padding-bottom: 5px; display: inline-block; }
-
-        /* LIDERANÇA */
-        .lider-scroll { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; z-index: 1; position: relative; }
-        .lider-box { min-width: 280px; background: var(--card); padding: 15px; border-radius: 8px; border-top: 4px solid var(--primary); }
-        .lider-box h4 { font-size: 0.9rem; margin: 5px 0; }
-        .lider-box small { color: var(--accent); font-weight: bold; font-size: 0.7rem; }
-
-        /* CHATBOT */
-        #c-box { height: 250px; overflow-y:auto; background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; }
-        .msg { padding: 10px 14px; border-radius: 12px; font-size: 0.85rem; max-width: 85%; }
-        .msg-bot { background: #E7F3FF; color: #000; align-self: flex-start; }
-        .msg-user { background: var(--primary); color: white; align-self: flex-end; }
-
-        /* RECIBO */
-        #receipt { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 350px; background: white; padding: 25px; border-radius: 2px; z-index: 2000; display: none; color: black; font-family: 'Courier New', monospace; border-top: 10px solid var(--primary); box-shadow: 0 0 50px rgba(0,0,0,0.5); }
-
-        /* NAV INFERIOR */
-        nav.bottom-nav { background: var(--card); display: flex; padding: 12px 0; border-top: 1px solid rgba(0,0,0,0.1); flex-shrink: 0; }
-        .nav-item { flex: 1; background: none; border: none; color: var(--muted); font-size: 0.65rem; cursor: pointer; font-weight: 600; text-transform: uppercase; }
-        .nav-item.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
+        /* DASHBOARD CARDS */
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .stat-card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .stat-card h3 { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; margin-bottom: 5px; }
+        .stat-card p { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
 
         /* UI ELEMENTS */
-        #mod-home { background-image: url('https://unsplash.com'); }
-        input, select, textarea { width: 100%; padding: 12px; margin-top: 10px; border-radius: 4px; border: 1px solid #ccc; font-size: 1rem; }
-        .btn-action { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 4px; margin-top: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .btn-success { background: var(--success); }
+        .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-primary { background: var(--primary); color: white; }
+        .hidden { display: none !important; }
+        #map { height: 350px; border-radius: 12px; margin-top: 15px; z-index: 1; }
+        
+        select.lang-select { padding: 5px; border-radius: 4px; border: 1px solid #ddd; background: var(--card); color: var(--text); }
+
+        /* MOBILE FIX */
+        @media (max-width: 768px) {
+            aside { position: absolute; left: -100%; height: 100%; }
+            aside.open { left: 0; width: 80%; }
+            .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: none; }
+            .sidebar-overlay.active { display: block; }
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="header-title">
-            <h1>UNA Digital</h1>
-            <small>União Nordeste de Angola</small>
+    <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <h3>UNA Digital</h3>
+            <small>União Nordeste</small>
         </div>
-        <button onclick="toggleTheme()" style="background:none; border:none; color:white; font-weight:bold; cursor:pointer;">MODO</button>
-    </header>
-
-    <div class="main-container">
-        
-        <!-- DASHBOARD PRINCIPAL -->
-        <div id="mod-home" class="module active">
-            <div class="lider-scroll">
-                <div class="lider-box"><small>PRESIDENTE</small><h4>Pr. Teixeira Vinte</h4><p style="font-size:0.75rem; font-style:italic;">Missão e Unidade.</p></div>
-                <div class="lider-box"><small>SECRETÁRIO</small><h4>Pr. Osvaldo Vunge</h4><p style="font-size:0.75rem; font-style:italic;">Organização e Serviço.</p></div>
-                <div class="lider-box"><small>TESOUREIRO</small><h4>Dr. Paulo C. Ribeiro</h4><p style="font-size:0.75rem; font-style:italic;">Fidelidade e Transparência.</p></div>
-            </div>
-
-            <div class="dash-grid">
-                <div class="dash-item" onclick="nav('biblia')"><b>Bíblia e Lição</b></div>
-                <div class="dash-item" onclick="nav('hino')"><b>Hinário</b></div>
-                <div class="dash-item" onclick="nav('fin')"><b>Tesouraria</b></div>
-                <div class="dash-item" onclick="nav('secretaria')"><b>Secretaria</b></div>
-                <div class="dash-item" onclick="nav('chat')"><b>Guia UNA</b></div>
-                <div class="dash-item" onclick="nav('mapa')"><b>Distritos</b></div>
-            </div>
+        <div class="nav-menu">
+            <div class="nav-item active" onclick="nav('home')">Dashboard</div>
+            <div class="nav-item" onclick="nav('secretaria')">Secretaria</div>
+            <div class="nav-item" onclick="nav('tesouraria')">Tesouraria</div>
+            <div class="nav-item" onclick="nav('hinos')">Hinário</div>
+            <div class="nav-item" onclick="nav('oracao')">Mural de Oração</div>
         </div>
-
-        <!-- SECRETARIA -->
-        <div id="mod-secretaria" class="module" style="background-image: url('https://unsplash.com');">
-            <div class="card">
-                <span class="module-title">Registro de Membros</span>
-                <input type="text" placeholder="Nome Completo">
-                <input type="text" placeholder="Província / Distrito">
-                <button class="btn-action" onclick="alert('Dados enviados à Secretaria Executiva.')">Cadastrar Membro</button>
-            </div>
-            <button class="btn-action" style="background:#444" onclick="nav('home')">Voltar</button>
+        <div class="sidebar-header" style="border-top: 1px solid rgba(255,255,255,0.1);">
+            <small>Admin: Teixeira Vinte</small>
         </div>
+    </aside>
 
-        <!-- HINÁRIO -->
-        <div id="mod-hino" class="module" style="background-image: url('https://unsplash.com');">
-            <div class="card">
-                <span class="module-title">Hinário Adventista</span>
-                <input type="text" id="h-in" placeholder="Número ou Título..." oninput="buscarHino()">
-                <div id="h-list" style="max-height: 300px; overflow-y:auto; margin-top:10px; font-size: 0.9rem;"></div>
+    <main>
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                <h2 id="view-title">Dashboard</h2>
             </div>
-            <button class="btn-action" onclick="nav('home')">Menu Principal</button>
-        </div>
-
-        <!-- TESOURARIA -->
-        <div id="mod-fin" class="module" style="background-image: url('https://unsplash.com');">
-            <div class="card">
-                <span class="module-title">Dízimos e Ofertas</span>
-                <input type="text" id="f-nome" placeholder="Nome do Doador">
-                <input type="number" id="f-valor" placeholder="Valor em Kwanzas (Kz)">
-                <select id="f-tipo">
-                    <option>Dízimo (10%)</option>
-                    <option>Oferta Missionária</option>
-                    <option>Pacto UNA</option>
+            <div class="topbar-right">
+                <select class="lang-select" onchange="changeLang(this.value)">
+                    <option value="pt">PT</option>
+                    <option value="en">EN</option>
+                    <option value="fr">FR</option>
                 </select>
-                <button class="btn-action btn-success" onclick="pagar()">Gerar Comprovativo</button>
+                <button class="btn btn-primary" onclick="toggleTheme()">🌓</button>
             </div>
-        </div>
+        </header>
 
-        <!-- CHATBOT -->
-        <div id="mod-chat" class="module" style="background-image: url('https://unsplash.com');">
-            <div class="card">
-                <span class="module-title">Guia UNA - Assistente</span>
-                <div id="c-box">
-                    <div class="msg msg-bot">Saudações. Digite "versículo" para uma promessa bíblica ou pergunte sobre dízimos.</div>
+        <!-- CONTENT AREA -->
+        <div class="content-area">
+            
+            <!-- VIEW: DASHBOARD -->
+            <div id="view-home" class="module">
+                <div class="stat-grid">
+                    <div class="stat-card"><h3>Membros Ativos</h3><p>12,450</p></div>
+                    <div class="stat-card"><h3>Dízimos (Mês)</h3><p>Kz 4.5M</p></div>
+                    <div class="stat-card"><h3>Igrejas/Distritos</h3><p>142</p></div>
+                    <div class="stat-card"><h3>Batismos 2026</h3><p>892</p></div>
                 </div>
-                <div style="display:flex; gap:5px;">
-                    <input type="text" id="c-in" placeholder="Sua dúvida...">
-                    <button class="btn-action" style="width:60px; margin:10px 0 0 0" onclick="chat()">OK</button>
+
+                <div class="card">
+                    <h3>Mapa de Sedes da União</h3>
+                    <div id="map"></div>
                 </div>
             </div>
-        </div>
 
-        <!-- MAPA -->
-        <div id="mod-mapa" class="module">
-            <div class="card">
-                <span class="module-title">Sedes e Igrejas</span>
-                <div id="map" style="height: 300px; border-radius: 4px;"></div>
+            <!-- VIEW: TESOURARIA -->
+            <div id="view-tesouraria" class="module hidden">
+                <div class="card">
+                    <h3>Lançamento de Dízimos e Ofertas</h3>
+                    <div style="display: grid; gap: 15px; margin-top:15px;">
+                        <input type="text" id="f-nome" placeholder="Nome do Doador" style="padding:10px; border-radius:5px; border:1px solid #ddd;">
+                        <input type="number" id="f-valor" placeholder="Valor (Kz)" style="padding:10px; border-radius:5px; border:1px solid #ddd;">
+                        <button class="btn btn-primary" onclick="processar()">Gerar Recibo Instantâneo</button>
+                    </div>
+                </div>
             </div>
-            <button class="btn-action" onclick="nav('home')">Voltar</button>
+
+            <!-- OUTRAS VIEWS (Simuladas) -->
+            <div id="view-secretaria" class="module hidden">
+                <div class="card"><h3>Gestão de Membros</h3><p>Módulo de secretaria executiva UNA.</p></div>
+            </div>
+
         </div>
-
-    </div>
-
-    <!-- COMPROVATIVO -->
-    <div id="receipt">
-        <center><h3>COMPROVATIVO DIGITAL</h3><p>UNA - ANGOLA</p></center>
-        <hr style="margin:15px 0; border: 1px dashed #000;">
-        <p>DATA: <span id="r-d"></span></p>
-        <p>DOADOR: <span id="r-n"></span></p>
-        <p>VALOR: KZ <span id="r-v"></span></p>
-        <p>REF: <span id="r-t"></span></p>
-        <hr style="margin:15px 0; border: 1px dashed #000;">
-        <center><small>Validado pela Tesouraria UNA</small></center>
-        <button class="btn-action" onclick="document.getElementById('receipt').style.display='none'">Sair</button>
-    </div>
-
-    <nav class="bottom-nav">
-        <button class="nav-item active" onclick="nav('home')">Dashboard</button>
-        <button class="nav-item" onclick="nav('hino')">Hinos</button>
-        <button class="nav-item" onclick="nav('fin')">Dízimos</button>
-        <button class="nav-item" onclick="nav('chat')">Chatbot</button>
-    </nav>
+    </main>
 
     <script src="https://unpkg.com"></script>
     <script>
-        function nav(id) {
-            document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById('mod-'+id).classList.add('active');
-            
-            // Ativa botão nav se existir
-            const navBtn = Array.from(document.querySelectorAll('.nav-item')).find(btn => btn.innerText.toLowerCase() === id);
-            if(navBtn) navBtn.classList.add('active');
+        // ESTADO
+        let currentLang = 'pt';
+        
+        function toggleSidebar() {
+            const side = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            if(window.innerWidth > 768) {
+                side.classList.toggle('collapsed');
+            } else {
+                side.classList.toggle('open');
+                overlay.classList.toggle('active');
+            }
+        }
 
-            if(id === 'mapa') setTimeout(initMap, 300);
+        function nav(id) {
+            document.querySelectorAll('.module').forEach(m => m.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            
+            document.getElementById('view-' + id).classList.remove('hidden');
+            document.getElementById('view-title').innerText = id.charAt(0).toUpperCase() + id.slice(1);
+            
+            // Ativa item no menu
+            event.currentTarget.classList.add('active');
+            
+            if(id === 'home') setTimeout(initMap, 300);
+            if(window.innerWidth <= 768) toggleSidebar();
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+        }
+
+        function changeLang(lang) {
+            currentLang = lang;
+            const titles = {
+                pt: { dash: 'Dashboard', sec: 'Secretaria', tes: 'Tesouraria' },
+                en: { dash: 'Dashboard', sec: 'Secretariat', tes: 'Treasury' }
+            };
+            alert("Língua alterada para: " + lang.toUpperCase());
         }
 
         function initMap() {
             if(!window.m) {
-                window.m = L.map('map').setView([-9.54, 16.34], 6);
+                window.m = L.map('map').setView([-9.54, 17.50], 6);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(window.m);
-                L.marker([-9.54, 16.34]).addTo(window.m).bindPopup("Sede Malanje");
+                L.marker([-9.54, 16.34]).addTo(window.m).bindPopup("Sede UNA - Malanje");
+                L.marker([-9.65, 20.39]).addTo(window.m).bindPopup("Distrito Saurimo");
             }
         }
 
-        function pagar() {
-            const v = document.getElementById('f-valor').value;
-            if(!v) return alert("Insira o valor do dízimo/oferta.");
-            document.getElementById('r-d').innerText = new Date().toLocaleString();
-            document.getElementById('r-n').innerText = document.getElementById('f-nome').value || "Membro UNA";
-            document.getElementById('r-v').innerText = v;
-            document.getElementById('r-t').innerText = document.getElementById('f-tipo').value;
-            document.getElementById('receipt').style.display = 'block';
-        }
-
-        function buscarHino() {
-            const hinos = [{n:1, t:"Santo! Santo! Santo!"}, {n:2, t:"Ó Adorai o Senhor"}, {n:33, t:"Comigo Habita"}, {n:600, t:"Quão Grande És Tu"}];
-            const q = document.getElementById('h-in').value.toLowerCase();
-            const l = document.getElementById('h-list'); l.innerHTML = '';
-            hinos.filter(h => h.t.toLowerCase().includes(q) || h.n.toString().includes(q)).forEach(h => {
-                l.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee">#${h.n} - ${h.t}</div>`;
-            });
-        }
-
-        function chat() {
-            const i = document.getElementById('c-in');
-            const b = document.getElementById('c-box');
-            if(!i.value) return;
-            b.innerHTML += `<div class="msg msg-user">${i.value}</div>`;
-            let res = "O Guia UNA está processando sua dúvida sobre a União Nordeste.";
-            if(i.value.toLowerCase().includes("versículo")) res = "Palavra do Dia: 'O Senhor é o meu pastor, nada me faltará.' (Salmos 23:1)";
-            if(i.value.toLowerCase().includes("dízimo")) res = "O dízimo pode ser entregue via transferência para a conta oficial da UNA ou pelo menu Tesouraria.";
-            
-            setTimeout(() => {
-                b.innerHTML += `<div class="msg msg-bot">${res}</div>`;
-                b.scrollTop = b.scrollHeight;
-            }, 600);
-            i.value = '';
-        }
-
-        function toggleTheme() {
-            const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', t);
-        }
+        window.onload = initMap;
     </script>
 </body>
-                    </html>
-                    
+                </html>
+    
