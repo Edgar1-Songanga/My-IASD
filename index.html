@@ -1,372 +1,395 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UNA Digital Platform</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNA Digital | IASD Social Network</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --accent: #818cf8;
+            --bg: #020617;
+            --glass: rgba(15, 23, 42, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --neon: #0ea5e9;
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus+Jakarta+Sans', sans-serif; }
+        body { background: var(--bg); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; }
 
-<style>
-:root{
---primary:#002D5E;
---accent:#C5A059;
---bg:#f4f6f8;
---card:#fff;
---text:#1e293b;
-}
+        /* NAVEGAÇÃO LATERAL - ULTRA MODERN */
+        aside {
+            width: 280px;
+            background: rgba(15, 23, 42, 0.95);
+            border-right: 1px solid var(--glass-border);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter';}
+        .logo { font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
+        .logo span { color: var(--neon); }
 
-body{display:flex;height:100vh;background:var(--bg);color:var(--text);}
+        .nav-item {
+            padding: 14px 20px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 600;
+            color: var(--text-dim);
+        }
 
-/* SIDEBAR */
-aside{
-width:260px;
-background:#fff;
-padding:20px;
-border-right:1px solid #eee;
-overflow:auto;
-}
+        .nav-item:hover { background: rgba(255, 255, 255, 0.05); color: #fff; transform: translateX(5px); }
+        .nav-item.active { background: var(--primary); color: #fff; box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.5); }
 
-.nav-item{
-padding:12px;
-border-radius:10px;
-margin-bottom:8px;
-cursor:pointer;
-}
+        /* MAIN CONTENT */
+        main { flex: 1; display: flex; flex-direction: column; position: relative; }
 
-.nav-item:hover{background:#f1f5f9;}
-.nav-item.active{background:var(--primary);color:#fff;}
+        header {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+        }
 
-/* MAIN */
-main{flex:1;display:flex;flex-direction:column;}
+        .user-pill {
+            background: var(--glass);
+            padding: 8px 16px;
+            border-radius: 30px;
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
 
-header{
-background:rgba(255,255,255,0.7);
-backdrop-filter:blur(10px);
-padding:15px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-border-bottom:1px solid #eee;
-}
+        .container { padding: 40px; overflow-y: auto; flex: 1; scroll-behavior: smooth; }
 
-.container{
-padding:20px;
-overflow:auto;
-}
+        /* CARDS & FEED */
+        .card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.5s ease-out;
+        }
 
-/* CARD */
-.card{
-background:var(--card);
-padding:15px;
-border-radius:14px;
-margin-bottom:15px;
-box-shadow:0 5px 15px rgba(0,0,0,0.05);
-}
+        .post-input {
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 15px;
+            color: #fff;
+            resize: none;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
 
-input,textarea,select{
-width:100%;
-padding:10px;
-margin-top:8px;
-border-radius:8px;
-border:1px solid #ddd;
-}
+        .post-actions { display: flex; gap: 10px; }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        .btn-outline { background: transparent; border: 1px solid var(--glass-border); color: var(--text-dim); }
 
-button{
-margin-top:8px;
-padding:10px;
-border:none;
-background:var(--primary);
-color:#fff;
-border-radius:8px;
-cursor:pointer;
-}
+        /* POST CONTENT */
+        .post-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .user-info b { color: #fff; font-size: 16px; }
+        .user-info small { color: var(--text-dim); display: block; }
+        
+        .video-container {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 15px 0;
+            background: #000;
+            aspect-ratio: 9/16;
+            max-height: 500px;
+        }
+        .video-container video { width: 100%; height: 100%; object-fit: cover; }
 
-.view{display:none;}
-.view.active{display:block;}
+        .interactions { display: flex; gap: 20px; border-top: 1px solid var(--glass-border); pt: 15px; margin-top: 15px; }
+        .stat { cursor: pointer; color: var(--text-dim); font-size: 14px; display: flex; align-items: center; gap: 5px; }
+        .stat:hover { color: var(--neon); }
 
-</style>
+        /* BIBLIA & CHAT */
+        .bible-search { display: flex; gap: 10px; margin-bottom: 20px; }
+        #bibleResult { font-size: 1.2rem; line-height: 1.6; color: #fff; font-style: italic; border-left: 4px solid var(--neon); padding-left: 20px; margin-top: 20px; }
+
+        #chatBox { height: 400px; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 12px 18px; border-radius: 18px; max-width: 80%; line-height: 1.4; }
+        .msg.user { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 4px; }
+        .msg.bot { align-self: flex-start; background: var(--glass); border: 1px solid var(--glass-border); border-bottom-left-radius: 4px; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .view { display: none; }
+        .view.active { display: block; }
+    </style>
 </head>
-
 <body>
 
-<!-- SIDEBAR -->
 <aside>
-<h3>UNA Digital</h3>
-
-<div class="nav-item active" onclick="nav('feed', this)">Feed</div>
-<div class="nav-item" onclick="nav('sec', this)">Secretaria</div>
-<div class="nav-item" onclick="nav('fin', this)">Tesouraria</div>
-<div class="nav-item" onclick="nav('admin', this)">Administração</div>
-<div class="nav-item" onclick="nav('biblia', this)">Bíblia</div>
-<div class="nav-item" onclick="nav('chatbot', this)">Guia</div>
-<div class="nav-item" onclick="nav('radio', this)">Rádio</div>
-<div class="nav-item" onclick="nav('devocional', this)">Devocional</div>
-<div class="nav-item" onclick="nav('licao', this)">Lição</div>
-
+    <div class="logo">UNA <span>Digital</span></div>
+    
+    <div class="nav-item active" onclick="nav('feed', this)">🏠 Feed Global</div>
+    <div class="nav-item" onclick="nav('social', this)">🤝 Seguindo</div>
+    <div class="nav-item" onclick="nav('biblia', this)">📖 Bíblia Sagrada</div>
+    <div class="nav-item" onclick="nav('chat', this)">🛡️ Guia Espiritual</div>
+    <div class="nav-item" onclick="nav('admin', this)">⚙️ Admin</div>
 </aside>
 
 <main>
+    <header>
+        <div class="user-pill" onclick="switchUser()">
+            <div id="userAvatar" style="width:32px; height:32px; background:var(--primary); border-radius:50%; display:grid; place-items:center; font-weight:800"></div>
+            <span id="userNameDisplay"></span>
+        </div>
+        <div style="display:flex; gap:10px">
+            <span id="churchBadge" style="font-size: 12px; color: var(--neon); border: 1px solid var(--neon); padding: 4px 12px; border-radius: 20px;"></span>
+        </div>
+    </header>
 
-<header>
-<span id="userInfo"></span>
-<button onclick="logout()">Sair</button>
-</header>
+    <div class="container">
+        <!-- FEED -->
+        <div id="feed" class="view active">
+            <div class="card">
+                <textarea id="postText" class="post-input" placeholder="O que Deus colocou no seu coração hoje?"></textarea>
+                <div class="post-actions">
+                    <button class="btn btn-primary" onclick="createPost()">Publicar</button>
+                    <button class="btn btn-outline" onclick="triggerUpload()">📷 Imagem/Vídeo</button>
+                    <input type="file" id="mediaUpload" style="display:none" accept="image/*,video/*">
+                </div>
+            </div>
+            <div id="postsList"></div>
+        </div>
 
-<div class="container">
+        <!-- SOCIAL / SEGUINDO -->
+        <div id="social" class="view">
+            <h2 style="margin-bottom:20px">Comunidade IASD</h2>
+            <div id="usersList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:15px"></div>
+        </div>
 
-<!-- FEED -->
-<div id="feed" class="view active">
-<div class="card">
-<textarea id="postText" placeholder="Partilhar mensagem..."></textarea>
-<button onclick="createPost()">Publicar</button>
-</div>
-<div id="posts"></div>
-</div>
+        <!-- BÍBLIA -->
+        <div id="biblia" class="view">
+            <div class="card">
+                <h1>Bíblia Digital</h1>
+                <p style="color:var(--text-dim); margin-bottom:20px">Pesquise capítulos ou versículos (ex: João 3:16)</p>
+                <div class="bible-search">
+                    <input id="bibleQuery" class="post-input" style="margin:0" placeholder="Digite aqui...">
+                    <button class="btn btn-primary" onclick="searchBible()">Buscar</button>
+                </div>
+                <div id="bibleResult"></div>
+            </div>
+        </div>
 
-<!-- SECRETARIA -->
-<div id="sec" class="view">
-<div class="card">
-<input id="memberName" placeholder="Nome membro">
-<button onclick="addMember()">Adicionar</button>
-</div>
-<div id="members"></div>
-</div>
-
-<!-- TESOURARIA -->
-<div id="fin" class="view">
-<div class="card">
-<input id="donor" placeholder="Nome">
-<input id="amount" placeholder="Valor">
-<select id="type">
-<option>Dízimo</option>
-<option>Oferta</option>
-</select>
-<button onclick="pay()">Registrar</button>
-</div>
-<div id="finance"></div>
-</div>
-
-<!-- ADMIN -->
-<div id="admin" class="view">
-<div class="card">
-<input id="deptName" placeholder="Nome do departamento">
-<button onclick="createDept()">Criar</button>
-</div>
-<div id="deptList"></div>
-</div>
-
-<!-- BIBLIA -->
-<div id="biblia" class="view">
-<div class="card">
-<input id="bibleSearch" placeholder="Ex: João 3:16">
-<button onclick="searchBible()">Buscar</button>
-<div id="bibleResult"></div>
-</div>
-</div>
-
-<!-- CHAT -->
-<div id="chatbot" class="view">
-<div class="card">
-<div id="chatBox"></div>
-<input id="chatInput">
-<button onclick="sendChat()">Enviar</button>
-</div>
-</div>
-
-<!-- RADIO -->
-<div id="radio" class="view">
-<div class="card">
-<audio controls style="width:100%">
-<source src="https://stream.radiojar.com/4ywdgup3bnzuv">
-</audio>
-</div>
-</div>
-
-<!-- DEVOCIONAL -->
-<div id="devocional" class="view">
-<div class="card">
-<p>Entrega o teu caminho ao Senhor.</p>
-</div>
-</div>
-
-<!-- LICAO -->
-<div id="licao" class="view">
-<div class="card">
-<p>Lição da semana disponível.</p>
-</div>
-</div>
-
-</div>
-
+        <!-- CHAT -->
+        <div id="chat" class="view">
+            <div class="card">
+                <div id="chatBox"></div>
+                <div class="bible-search" style="margin-top:20px">
+                    <input id="chatInput" class="post-input" style="margin:0" placeholder="Peça um conselho bíblico...">
+                    <button class="btn btn-primary" onclick="sendChat()">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
 
 <script>
+    /* DATABASE SYSTEM */
+    let DB = JSON.parse(localStorage.getItem("una_db")) || {
+        users: [
+            { id: 1, name: "Pastor Silva", church: "Central Luanda", followers: [], following: [], avatar: "PS" },
+            { id: 2, name: "Ana Maria", church: "Central Luanda", followers: [], following: [], avatar: "AM" },
+            { id: 3, name: "Ricardo Lopes", church: "IASD Talatona", followers: [], following: [], avatar: "RL" }
+        ],
+        posts: []
+    };
 
-/* DATABASE */
-let DB = JSON.parse(localStorage.getItem("db")) || {
-posts:[], members:[], finances:[], comments:[], follows:[], departments:[]
-};
+    let session = JSON.parse(localStorage.getItem("una_session")) || DB.users[0];
 
-let session = JSON.parse(localStorage.getItem("session")) || {
-name: prompt("Nome"),
-church: prompt("Igreja")
-};
+    /* INITIALIZE */
+    function init() {
+        document.getElementById('userNameDisplay').innerText = session.name;
+        document.getElementById('churchBadge').innerText = session.church;
+        document.getElementById('userAvatar').innerText = session.avatar;
+        renderPosts();
+        renderUsers();
+    }
 
-localStorage.setItem("session", JSON.stringify(session));
-userInfo.innerText = session.name+" | "+session.church;
+    /* NAVIGATION */
+    function nav(id, el) {
+        document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+        document.getElementById(id).classList.add("active");
+        document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+        el.classList.add("active");
+    }
 
-/* NAV */
-function nav(id,el){
-document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
-document.getElementById(id).classList.add("active");
+    /* SOCIAL ENGINE: FOLLOW/UNFOLLOW */
+    function followUser(targetId) {
+        let me = DB.users.find(u => u.id === session.id);
+        let target = DB.users.find(u => u.id === targetId);
+        
+        if (!me.following.includes(targetId)) {
+            me.following.push(targetId);
+            target.followers.push(session.id);
+        } else {
+            me.following = me.following.filter(id => id !== targetId);
+            target.followers = target.followers.filter(id => id !== session.id);
+        }
+        save(); renderUsers();
+    }
 
-document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
-el.classList.add("active");
-}
+    /* FEED ENGINE */
+    function createPost() {
+        const text = document.getElementById('postText').value;
+        if (!text.trim()) return;
 
-/* POSTS */
-function createPost(){
-DB.posts.unshift({
-id:Date.now(),
-user:session.name,
-church:session.church,
-text:postText.value,
-likes:[]
-});
-save(); renderPosts();
-}
+        const newPost = {
+            id: Date.now(),
+            userId: session.id,
+            userName: session.name,
+            text: text,
+            media: null, // Aqui entraria a lógica de upload real
+            likes: [],
+            comments: [],
+            date: new Date().toLocaleString()
+        };
 
-function likePost(id){
-let p = DB.posts.find(x=>x.id===id);
-if(!p.likes.includes(session.name)) p.likes.push(session.name);
-save(); renderPosts();
-}
+        DB.posts.unshift(newPost);
+        document.getElementById('postText').value = "";
+        save(); renderPosts();
+    }
 
-function addComment(id){
-DB.comments.push({
-postId:id,
-user:session.name,
-text:document.getElementById("c-"+id).value
-});
-save(); renderPosts();
-}
+    function renderPosts() {
+        const list = document.getElementById('postsList');
+        list.innerHTML = "";
 
-function renderPosts(){
-posts.innerHTML="";
-DB.posts.filter(p=>p.church===session.church).forEach(p=>{
-let comments = DB.comments.filter(c=>c.postId===p.id);
-posts.innerHTML+=`
-<div class="card">
-<b>${p.user}</b><br>${p.text}<br>
-❤️ ${p.likes.length}
-<button onclick="likePost(${p.id})">Curtir</button>
+        DB.posts.forEach(post => {
+            const isLiked = post.likes.includes(session.id);
+            list.innerHTML += `
+                <div class="card">
+                    <div class="post-header">
+                        <div class="user-info">
+                            <b>${post.userName}</b>
+                            <small>${post.date}</small>
+                        </div>
+                        <button class="btn btn-outline" style="padding:4px 10px" onclick="followUser(${post.userId})">
+                            ${session.following.includes(post.userId) ? 'Seguindo' : '+ Seguir'}
+                        </button>
+                    </div>
+                    <p style="font-size:17px; line-height:1.6">${post.text}</p>
+                    
+                    <!-- Exemplo de vídeo se houver URL -->
+                    ${post.media && post.media.includes('mp4') ? `
+                        <div class="video-container">
+                            <video src="${post.media}" controls loop></video>
+                        </div>
+                    ` : ''}
 
-<input id="c-${p.id}" placeholder="Comentar">
-<button onclick="addComment(${p.id})">Enviar</button>
+                    <div class="interactions">
+                        <div class="stat" onclick="likePost(${post.id})">
+                            ${isLiked ? '❤️' : '🤍'} ${post.likes.length} Likes
+                        </div>
+                        <div class="stat">💬 ${post.comments.length} Comentários</div>
+                        <div class="stat" onclick="sharePost(${post.id})">📤 Partilhar</div>
+                    </div>
+                </div>
+            `;
+        });
+    }
 
-${comments.map(c=>`<div><b>${c.user}:</b> ${c.text}</div>`).join("")}
-</div>`;
-});
-}
+    function likePost(id) {
+        let p = DB.posts.find(x => x.id === id);
+        if (!p.likes.includes(session.id)) p.likes.push(session.id);
+        else p.likes = p.likes.filter(uid => uid !== session.id);
+        save(); renderPosts();
+    }
 
-/* SECRETARIA */
-function addMember(){
-DB.members.push({name:memberName.value});
-save(); renderMembers();
-}
+    /* BIBLE API REAL */
+    async function searchBible() {
+        const query = document.getElementById('bibleQuery').value;
+        const resultDiv = document.getElementById('bibleResult');
+        resultDiv.innerText = "Consultando os céus...";
+        
+        try {
+            const res = await fetch(`https://bible-api.com{query}?translation=almeida`);
+            const data = await res.json();
+            resultDiv.innerHTML = data.text ? `"${data.text}"<br><small>— ${data.reference}</small>` : "Versículo não encontrado.";
+        } catch (e) {
+            resultDiv.innerText = "Erro na conexão.";
+        }
+    }
 
-function renderMembers(){
-members.innerHTML="";
-DB.members.forEach(m=>{
-members.innerHTML+=`<div class="card">${m.name}</div>`;
-});
-}
+    /* CHATBOT */
+    function sendChat() {
+        const inp = document.getElementById('chatInput');
+        const box = document.getElementById('chatBox');
+        if(!inp.value) return;
 
-/* TESOURARIA */
-function pay(){
-DB.finances.push({
-name:donor.value,
-amount:amount.value,
-type:type.value
-});
-save(); renderFinance();
-}
+        box.innerHTML += `<div class="msg user">${inp.value}</div>`;
+        
+        setTimeout(() => {
+            box.innerHTML += `<div class="msg bot">"Não se turbe o vosso coração; credes em Deus, crede também em mim." (João 14:1). Como posso te guiar hoje?</div>`;
+            box.scrollTop = box.scrollHeight;
+        }, 600);
+        
+        inp.value = "";
+    }
 
-function renderFinance(){
-finance.innerHTML="";
-DB.finances.forEach(f=>{
-finance.innerHTML+=`<div class="card">${f.name} - Kz ${f.amount}</div>`;
-});
-}
+    function renderUsers() {
+        const list = document.getElementById('usersList');
+        list.innerHTML = "";
+        DB.users.forEach(u => {
+            if(u.id === session.id) return;
+            list.innerHTML += `
+                <div class="card" style="text-align:center; padding:15px">
+                    <div style="width:50px; height:50px; background:var(--primary); border-radius:50%; margin: 0 auto 10px; display:grid; place-items:center; font-weight:800">${u.avatar}</div>
+                    <b>${u.name}</b><br>
+                    <small style="color:var(--text-dim)">${u.church}</small><br><br>
+                    <button class="btn ${session.following.includes(u.id) ? 'btn-outline' : 'btn-primary'}" onclick="followUser(${u.id})" style="width:100%; justify-content:center">
+                        ${session.following.includes(u.id) ? 'Remover' : 'Seguir'}
+                    </button>
+                </div>
+            `;
+        });
+    }
 
-/* ADMIN + RELATÓRIOS */
-function createDept(){
-DB.departments.push({
-id:Date.now(),
-name:deptName.value,
-church:session.church,
-data:[]
-});
-save(); renderDepts();
-}
+    function save() { localStorage.setItem("una_db", JSON.stringify(DB)); localStorage.setItem("una_session", JSON.stringify(session)); }
+    function switchUser() {
+        let name = prompt("Trocar utilizador (Digite: Ana, Pedro ou Ricardo)");
+        let user = DB.users.find(u => u.name.includes(name));
+        if(user) { session = user; save(); location.reload(); }
+    }
 
-function addDeptData(id){
-let d = DB.departments.find(x=>x.id===id);
-let val = document.getElementById("data-"+id).value;
-d.data.push({text:val,date:new Date().toLocaleDateString()});
-save(); renderDepts();
-}
-
-function generateReport(id){
-let d = DB.departments.find(x=>x.id===id);
-let report=`Relatório ${d.name}\nTotal: ${d.data.length}`;
-alert(report);
-}
-
-function renderDepts(){
-deptList.innerHTML="";
-DB.departments.filter(d=>d.church===session.church).forEach(d=>{
-deptList.innerHTML+=`
-<div class="card">
-<b>${d.name}</b><br>
-Total: ${d.data.length}
-
-<input id="data-${d.id}">
-<button onclick="addDeptData(${d.id})">Adicionar</button>
-
-<button onclick="generateReport(${d.id})">Relatório</button>
-</div>`;
-});
-}
-
-/* BIBLIA */
-const BIBLE={"joao 3:16":"Deus amou o mundo..."};
-function searchBible(){
-bibleResult.innerText=BIBLE[bibleSearch.value.toLowerCase()]||"Não encontrado";
-}
-
-/* CHAT */
-function sendChat(){
-let msg=chatInput.value;
-chatBox.innerHTML+=`<div>Você: ${msg}</div>`;
-chatBox.innerHTML+=`<div>Guia: Confie em Deus</div>`;
-}
-
-/* SAVE */
-function save(){
-localStorage.setItem("db", JSON.stringify(DB));
-}
-
-/* INIT */
-renderPosts();
-renderMembers();
-renderFinance();
-renderDepts();
-
+    init();
 </script>
 
 </body>
-</html>
+  </html>
+  
