@@ -1,254 +1,270 @@
 <!DOCTYPE html>
-<html lang="pt-AO">
+<html lang="pt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>União Nordeste de Angola Digital | Sistema de Gestão Eclesiástica</title>
-    
-    <!-- Bibliotecas Premium -->
-    <link rel="stylesheet" href="https://unpkg.com" />
-    <link href="https://googleapis.com" rel="stylesheet">
-    
-    <style>
-        :root {
-            --primary: #002D5E; --accent: #C5A059; --success: #28a745;
-            --bg: #f8fafc; --sidebar: #ffffff; --text: #1e293b;
-            --sidebar-w: 280px; --topbar-h: 70px; --radius: 12px;
-        }
-        [data-theme="dark"] {
-            --bg: #0f172a; --sidebar: #1e293b; --text: #f1f5f9; --card: #1e293b;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNA Digital Platform</title>
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
-        /* SIDEBAR PREMIUM */
-        aside {
-            width: var(--sidebar-w); background: var(--sidebar); height: 100%;
-            border-right: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1001;
-        }
-        .sidebar-brand { padding: 30px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.03); }
-        .sidebar-brand h2 { font-size: 1.2rem; color: var(--primary); letter-spacing: -1px; }
-        
-        .nav-list { flex: 1; padding: 20px; list-style: none; }
-        .nav-item { 
-            padding: 14px 18px; border-radius: var(--radius); cursor: pointer;
-            margin-bottom: 8px; transition: 0.3s; display: flex; align-items: center; gap: 12px;
-            font-weight: 500; font-size: 0.95rem; color: #64748b;
-        }
-        .nav-item:hover { background: #f1f5f9; color: var(--primary); }
-        .nav-item.active { background: var(--primary); color: white; box-shadow: 0 10px 15px -3px rgba(0, 45, 94, 0.3); }
+<style>
+:root{
+  --primary:#002D5E;
+  --accent:#C5A059;
+  --bg:#f4f6f8;
+  --card:#fff;
+}
 
-        /* MAIN CONTENT AREA */
-        main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter';}
 
-        /* TOPBAR MODERN */
-        .topbar {
-            height: var(--topbar-h); background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);
-            padding: 0 30px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(0,0,0,0.05); sticky: top: 0;
-        }
-        .lang-zone { display: flex; gap: 10px; }
-        .lang-btn { background: #f1f5f9; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.75rem; }
+body{background:var(--bg);display:flex;height:100vh;}
 
-        .content-scroll { flex: 1; overflow-y: auto; padding: 30px; scroll-behavior: smooth; }
+/* SIDEBAR */
+aside{
+  width:260px;
+  background:#fff;
+  padding:20px;
+}
 
-        /* DASHBOARD GRID */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
-        .card { 
-            background: #fff; border-radius: var(--radius); padding: 25px; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.02);
-            transition: transform 0.3s; position: relative; overflow: hidden;
-        }
-        .card:hover { transform: translateY(-5px); }
+.nav-item{
+  padding:12px;
+  border-radius:8px;
+  cursor:pointer;
+  margin-bottom:8px;
+}
 
-        /* FUNDOS DINÂMICOS */
-        .dynamic-bg { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background-size: cover; background-position: center; opacity: 0.15; z-index: 0;
-        }
-        .card-content { position: relative; z-index: 1; }
+.nav-item:hover{background:#eee;}
+.active{background:var(--primary);color:#fff;}
 
-        /* MAPA FIX */
-        #map { height: 400px; width: 100%; border-radius: var(--radius); border: 2px solid #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+/* MAIN */
+main{flex:1;display:flex;flex-direction:column;}
 
-        /* CHAT & RECIBO */
-        .chat-ui { height: 300px; display: flex; flex-direction: column; background: #f8fafc; border-radius: 8px; padding: 15px; }
-        #receipt { 
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: white; padding: 30px; border-radius: 4px; box-shadow: 0 0 50px rgba(0,0,0,0.3);
-            display: none; z-index: 2000; font-family: monospace; border-top: 8px solid var(--primary);
-        }
+header{
+  padding:15px;
+  background:var(--primary);
+  color:#fff;
+  display:flex;
+  justify-content:space-between;
+}
 
-        /* MOBILE RESPONSIVE */
-        @media (max-width: 1024px) {
-            aside { position: fixed; left: -100%; }
-            aside.active { left: 0; }
-            .grid { grid-template-columns: 1fr; }
-        }
-    </style>
+.container{
+  padding:20px;
+  overflow:auto;
+}
+
+.card{
+  background:#fff;
+  padding:15px;
+  border-radius:12px;
+  margin-bottom:10px;
+}
+
+button{
+  padding:10px;
+  border:none;
+  background:var(--primary);
+  color:#fff;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+input,textarea{
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  border-radius:8px;
+  border:1px solid #ddd;
+}
+
+</style>
 </head>
+
 <body>
 
-    <aside id="sidebar">
-        <div class="sidebar-brand">
-            <h2>UNA DIGITAL</h2>
-            <small style="color: var(--accent); font-weight: bold;">União Nordeste de Angola</small>
-        </div>
-        <ul class="nav-list">
-            <li class="nav-item active" onclick="nav('home')">Dashboard</li>
-            <li class="nav-item" onclick="nav('fin')">Tesouraria</li>
-            <li class="nav-item" onclick="nav('sec')">Secretaria</li>
-            <li class="nav-item" onclick="nav('hino')">Hinário</li>
-            <li class="nav-item" onclick="nav('chat')">Guia Inteligente</li>
-        </ul>
-        <div style="padding: 20px; border-top: 1px solid rgba(0,0,0,0.05);">
-            <small>Admin: Pr. Teixeira Vinte</small>
-        </div>
-    </aside>
+<!-- SIDEBAR -->
+<aside>
+<h3>UNA Digital</h3>
 
-    <main>
-        <header class="topbar">
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <button onclick="toggleSidebar()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">☰</button>
-                <h3 id="view-title">Visão Geral</h3>
-            </div>
-            <div class="lang-zone">
-                <button class="lang-btn" onclick="setLang('pt')">PT</button>
-                <button class="lang-btn" onclick="setLang('en')">EN</button>
-                <button onclick="toggleTheme()" class="lang-btn">🌙</button>
-            </div>
-        </header>
+<div class="nav-item active" onclick="nav('feed', this)">Feed</div>
+<div class="nav-item" onclick="nav('perfil', this)">Perfil</div>
+<div class="nav-item" onclick="nav('radio', this)">Rádio</div>
+<div class="nav-item" onclick="nav('devocional', this)">Devocional</div>
+<div class="nav-item" onclick="nav('licao', this)">Lição</div>
 
-        <div class="content-scroll">
-            
-            <!-- DASHBOARD -->
-            <div id="view-home" class="view">
-                <div class="grid">
-                    <div class="card">
-                        <div class="dynamic-bg" style="background-image: url('https://unsplash.com');"></div>
-                        <div class="card-content">
-                            <h4>Dízimos UNA (Abril)</h4>
-                            <h2 style="color:var(--primary); font-size: 2rem;">Kz 14.250.000</h2>
-                            <p style="color:var(--success)">↑ 12% em relação a Março</p>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-content">
-                            <h4>Liderança Ativa</h4>
-                            <p><b>Secretário:</b> Pr. Osvaldo Vunge</p>
-                            <p><b>Tesoureiro:</b> Dr. Paulo Ribeiro</p>
-                        </div>
-                    </div>
-                </div>
+</aside>
 
-                <div class="card" style="margin-top: 25px;">
-                    <h3 style="margin-bottom: 15px;">Geolocalização dos Distritos UNA</h3>
-                    <div id="map"></div>
-                </div>
-            </div>
+<!-- MAIN -->
+<main>
 
-            <!-- TESOURARIA -->
-            <div id="view-fin" class="view" style="display:none;">
-                <div class="card" style="max-width: 500px;">
-                    <h3>Adoração Financeira</h3>
-                    <input type="text" id="donor" placeholder="Nome Completo" style="width:100%; padding:12px; margin:10px 0; border-radius:8px; border:1px solid #ddd;">
-                    <input type="number" id="amount" placeholder="Valor (Kz)" style="width:100%; padding:12px; margin:10px 0; border-radius:8px; border:1px solid #ddd;">
-                    <select id="type" style="width:100%; padding:12px; margin:10px 0; border-radius:8px; border:1px solid #ddd;">
-                        <option>Dízimo (10%)</option>
-                        <option>Oferta Missionária</option>
-                        <option>Pacto UNA</option>
-                    </select>
-                    <button onclick="pay()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">CONFIRMAR E GERAR RECIBO</button>
-                </div>
-            </div>
+<header>
+<span id="userInfo"></span>
+<button onclick="logout()">Sair</button>
+</header>
 
-            <!-- HINÁRIO -->
-            <div id="view-hino" class="view" style="display:none;">
-                <div class="card">
-                    <h3>Hinário Adventista Integrado</h3>
-                    <input type="text" placeholder="Pesquisar hino..." style="width:100%; padding:12px; margin:10px 0; border-radius:8px; border:1px solid #ddd;">
-                    <div id="hino-list">
-                        <div style="padding:10px; border-bottom:1px solid #eee;">#01 - Santo! Santo! Santo!</div>
-                        <div style="padding:10px; border-bottom:1px solid #eee;">#33 - Comigo Habita</div>
-                        <div style="padding:10px; border-bottom:1px solid #eee;">#600 - Quão Grande És Tu</div>
-                    </div>
-                </div>
-            </div>
+<div class="container">
 
-        </div>
-    </main>
+<!-- FEED -->
+<div id="feed" class="view">
 
-    <!-- RECIBO -->
-    <div id="receipt">
-        <center>
-            <h3 style="color:var(--primary)">UNA - RECIBO OFICIAL</h3>
-            <p>União Nordeste de Angola</p>
-        </center>
-        <hr style="margin:20px 0; border:1px dashed #ccc;">
-        <p><b>DATA:</b> <span id="r-date"></span></p>
-        <p><b>MEMBRO:</b> <span id="r-name"></span></p>
-        <p><b>VALOR:</b> Kz <span id="r-amt"></span></p>
-        <p><b>REF:</b> <span id="r-type"></span></p>
-        <hr style="margin:20px 0; border:1px dashed #ccc;">
-        <center><button onclick="document.getElementById('receipt').style.display='none'" style="padding:10px 20px; cursor:pointer;">FECHAR COMPROVATIVO</button></center>
+<div class="card">
+<textarea id="postText" placeholder="Partilhar mensagem..."></textarea>
+<button onclick="createPost()">Publicar</button>
+</div>
+
+<div id="posts"></div>
+
+</div>
+
+<!-- PERFIL -->
+<div id="perfil" class="view" style="display:none;">
+<div class="card">
+<input id="name" placeholder="Nome">
+<textarea id="bio" placeholder="Bio"></textarea>
+<button onclick="saveProfile()">Guardar</button>
+</div>
+
+<div id="profileView"></div>
+</div>
+
+<!-- RADIO -->
+<div id="radio" class="view" style="display:none;">
+<div class="card">
+<h3>Rádio Novo Advento</h3>
+<audio controls style="width:100%">
+<source src="https://stream.radiojar.com/4ywdgup3bnzuv" type="audio/mpeg">
+</audio>
+</div>
+</div>
+
+<!-- DEVOCIONAL -->
+<div id="devocional" class="view" style="display:none;">
+<div class="card">
+<h3>Devocional</h3>
+<p>Entrega o teu caminho ao Senhor...</p>
+</div>
+</div>
+
+<!-- LIÇÃO -->
+<div id="licao" class="view" style="display:none;">
+<div class="card">
+<h3>Escola Sabatina</h3>
+<p>Lição da semana disponível.</p>
+</div>
+</div>
+
+</div>
+
+</main>
+
+<script>
+
+/* ===== BACKEND SIMULADO ===== */
+let DB = JSON.parse(localStorage.getItem("una_db")) || {
+  users:[],
+  posts:[],
+  profiles:[],
+  follows:[]
+};
+
+let session = JSON.parse(localStorage.getItem("session")) || null;
+
+/* LOGIN SIMPLES */
+if(!session){
+  let name = prompt("Nome:");
+  let church = prompt("Igreja:");
+
+  session = {name, church};
+  localStorage.setItem("session", JSON.stringify(session));
+}
+
+/* USER INFO */
+userInfo.innerText = session.name + " | " + session.church;
+
+/* NAV */
+function nav(id, el){
+  document.querySelectorAll(".view").forEach(v=>v.style.display="none");
+  document.getElementById(id).style.display="block";
+
+  document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+  el.classList.add("active");
+}
+
+/* POSTS */
+function createPost(){
+  DB.posts.unshift({
+    user:session.name,
+    church:session.church,
+    text:postText.value,
+    likes:0
+  });
+
+  save();
+  renderPosts();
+}
+
+function likePost(i){
+  DB.posts[i].likes++;
+  save();
+  renderPosts();
+}
+
+function renderPosts(){
+  posts.innerHTML="";
+
+  DB.posts
+  .filter(p=>p.church===session.church)
+  .forEach((p,i)=>{
+    posts.innerHTML+=`
+      <div class="card">
+        <b>${p.user}</b><br>
+        ${p.text}<br><br>
+        ❤️ ${p.likes}
+        <button onclick="likePost(${i})">Curtir</button>
+      </div>
+    `;
+  });
+}
+
+/* PROFILE */
+function saveProfile(){
+  DB.profiles = DB.profiles.filter(p=>p.user!==session.name);
+
+  DB.profiles.push({
+    user:session.name,
+    bio:bio.value
+  });
+
+  save();
+  renderProfile();
+}
+
+function renderProfile(){
+  let p = DB.profiles.find(x=>x.user===session.name);
+
+  profileView.innerHTML = p ? `
+    <div class="card">
+      <h3>${p.user}</h3>
+      <p>${p.bio}</p>
     </div>
+  ` : "";
+}
 
-    <script src="https://unpkg.com"></script>
-    <script>
-        // CONFIGURAÇÕES DE NAVEGAÇÃO
-        function nav(target) {
-            document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            
-            document.getElementById('view-' + target).style.display = 'block';
-            event.currentTarget.classList.add('active');
-            document.getElementById('view-title').innerText = target.toUpperCase();
-            
-            if(target === 'home') setTimeout(loadMap, 300);
-            if(window.innerWidth < 1024) toggleSidebar();
-        }
+/* STORAGE */
+function save(){
+  localStorage.setItem("una_db", JSON.stringify(DB));
+}
 
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
-        }
+/* LOGOUT */
+function logout(){
+  localStorage.removeItem("session");
+  location.reload();
+}
 
-        // MAPA FUNCIONAL
-        let map;
-        function loadMap() {
-            if(map) map.remove();
-            map = L.map('map').setView([-9.5406, 16.3478], 6); // Foco em Malanje
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-            
-            // Sedes UNA
-            L.marker([-9.5406, 16.3478]).addTo(map).bindPopup('<b>Sede Administrativa UNA</b><br>Malanje');
-            L.marker([-9.6592, 20.3916]).addTo(map).bindPopup('Saurimo - Lunda Sul');
-            L.marker([-11.7833, 19.9167]).addTo(map).bindPopup('Luena - Moxico');
-        }
+/* INIT */
+renderPosts();
+renderProfile();
 
-        // PAGAMENTO E RECIBO
-        function pay() {
-            const donor = document.getElementById('donor').value;
-            const amt = document.getElementById('amount').value;
-            if(!amt) return alert("Insira um valor.");
+</script>
 
-            document.getElementById('r-date').innerText = new Date().toLocaleString();
-            document.getElementById('r-name').innerText = donor || "Doador Anônimo";
-            document.getElementById('r-amt').innerText = amt;
-            document.getElementById('r-type').innerText = document.getElementById('type').value;
-            
-            document.getElementById('receipt').style.display = 'block';
-        }
-
-        // TEMA
-        function toggleTheme() {
-            const current = document.body.getAttribute('data-theme');
-            document.body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
-        }
-
-        window.onload = loadMap;
-    </script>
 </body>
-    </html>
-                                             
+</html>
