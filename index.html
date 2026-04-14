@@ -3,305 +3,314 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>IASD Super App</title>
+<title>IASD Digital Platform</title>
 
 <style>
-:root {
+:root{
   --primary:#003366;
-  --secondary:#0055a5;
   --accent:#f5a623;
-  --bg:#f7f9fb;
+  --bg:#f5f7fb;
   --card:#ffffff;
 }
 
-* { box-sizing:border-box; margin:0; padding:0; font-family:system-ui; }
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui;}
 
-body { background:var(--bg); color:#111; }
+body{background:var(--bg);}
 
-/* HEADER */
-header {
-  background:linear-gradient(135deg, #003366, #0055a5);
-  color:#fff;
-  padding:20px;
-  border-radius:0 0 20px 20px;
-}
-
-/* NAV */
-nav {
+/* LOGIN */
+#login{
+  height:100vh;
   display:flex;
-  overflow-x:auto;
-  padding:10px;
-  gap:10px;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#003366,#0055a5);
 }
 
-nav button {
+.login-box{
   background:#fff;
-  border:none;
-  padding:10px 15px;
-  border-radius:20px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.1);
-  cursor:pointer;
-}
-
-/* CONTAINER */
-.container { padding:15px; }
-
-/* CARDS */
-.card {
-  background:var(--card);
-  padding:16px;
+  width:90%;
+  max-width:360px;
+  padding:25px;
   border-radius:16px;
-  margin-bottom:12px;
-  box-shadow:0 6px 20px rgba(0,0,0,0.05);
-  transition:0.3s;
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
 }
 
-.card:hover {
-  transform:translateY(-2px);
-}
-
-/* INPUT */
-input, select, textarea {
+input,select,textarea{
   width:100%;
   padding:12px;
   margin-top:10px;
   border-radius:10px;
   border:1px solid #ddd;
+  outline:none;
 }
 
-/* BUTTON */
-button.primary {
-  background:var(--accent);
-  color:#fff;
-  border:none;
+button{
+  width:100%;
   padding:12px;
-  margin-top:10px;
-  border-radius:12px;
-  font-weight:bold;
+  margin-top:12px;
+  border:none;
+  border-radius:10px;
+  background:var(--primary);
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
 }
 
-/* GRID */
-.grid {
+/* APP */
+#app{display:none;}
+
+/* HEADER */
+header{
+  background:var(--primary);
+  color:#fff;
+  padding:14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+/* DASHBOARD */
+.container{padding:15px;padding-bottom:80px;}
+
+.grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(150px,1fr));
+  grid-template-columns:repeat(2,1fr);
   gap:10px;
 }
 
-/* MODULE */
-.module { display:none; }
-.active { display:block; }
+.card{
+  background:var(--card);
+  padding:15px;
+  border-radius:14px;
+  box-shadow:0 6px 15px rgba(0,0,0,0.06);
+}
 
-/* LANGUAGE */
-.lang {
-  float:right;
+/* MODULES */
+.module{display:none;}
+.active{display:block;}
+
+/* MENU */
+nav{
+  position:fixed;
+  bottom:0;
+  width:100%;
   background:#fff;
-  color:#000;
-  padding:5px 10px;
-  border-radius:10px;
+  display:flex;
+  border-top:1px solid #eee;
 }
 
-/* MOBILE */
-@media(max-width:600px){
-  header h2 { font-size:18px; }
+nav button{
+  flex:1;
+  background:none;
+  color:#333;
+  padding:12px;
 }
+
+/* ANIMATION */
+.card{transition:.2s;}
+.card:hover{transform:translateY(-2px);}
 </style>
 </head>
 
 <body>
 
-<header>
-<h2 id="title">IASD Super App</h2>
+<!-- LOGIN -->
+<div id="login">
+<div class="login-box">
+<h3>IASD Platform</h3>
 
-<select class="lang" onchange="setLang(this.value)">
-<option value="pt">PT</option>
-<option value="en">EN</option>
-<option value="ow">Oshiwambo</option>
-<option value="sw">Swahili</option>
-<option value="um">Umbundu</option>
-<option value="ki">Kimbundu</option>
+<input id="name" placeholder="Nome">
+<select id="role">
+<option value="pastor">Pastor</option>
+<option value="secretario">Secretário</option>
+<option value="tesoureiro">Tesoureiro</option>
+<option value="membro">Membro</option>
 </select>
 
-<p id="subtitle">União Nordeste de Angola</p>
-</header>
+<input id="church" placeholder="Igreja">
 
-<nav>
-<button onclick="show('home')">🏠</button>
-<button onclick="show('perfil')">👤</button>
-<button onclick="show('mensagens')">📢</button>
-<button onclick="show('departamentos')">🏛️</button>
-<button onclick="show('relatorios')">📊</button>
-</nav>
+<button onclick="login()">Entrar</button>
+</div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+<header>
+<span id="title">Dashboard</span>
+<span id="userLabel"></span>
+</header>
 
 <div class="container">
 
 <!-- HOME -->
 <div id="home" class="module active">
+
 <div class="card">
 <h3 id="welcome">Bem-vindo</h3>
-<p id="userInfo"></p>
+<p id="sessionInfo"></p>
 </div>
 
 <div class="grid">
 <div class="card">📖 Devocional</div>
 <div class="card">🎵 Hinário</div>
-<div class="card">🎮 Jogos Bíblicos</div>
 <div class="card">📡 Lives</div>
-</div>
-</div>
-
-<!-- PERFIL -->
-<div id="perfil" class="module">
-<div class="card">
-<input id="nome" placeholder="Nome">
-<input id="funcao" placeholder="Função">
-<input id="nivel" placeholder="Nível">
-<textarea id="bio" placeholder="Biografia"></textarea>
-<button class="primary" onclick="savePerfil()">Guardar</button>
+<div class="card">📊 Relatórios</div>
 </div>
 
-<div id="perfilView"></div>
 </div>
 
 <!-- MENSAGENS -->
-<div id="mensagens" class="module">
-<div id="msgForm" class="card" style="display:none">
-<textarea id="msgText" placeholder="Mensagem espiritual"></textarea>
-<button class="primary" onclick="postMensagem()">Publicar</button>
+<div id="messages" class="module">
+
+<div class="card" id="msgBox">
+<textarea id="msgInput" placeholder="Mensagem espiritual"></textarea>
+<button onclick="sendMessage()">Publicar</button>
 </div>
 
-<div id="msgList"></div>
+<div id="feed"></div>
+
 </div>
 
-<!-- DEPARTAMENTOS -->
-<div id="departamentos" class="module">
+<!-- PERFIL -->
+<div id="profile" class="module">
+
 <div class="card">
-<input id="depName" placeholder="Departamento">
-<button class="primary" onclick="addDep()">Adicionar</button>
+<input id="bio" placeholder="Biografia espiritual">
+<button onclick="saveProfile()">Guardar Perfil</button>
 </div>
 
-<div id="depList"></div>
+<div id="profileView"></div>
+
 </div>
 
-<!-- RELATORIOS -->
-<div id="relatorios" class="module">
-<div class="card">
-<select id="depSelect"></select>
-<textarea id="relText" placeholder="Relatório"></textarea>
-<button class="primary" onclick="addRel()">Enviar</button>
 </div>
 
-<div id="relList"></div>
-</div>
+<!-- MENU -->
+<nav>
+<button onclick="nav('home')">🏠</button>
+<button onclick="nav('messages')">📢</button>
+<button onclick="nav('profile')">👤</button>
+</nav>
 
 </div>
 
 <script>
 
-/* DB */
-let db = JSON.parse(localStorage.getItem("db")) || {
-  perfis:[], mensagens:[], departamentos:[], relatorios:[]
+/* ===== "FAKE BACKEND" ===== */
+let DB = JSON.parse(localStorage.getItem("iasd_db")) || {
+  users: [],
+  messages: [],
+  profiles: []
 };
 
-let user = {role:"pastor", igreja:"Central"}; // demo
+let session = null;
 
-/* LANGUAGES */
-const langData = {
-  pt:{welcome:"Bem-vindo"},
-  en:{welcome:"Welcome"},
-  ow:{welcome:"Wa uhala po"},
-  sw:{welcome:"Karibu"},
-  um:{welcome:"Ongola"},
-  ki:{welcome:"Kia kuetu"}
-};
+/* LOGIN */
+function login(){
 
-function setLang(l){
-  document.getElementById("welcome").innerText = langData[l].welcome;
+  session = {
+    name:name.value,
+    role:role.value,
+    church:church.value
+  };
+
+  localStorage.setItem("session",JSON.stringify(session));
+
+  document.getElementById("login").style.display="none";
+  document.getElementById("app").style.display="block";
+
+  userLabel.innerText = session.role+" | "+session.church;
+  sessionInfo.innerText = session.name+" - "+session.church;
+
+  renderMessages();
+  renderProfile();
 }
 
 /* NAV */
-function show(id){
+function nav(page){
   document.querySelectorAll(".module").forEach(m=>m.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+  document.getElementById(page).classList.add("active");
 }
 
-/* PERFIL */
-function savePerfil(){
-  let perfil = {
-    nome:nome.value,
-    funcao:funcao.value,
-    nivel:nivel.value,
-    bio:bio.value
+/* MESSAGES (FILTER BY CHURCH) */
+function sendMessage(){
+
+  DB.messages.unshift({
+    church:session.church,
+    role:session.role,
+    text:msgInput.value,
+    time:new Date().toLocaleString()
+  });
+
+  save();
+  renderMessages();
+}
+
+function renderMessages(){
+
+  feed.innerHTML="";
+
+  DB.messages
+  .filter(m=>m.church===session.church)
+  .forEach(m=>{
+    feed.innerHTML+=`
+      <div class="card">
+        <b>${m.role}</b><br>
+        ${m.text}<br>
+        <small>${m.time}</small>
+      </div>
+    `;
+  });
+
+}
+
+/* PROFILE */
+function saveProfile(){
+
+  let profile = {
+    church:session.church,
+    bio:bio.value,
+    name:session.name,
+    role:session.role
   };
-  db.perfis=[perfil];
+
+  DB.profiles = DB.profiles.filter(p=>p.church!==session.church);
+  DB.profiles.push(profile);
+
   save();
-  renderPerfil();
+  renderProfile();
 }
 
-function renderPerfil(){
-  let p=db.perfis[0];
-  if(!p) return;
-  perfilView.innerHTML=`
-  <div class="card">
-    <h3>${p.nome}</h3>
-    <p>${p.funcao}</p>
-    <p>${p.nivel}</p>
-    <p>${p.bio}</p>
-  </div>`;
+function renderProfile(){
+
+  let p = DB.profiles.find(x=>x.church===session.church);
+
+  profileView.innerHTML = p ? `
+    <div class="card">
+      <h3>${p.name}</h3>
+      <p>${p.role}</p>
+      <p>${p.bio}</p>
+    </div>
+  ` : "";
 }
 
-/* MENSAGENS */
-function postMensagem(){
-  db.mensagens.unshift(msgText.value);
-  save();
-  renderMensagens();
+/* SAVE */
+function save(){
+  localStorage.setItem("iasd_db",JSON.stringify(DB));
 }
 
-function renderMensagens(){
-  msgList.innerHTML="";
-  db.mensagens.forEach(m=>{
-    msgList.innerHTML+=`<div class="card">${m}</div>`;
-  });
+/* INIT SESSION RESTORE */
+let saved = localStorage.getItem("session");
+if(saved){
+  session = JSON.parse(saved);
+  document.getElementById("login").style.display="none";
+  document.getElementById("app").style.display="block";
+  userLabel.innerText = session.role+" | "+session.church;
+  sessionInfo.innerText = session.name+" - "+session.church;
+  renderMessages();
+  renderProfile();
 }
-
-/* DEPARTAMENTOS */
-function addDep(){
-  db.departamentos.push(depName.value);
-  save();
-  renderDeps();
-}
-
-function renderDeps(){
-  depList.innerHTML="";
-  depSelect.innerHTML="";
-  db.departamentos.forEach(d=>{
-    depList.innerHTML+=`<div class="card">${d}</div>`;
-    depSelect.innerHTML+=`<option>${d}</option>`;
-  });
-}
-
-/* RELATÓRIOS */
-function addRel(){
-  db.relatorios.push({dep:depSelect.value,text:relText.value});
-  save();
-  renderRel();
-}
-
-function renderRel(){
-  relList.innerHTML="";
-  db.relatorios.forEach(r=>{
-    relList.innerHTML+=`<div class="card"><strong>${r.dep}</strong><br>${r.text}</div>`;
-  });
-}
-
-/* STORAGE */
-function save(){ localStorage.setItem("db", JSON.stringify(db)); }
-
-/* INIT */
-renderPerfil();
-renderMensagens();
-renderDeps();
-renderRel();
 
 </script>
 
