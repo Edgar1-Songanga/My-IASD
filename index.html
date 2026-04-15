@@ -1,256 +1,220 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNA Digital | Veltrix OS - Adventist Hub</title>
-    
-    <!-- Bibliotecas e Estilos -->
-    <link href="https://googleapis.com" rel="stylesheet">
-    <link href="https://jsdelivr.net" rel="stylesheet">
-    <script src="https://jsdelivr.net"></script>
-    <script src="https://cloudflare.com"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNA Digital | Veltrix OS</title>
 
-    <style>
-        :root {
-            --bg: #0d1117; --card: #161b22; --primary: #5865f2; --success: #238636; 
-            --danger: #da3633; --text: #c9d1d9; --text-muted: #8b949e; --border: #30363d;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+<!-- CORRIGIDO -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf"></script>
 
-        /* Login */
-        #auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .auth-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 40px; width: 100%; max-width: 380px; text-align: center; }
+<style>
+:root {
+--bg:#0a0d14;--card:#161b22;--primary:#4f46e5;
+--success:#10b981;--danger:#ef4444;
+--text:#e6edf3;--text-muted:#8b949e;--border:#30363d;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter'}
+body{background:var(--bg);color:var(--text);height:100vh;display:flex;overflow:hidden}
 
-        /* Layout */
-        aside { width: 260px; background: var(--card); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; transition: 0.3s; z-index: 1000; }
-        main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        header { padding: 12px 20px; background: rgba(13, 17, 23, 0.9); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        
-        .view { display: none; padding: 20px; height: 100%; overflow-y: auto; }
-        .view.active { display: block; animation: slideUp 0.3s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* LOGIN */
+#auth-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:1000}
+.auth-card{background:var(--card);padding:30px;border-radius:16px;border:1px solid var(--border)}
 
-        /* Components */
-        .card { background: #0d1117; border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 15px; }
-        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 6px; cursor: pointer; color: var(--text-muted); margin-bottom: 4px; }
-        .nav-item:hover, .nav-item.active { background: #21262d; color: white; border-left: 3px solid var(--primary); }
-        .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-primary { background: var(--primary); color: white; }
-        
-        input, select { width: 100%; padding: 10px; background: #010409; border: 1px solid var(--border); border-radius: 6px; color: white; margin-top: 5px; }
+/* LAYOUT */
+#app-shell{display:none;width:100%}
+aside{width:260px;background:#0d1117;padding:20px}
+.nav-item{padding:10px;border-radius:8px;margin-bottom:5px;cursor:pointer}
+.nav-item:hover,.nav-item.active{background:var(--primary);color:#fff}
+main{flex:1;display:flex;flex-direction:column}
+header{padding:15px;background:#0d1117;display:flex;justify-content:space-between}
 
-        /* Hinário Database UI */
-        .hymn-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 15px; }
-        .hymn-box { background: #21262d; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid transparent; transition: 0.2s; }
-        .hymn-box:hover { border-color: var(--primary); transform: translateY(-3px); }
-        .hymn-content { white-space: pre-line; line-height: 1.8; font-size: 1.1rem; color: #f0f6fc; text-align: center; }
+.view{display:none;padding:20px;overflow:auto}
+.view.active{display:block}
 
-        @media (max-width: 1024px) { aside { position: fixed; left: -260px; height: 100%; } aside.open { left: 0; } }
-    </style>
+.card{background:var(--card);padding:15px;border-radius:12px;margin-bottom:10px;border:1px solid var(--border)}
+
+input,select{width:100%;padding:10px;margin-top:5px;background:#0d1117;border:1px solid var(--border);color:#fff}
+button{padding:10px;margin-top:5px;border:none;background:var(--primary);color:#fff;border-radius:8px;cursor:pointer}
+</style>
 </head>
+
 <body>
 
+<!-- LOGIN -->
 <div id="auth-screen">
-    <div class="auth-card">
-        <h2 style="color: var(--primary); margin-bottom: 20px;">UNA Digital</h2>
-        <select id="loginRole">
-            <option value="member">Membro / Visitante</option>
-            <option value="pastor">Pastor</option>
-            <option value="treasurer">Tesoureiro</option>
-            <option value="secretary">Secretário</option>
-        </select>
-        <button class="btn btn-primary" style="width: 100%; margin-top: 20px; justify-content: center;" onclick="App.login()">Entrar no OS</button>
-    </div>
+<div class="auth-card">
+<h3>UNA Digital</h3>
+<select id="loginRole">
+<option value="member">Membro</option>
+<option value="pastor">Pastor</option>
+<option value="treasurer">Tesoureiro</option>
+<option value="secretary">Secretário</option>
+</select>
+<button onclick="App.login()">Entrar</button>
+</div>
 </div>
 
-<aside id="sidebar">
-    <h3 style="margin-bottom: 25px; padding-left: 10px;">VELTRIX <span style="color:var(--primary)">OS</span></h3>
-    <div class="nav-item active" onclick="App.nav('home')"><i class="ri-home-line"></i> Início</div>
-    <div class="nav-item" onclick="App.nav('bible')"><i class="ri-book-line"></i> Bíblia</div>
-    <div class="nav-item" onclick="App.nav('hymnal')"><i class="ri-music-line"></i> Hinário ASD</div>
-    
-    <div id="nav-treasury" class="nav-item" style="display:none" onclick="App.nav('treasury')"><i class="ri-funds-line"></i> Tesouraria</div>
-    <div id="nav-secretary" class="nav-item" style="display:none" onclick="App.nav('secretary')"><i class="ri-shield-user-line"></i> Secretaria</div>
-    
-    <div class="nav-item" onclick="App.nav('chat')"><i class="ri-chat-1-line"></i> Comunidade</div>
-    <button class="btn btn-primary" style="margin-top: auto; background: #da3633;" onclick="location.reload()">Sair</button>
+<!-- APP -->
+<div id="app-shell">
+
+<aside>
+<div class="nav-item active" onclick="App.nav('home',this)">Início</div>
+<div class="nav-item" onclick="App.nav('bible',this)">Bíblia</div>
+<div class="nav-item" onclick="App.nav('hymnal',this)">Hinário</div>
+<div id="nav-treasury" class="nav-item" style="display:none" onclick="App.nav('treasury',this)">Tesouraria</div>
+<div id="nav-secretary" class="nav-item" style="display:none" onclick="App.nav('secretary',this)">Secretaria</div>
+<div class="nav-item" onclick="App.nav('chat',this)">Chat</div>
+<button style="background:var(--danger)" onclick="App.logout()">Sair</button>
 </aside>
 
 <main>
-    <header>
-        <button class="btn" style="background:transparent; color:white" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="ri-menu-line"></i></button>
-        <span id="userProfile" style="font-weight: 600; font-size: 14px;"></span>
-    </header>
 
-    <div class="container">
-        <!-- HOME -->
-        <div id="home" class="view active">
-            <h2>Dashboard</h2>
-            <div class="card" style="margin-top: 15px;">
-                <h4>Versículo do Dia</h4>
-                <p id="dailyVerse" style="margin-top: 10px; font-style: italic; color: var(--text-muted);">"Lâmpada para os meus pés é a tua palavra..."</p>
-            </div>
-            <div id="statsBox" style="display: none;">
-                <div class="card">
-                    <h4>Crescimento da Igreja</h4>
-                    <canvas id="chartGeneral" height="100"></canvas>
-                </div>
-            </div>
-        </div>
+<header>
+<span id="userNameHeader"></span>
+</header>
 
-        <!-- BIBLE -->
-        <div id="bible" class="view">
-            <h2>Escrituras Sagradas</h2>
-            <div style="display: flex; gap: 10px; margin: 15px 0;">
-                <input type="text" id="bibleSearch" placeholder="Ex: João 14:1">
-                <button class="btn btn-primary" onclick="App.searchBible()">Ler</button>
-            </div>
-            <div id="bibleResult" class="card"></div>
-        </div>
+<div class="container">
 
-        <!-- HYMNAL -->
-        <div id="hymnal" class="view">
-            <h2>Hinário Adventista</h2>
-            <input type="text" id="hymnSearch" placeholder="Número ou Título..." onkeyup="App.filterHymns()">
-            <div id="hymnDisplay" class="card" style="display:none;">
-                <button class="btn" onclick="document.getElementById('hymnDisplay').style.display='none'"><i class="ri-arrow-left-line"></i> Voltar</button>
-                <div id="hymnBody" class="hymn-content" style="margin-top: 20px;"></div>
-            </div>
-            <div id="hymnList" class="hymn-list"></div>
-        </div>
+<div id="home" class="view active">
+<div class="card">
+<h4>Versículo</h4>
+<p id="dailyVerse"></p>
+</div>
+<div id="dash-secretary" style="display:none" class="card">
+<canvas id="chartMembros"></canvas>
+</div>
+</div>
 
-        <!-- TREASURY & SECRETARY (DYN) -->
-        <div id="treasury" class="view">
-            <h2>Relatórios Financeiros</h2>
-            <div class="card"><canvas id="chartFin" height="120"></canvas></div>
-        </div>
+<div id="bible" class="view">
+<input id="bibleIn">
+<button onclick="App.searchBible()">Buscar</button>
+<div id="bibleOut"></div>
+</div>
 
-        <div id="secretary" class="view">
-            <h2>Gestão de Membros</h2>
-            <div class="card">
-                <h4>Gerar Certificado</h4>
-                <input type="text" id="certName" placeholder="Nome Completo">
-                <button class="btn btn-primary" style="margin-top: 10px;" onclick="App.genCert()">Exportar PDF</button>
-            </div>
-        </div>
+<div id="hymnal" class="view">
+<input id="hymnIn" onkeyup="App.filterHymns()">
+<div id="hymnList"></div>
+</div>
 
-        <div id="chat" class="view">
-            <h2>Chat Global</h2>
-            <div class="card" id="chatArea" style="height: 300px; overflow-y: auto;"></div>
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <input type="text" id="chatInput" placeholder="Mensagem...">
-                <button class="btn btn-primary" onclick="App.sendMsg()">Enviar</button>
-            </div>
-        </div>
-    </div>
+<div id="treasury" class="view">
+<canvas id="chartFin"></canvas>
+</div>
+
+<div id="secretary" class="view">
+<input id="certName">
+<button onclick="App.genPDF()">Gerar PDF</button>
+</div>
+
+<div id="chat" class="view">
+<div id="chatBox" style="height:200px;overflow:auto"></div>
+<input id="chatIn">
+<button onclick="App.sendMsg()">Enviar</button>
+</div>
+
+</div>
 </main>
+</div>
 
 <script>
-const { jsPDF } = window.jspdf;
+const App={
+user:JSON.parse(localStorage.getItem("una_session")),
 
-const App = {
-    // DATABASE REAL (Exemplo de estrutura completa)
-    hymnalDB: [
-        { n: 1, t: "Ó Valha-me, Senhor", l: "Ó valha-me, Senhor, na trilha deste mundo,\nOnde o perigo é mui profundo.\nConserva-me no Teu amor!" },
-        { n: 15, t: "Cristo é o Senhor", l: "Cristo é o Senhor, n'Ele há vida,\nN'Ele há paz e alegria sem fim!" },
-        { n: 33, t: "Castelo Forte", l: "Castelo forte é nosso Deus,\nEspada e bom escudo!" },
-        { n: 581, t: "Tua Palavra", l: "Tua palavra é lâmpada para os meus pés,\nE luz para o meu caminho." }
-    ],
+init(){
+if(this.user)this.showApp();
+this.renderHymns();
+this.fetchVerse();
+},
 
-    init() {
-        // Gera hinos vazios para completar 610
-        for(let i=1; i<=610; i++) {
-            if(!this.hymnalDB.find(h => h.n === i)) {
-                this.hymnalDB.push({ n: i, t: `Hino ${i}`, l: "Letra em sincronização com a base de dados central..." });
-            }
-        }
-        this.renderHymns();
-    },
+login(){
+let role=loginRole.value;
+this.user={role,name:role};
+localStorage.setItem("una_session",JSON.stringify(this.user));
+this.showApp();
+},
 
-    login() {
-        const role = document.getElementById('loginRole').value;
-        this.user = { role };
-        document.getElementById('auth-screen').style.display = 'none';
-        document.getElementById('userProfile').innerText = `Role: ${role.toUpperCase()}`;
+logout(){localStorage.clear();location.reload();},
 
-        if(role === 'treasurer' || role === 'pastor') {
-            document.getElementById('nav-treasury').style.display = 'flex';
-            setTimeout(() => this.initCharts('chartFin', 'Receitas Kz'), 100);
-        }
-        if(role === 'secretary' || role === 'pastor') {
-            document.getElementById('nav-secretary').style.display = 'flex';
-            document.getElementById('statsBox').style.display = 'block';
-            setTimeout(() => this.initCharts('chartGeneral', 'Novos Batismos'), 100);
-        }
-    },
+showApp(){
+auth-screen.style.display="none";
+app-shell.style.display="flex";
+userNameHeader.innerText=this.user.name;
 
-    nav(id) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        event.currentTarget.classList.add('active');
-        if(window.innerWidth < 1024) document.getElementById('sidebar').classList.remove('open');
-    },
+if(this.user.role==="pastor"||this.user.role==="treasurer"){
+nav-treasury.style.display="block";
+setTimeout(()=>this.drawChart("chartFin"),300);
+}
+if(this.user.role==="pastor"||this.user.role==="secretary"){
+nav-secretary.style.display="block";
+dash-secretary.style.display="block";
+setTimeout(()=>this.drawChart("chartMembros"),300);
+}
+},
 
-    async searchBible() {
-        const q = document.getElementById('bibleSearch').value;
-        const res = await fetch(`https://bible-api.com{q}`);
-        const data = await res.json();
-        document.getElementById('bibleResult').innerHTML = data.text ? `<h3>${data.reference}</h3><p style="margin-top:10px">${data.text}</p>` : "Não encontrado.";
-    },
+nav(id,el){
+document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+if(el)el.classList.add("active");
+},
 
-    renderHymns() {
-        const container = document.getElementById('hymnList');
-        container.innerHTML = this.hymnalDB.sort((a,b)=>a.n-b.n).map(h => `
-            <div class="hymn-box" onclick="App.openHymn(${h.n})">
-                <div style="font-weight:800; color:var(--primary)">${h.n}</div>
-                <div style="font-size:11px; margin-top:5px">${h.t}</div>
-            </div>
-        `).join('');
-    },
+renderHymns(){
+let list=hymnList;
+list.innerHTML="";
+for(let i=1;i<=610;i++){
+list.innerHTML+=`<div class="card">${i}</div>`;
+}
+},
 
-    openHymn(n) {
-        const h = this.hymnalDB.find(x => x.n === n);
-        document.getElementById('hymnDisplay').style.display = 'block';
-        document.getElementById('hymnBody').innerHTML = `<h2>${h.n}. ${h.t}</h2><br>${h.l}`;
-        document.getElementById('hymnal').scrollTop = 0;
-    },
+filterHymns(){
+let q=hymnIn.value;
+document.querySelectorAll("#hymnList .card").forEach(el=>{
+el.style.display=el.innerText.includes(q)?"block":"none";
+});
+},
 
-    filterHymns() {
-        const q = document.getElementById('hymnSearch').value.toLowerCase();
-        document.querySelectorAll('.hymn-box').forEach(el => {
-            el.style.display = el.innerText.toLowerCase().includes(q) ? 'block' : 'none';
-        });
-    },
+async fetchVerse(){
+try{
+let r=await fetch("https://bible-api.com/psalms 23:1");
+let d=await r.json();
+dailyVerse.innerText=d.text;
+}catch{}
+},
 
-    initCharts(id, label) {
-        new Chart(document.getElementById(id), {
-            type: 'line',
-            data: { labels: ['Jan','Fev','Mar','Abr'], datasets: [{ label: label, data:, borderColor: '#5865f2' }] },
-            options: { plugins: { legend: { labels: { color: '#fff' } } } }
-        });
-    },
+async searchBible(){
+let q=bibleIn.value;
+let r=await fetch(`https://bible-api.com/${q}`);
+let d=await r.json();
+bibleOut.innerText=d.text||"Não encontrado";
+},
 
-    genCert() {
-        const name = document.getElementById('certName').value || "Membro";
-        const doc = new jsPDF('l');
-        doc.setFillColor(13, 17, 23); doc.rect(0,0,297,210,'F');
-        doc.setTextColor(88, 101, 242); doc.setFontSize(40); doc.text("CERTIFICADO", 148, 60, {align:'center'});
-        doc.setTextColor(255); doc.setFontSize(20); doc.text(`Certificamos que ${name} pertence à UNA Digital`, 148, 100, {align:'center'});
-        doc.save('certificado.pdf');
-    },
+drawChart(id){
+new Chart(document.getElementById(id),{
+type:"line",
+data:{labels:["Jan","Fev","Mar"],datasets:[{data:[10,20,30]}]}
+});
+},
 
-    sendMsg() {
-        const i = document.getElementById('chatInput');
-        document.getElementById('chatArea').innerHTML += `<p><b>Você:</b> ${i.value}</p>`;
-        i.value = '';
-    }
+genPDF(){
+const {jsPDF}=window.jspdf;
+let doc=new jsPDF();
+doc.text("Certificado",20,20);
+doc.save("certificado.pdf");
+},
+
+sendMsg(){
+let box=chatBox;
+box.innerHTML+=`<div>${this.user.name}: ${chatIn.value}</div>`;
+box.scrollTop=box.scrollHeight;
+chatIn.value="";
+}
 };
 
-window.onload = () => App.init();
+window.onload=()=>App.init();
 </script>
+
 </body>
     </html>
-                                                                                                              
