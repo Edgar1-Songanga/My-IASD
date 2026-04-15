@@ -3,426 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNA Digital Platform | Super App</title>
-    
-    <!-- Fontes e Ícones -->
-    <link href="https://googleapis.com" rel="stylesheet">
+    <title>UNA Digital Platform</title>
     <script src="https://unpkg.com"></script>
     <script src="https://jsdelivr.net"></script>
-    <script src="https://cloudflare.com"></script>
+    <link href="https://googleapis.com" rel="stylesheet">
 
     <style>
-        :root {
-            --primary: #002D5E; /* Azul Profundo */
-            --accent: #C5A059;  /* Dourado */
-            --bg: #050a0f;
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text: #ffffff;
-            --text-dim: #a0a0a0;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
+        :root { --p: #002D5E; --a: #C5A059; --bg: #050a0f; --g: rgba(255,255,255,0.05); --gb: rgba(255,255,255,0.1); --t: #fff; --td: #a0a0a0; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--t); overflow-x: hidden; }
         
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            overflow-x: hidden;
-            background: radial-gradient(circle at top right, #001f3f, #050a0f);
-            min-height: 100vh;
-        }
+        /* Sistema de Grid Otimizado */
+        .app-shell { display: none; min-height: 100vh; }
+        .sidebar { width: 260px; background: var(--g); backdrop-filter: blur(15px); border-right: 1px solid var(--gb); position: fixed; height: 100vh; padding: 1.5rem; z-index: 10; transition: 0.3s; }
+        .main { flex: 1; margin-left: 260px; padding: 2rem; width: calc(100% - 260px); }
 
-        /* --- Layout --- */
-        .app-container { display: flex; min-height: 100vh; }
-
-        /* Sidebar Glassmorphism */
-        .sidebar {
-            width: 260px;
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            border-right: 1px solid var(--glass-border);
-            display: flex;
-            flex-direction: column;
-            padding: 2rem 1rem;
-            position: fixed;
-            height: 100vh;
-            z-index: 100;
-            transition: var(--transition);
-        }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 0 1rem 2.5rem;
-            color: var(--accent);
-            font-weight: 700;
-            font-size: 1.4rem;
-            letter-spacing: -1px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 0.8rem 1rem;
-            color: var(--text-dim);
-            text-decoration: none;
-            border-radius: 12px;
-            margin-bottom: 0.3rem;
-            transition: var(--transition);
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .nav-item:hover, .nav-item.active {
-            background: var(--glass);
-            color: var(--accent);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            margin-left: 260px;
-            padding: 2rem;
-            max-width: 1400px;
-        }
-
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        /* --- UI Components --- */
-        .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 1.5rem;
-            transition: var(--transition);
-        }
-
-        .glass-card:hover { transform: translateY(-5px); border-color: var(--accent); }
-
-        .btn-premium {
-            background: linear-gradient(135deg, var(--accent), #8e7037);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .btn-premium:hover { opacity: 0.9; transform: scale(1.02); }
-
-        .grid-dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        /* --- Social Feed --- */
-        .feed-container { max-width: 700px; margin: 0 auto; }
-        .post-card { margin-bottom: 1.5rem; }
-        .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); }
-
-        /* --- Player --- */
-        .radio-player {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 300px;
-            z-index: 1000;
-        }
-
-        /* --- Auth Modal --- */
-        .auth-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-            display: none; justify-content: center; align-items: center; z-index: 2000;
-        }
-
-        /* --- Mobile Responsive --- */
-        @media (max-width: 768px) {
-            .sidebar { width: 0; padding: 0; overflow: hidden; }
-            .main-content { margin-left: 0; }
-            .radio-player { width: calc(100% - 40px); left: 20px; }
-        }
+        /* Estética Premium (Glassmorphism) */
+        .card { background: var(--g); border: 1px solid var(--gb); border-radius: 16px; padding: 1.5rem; transition: 0.3s ease; }
+        .card:hover { border-color: var(--a); transform: translateY(-2px); }
         
-        .lang-selector { background: transparent; color: var(--text); border: 1px solid var(--glass-border); border-radius: 5px; padding: 5px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 10px; cursor: pointer; color: var(--td); margin-bottom: 4px; font-size: 0.9rem; }
+        .nav-item.active { background: var(--g); color: var(--a); border-left: 3px solid var(--a); }
+        
+        .btn { background: var(--a); color: #fff; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; width: 100%; transition: 0.2s; }
+        .btn:active { transform: scale(0.98); }
+
+        #auth-screen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        
+        input, select { width: 100%; padding: 12px; margin-bottom: 1rem; border-radius: 8px; border: 1px solid var(--gb); background: rgba(255,255,255,0.05); color: #fff; outline: none; }
+        
+        /* Módulos Específicos */
+        .hino-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
+        .feed-post { border-bottom: 1px solid var(--gb); padding: 15px 0; }
+        .radio-mini { position: fixed; bottom: 20px; right: 20px; width: 250px; background: var(--p); border-radius: 12px; padding: 10px; display: flex; align-items: center; gap: 10px; }
+
+        @media (max-width: 768px) { .sidebar { width: 0; padding: 0; overflow: hidden; } .main { margin-left: 0; width: 100%; } }
     </style>
 </head>
 <body>
 
-    <!-- Sistema de Login -->
-    <div id="auth-screen" class="auth-overlay" style="display: flex;">
-        <div class="glass-card" style="width: 400px; text-align: center;">
-            <h2 style="margin-bottom: 1rem; color: var(--accent);">UNA Digital</h2>
-            <p style="margin-bottom: 2rem; color: var(--text-dim);">Acesse sua plataforma espiritual</p>
-            <input type="text" id="user-name" placeholder="Nome de Usuário" style="width: 100%; padding: 12px; margin-bottom: 1rem; border-radius: 10px; border: none; background: rgba(255,255,255,0.1); color: white;">
-            <select id="user-role" style="width: 100%; padding: 12px; margin-bottom: 1.5rem; border-radius: 10px; background: rgba(255,255,255,0.1); color: white; border: none;">
+    <div id="auth-screen">
+        <div class="card" style="width: 340px; text-align: center;">
+            <h2 style="color: var(--a); margin-bottom: 2rem;">UNA Digital</h2>
+            <input type="text" id="user" placeholder="Seu nome">
+            <select id="role">
                 <option value="membro">Membro</option>
                 <option value="pastor">Pastor</option>
                 <option value="tesoureiro">Tesoureiro</option>
                 <option value="admin">Administrador</option>
             </select>
-            <button class="btn-premium" style="width: 100%;" onclick="App.auth.login()">Entrar</button>
+            <button class="btn" onclick="App.login()">Entrar na Plataforma</button>
         </div>
     </div>
 
-    <div class="app-container">
-        <!-- Sidebar -->
+    <div id="app-shell" class="app-shell">
         <aside class="sidebar">
-            <div class="logo-area">
-                <i data-lucide="shield-check"></i> UNA DIGITAL
-            </div>
-            <nav id="menu-items">
-                <!-- Injetado via JS -->
-            </nav>
+            <div style="font-weight: 700; color: var(--a); font-size: 1.4rem; margin-bottom: 2rem;">UNA.</div>
+            <nav id="menu-nav"></nav>
         </aside>
 
-        <!-- Main -->
-        <main class="main-content">
-            <header class="topbar">
-                <div id="page-title">
-                    <h1 style="font-size: 1.5rem;">Dashboard</h1>
-                    <span id="current-date" style="color: var(--text-dim); font-size: 0.8rem;"></span>
-                </div>
-                <div style="display: flex; gap: 15px; align-items: center;">
-                    <select class="lang-selector" onchange="App.translate(this.value)">
-                        <option value="pt">Português</option>
-                        <option value="en">English</option>
-                        <option value="um">Umbundo</option>
-                        <option value="ki">Kimbundo</option>
-                    </select>
-                    <div class="glass-card" style="padding: 8px 15px; border-radius: 30px; display: flex; align-items: center; gap: 10px;">
-                        <span id="user-display">Membro</span>
-                        <div class="avatar" style="width: 25px; height: 25px;"></div>
-                    </div>
-                </div>
+        <main class="main">
+            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 id="view-title">Dashboard</h2>
+                <div id="user-tag" style="font-size: 0.8rem; opacity: 0.6;"></div>
             </header>
-
-            <div id="app-view">
-                <!-- Conteúdo Dinâmico -->
-            </div>
+            <div id="view-content"></div>
         </main>
     </div>
 
-    <!-- Mini Player Rádio -->
-    <div class="radio-player glass-card">
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <div style="width: 50px; height: 50px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                <i data-lucide="radio" style="color: var(--accent);"></i>
-            </div>
-            <div style="flex: 1;">
-                <p style="font-size: 0.8rem; font-weight: 600;">Rádio Adventista</p>
-                <p style="font-size: 0.7rem; color: var(--text-dim);">Ao Vivo: Lição da Escola Sabatina</p>
-            </div>
-            <button style="background: none; border: none; color: white; cursor: pointer;">
-                <i data-lucide="play-circle"></i>
-            </button>
-        </div>
+    <div class="radio-mini card" id="player" style="display:none;">
+        <i data-lucide="radio" style="color: var(--a)"></i>
+        <marquee style="font-size: 0.7rem; flex: 1;">Rádio Adventista UNA - Ao Vivo: Lição da Escola Sabatina</marquee>
+        <i data-lucide="play" size="18" style="cursor:pointer"></i>
     </div>
 
     <script>
-        // --- Core Application Engine ---
         const App = {
-            state: {
-                user: null,
-                currentLang: 'pt',
-                view: 'dashboard',
-                data: JSON.parse(localStorage.getItem('una_data')) || {
-                    membros: 1250,
-                    dizimos: 45000,
-                    posts: [
-                        { id: 1, author: 'Pr. Silva', content: 'Que a paz de Deus esteja com todos hoje!', likes: 24, comments: 5 },
-                        { id: 2, author: 'Secretaria', content: 'Novo mutirão de limpeza no sábado.', likes: 12, comments: 2 }
-                    ],
-                    contribuicoes: []
-                }
-            },
+            state: { user: null, view: 'dashboard' },
 
             init() {
-                lucide.createIcons();
+                const session = localStorage.getItem('una_session');
+                if (session) { this.state.user = JSON.parse(session); this.launch(); }
+            },
+
+            login() {
+                const name = document.getElementById('user').value;
+                const role = document.getElementById('role').value;
+                if (!name) return alert("Identifique-se");
+                this.state.user = { name, role };
+                localStorage.setItem('una_session', JSON.stringify(this.state.user));
+                this.launch();
+            },
+
+            launch() {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('app-shell').style.display = 'flex';
+                document.getElementById('player').style.display = 'flex';
+                document.getElementById('user-tag').innerText = `${this.state.user.name} | ${this.state.user.role.toUpperCase()}`;
                 this.renderMenu();
-                this.router('dashboard');
-                document.getElementById('current-date').innerText = new Date().toLocaleDateString();
+                this.go('dashboard');
             },
 
-            auth: {
-                login() {
-                    const name = document.getElementById('user-name').value || 'Usuário';
-                    const role = document.getElementById('user-role').value;
-                    App.state.user = { name, role };
-                    document.getElementById('auth-screen').style.display = 'none';
-                    document.getElementById('user-display').innerText = name;
-                    App.renderMenu();
-                    App.router('dashboard');
-                }
+            renderMenu() {
+                const routes = [
+                    { id: 'dashboard', icon: 'layout-grid', label: 'Início', roles: ['admin', 'pastor', 'tesoureiro', 'membro'] },
+                    { id: 'social', icon: 'heart', label: 'Rede Social', roles: ['admin', 'pastor', 'membro', 'tesoureiro'] },
+                    { id: 'secretaria', icon: 'file-text', label: 'Secretaria', roles: ['admin', 'pastor'] },
+                    { id: 'tesouraria', icon: 'trending-up', label: 'Finanças', roles: ['admin', 'tesoureiro'] },
+                    { id: 'biblia', icon: 'book', label: 'Bíblia', roles: ['admin', 'pastor', 'membro'] },
+                    { id: 'hinos', icon: 'music', label: 'Hinos', roles: ['admin', 'pastor', 'membro'] },
+                    { id: 'ia', icon: 'cpu', label: 'UNA AI', roles: ['admin', 'pastor', 'membro'] }
+                ];
+                const nav = document.getElementById('menu-nav');
+                nav.innerHTML = routes.filter(r => r.roles.includes(this.state.user.role))
+                    .map(r => `<div class="nav-item" onclick="App.go('${r.id}')" id="n-${r.id}"><i data-lucide="${r.icon}" size="18"></i><span>${r.label}</span></div>`).join('');
+                lucide.createIcons();
             },
 
-            // --- Gerenciador de Rotas/Views ---
-            router(view) {
+            go(view) {
                 this.state.view = view;
-                const container = document.getElementById('app-view');
+                document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
+                document.getElementById(`n-${view}`).classList.add('active');
+                document.getElementById('view-title').innerText = view.charAt(0).toUpperCase() + view.slice(1);
                 
-                // Update active menu
-                document.querySelectorAll('.nav-item').forEach(el => {
-                    el.classList.toggle('active', el.dataset.view === view);
-                });
-
-                switch(view) {
-                    case 'dashboard': this.views.dashboard(container); break;
-                    case 'social': this.views.social(container); break;
-                    case 'secretaria': this.views.secretaria(container); break;
-                    case 'tesouraria': this.views.tesouraria(container); break;
-                    case 'biblia': this.views.biblia(container); break;
-                    case 'hinos': this.views.hinos(container); break;
-                    case 'chat': this.views.chat(container); break;
-                }
+                const container = document.getElementById('view-content');
+                this.views[view](container);
                 lucide.createIcons();
             },
 
             views: {
-                dashboard(container) {
-                    container.innerHTML = `
-                        <div class="grid-dashboard">
-                            <div class="glass-card">
-                                <h4 style="color: var(--text-dim)">Total de Membros</h4>
-                                <h2 style="font-size: 2.5rem; margin: 10px 0;">${App.state.data.membros}</h2>
-                                <div style="color: #4cd137; font-size: 0.8rem;">+12% este mês</div>
-                            </div>
-                            <div class="glass-card">
-                                <h4 style="color: var(--text-dim)">Faturamento (Kz)</h4>
-                                <h2 style="font-size: 2.5rem; margin: 10px 0;">${App.state.data.dizimos.toLocaleString()}</h2>
-                                <canvas id="chartDizimos" height="100"></canvas>
-                            </div>
-                            <div class="glass-card" style="background: linear-gradient(45deg, var(--primary), #004a99);">
-                                <h4 style="color: var(--accent)">Versículo do Dia</h4>
-                                <p style="font-style: italic; margin-top: 15px;">"Pois eu bem sei os planos que tenho para vós, diz o Senhor..."</p>
-                                <p style="text-align: right; margin-top: 10px; font-weight: bold;">Jeremias 29:11</p>
-                            </div>
+                dashboard(el) {
+                    el.innerHTML = `
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                            <div class="card"><h4>Membros</h4><h2>1.240</h2></div>
+                            <div class="card"><h4>Dízimos</h4><h2>45.200 Kz</h2></div>
                         </div>
-                    `;
-                    
-                    const ctx = document.getElementById('chartDizimos').getContext('2d');
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: ['Jan', 'Fev', 'Mar', 'Abr'],
-                            datasets: [{
-                                label: 'Crescimento',
-                                data: [12000, 19000, 15000, 45000],
-                                borderColor: '#C5A059',
-                                tension: 0.4
-                            }]
-                        },
-                        options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { display: false } } }
-                    });
+                        <div class="card" style="margin-top: 20px; height: 300px;"><canvas id="chart"></canvas></div>`;
+                    new Chart(document.getElementById('chart'), { type: 'line', data: { labels: ['Jan', 'Fev', 'Mar', 'Abr'], datasets: [{ label: 'Fiel', data:, borderColor: '#C5A059' }] }, options: { maintainAspectRatio: false }});
                 },
-
-                social(container) {
-                    let postsHtml = App.state.data.posts.map(p => `
-                        <div class="glass-card post-card">
-                            <div class="post-header">
-                                <div class="avatar"></div>
-                                <div>
-                                    <div style="font-weight: 600;">${p.author}</div>
-                                    <div style="font-size: 0.7rem; color: var(--text-dim);">Há 2 horas • Igreja Central</div>
-                                </div>
-                            </div>
-                            <p style="margin-bottom: 1.5rem;">${p.content}</p>
-                            <div style="display: flex; gap: 20px; color: var(--text-dim); border-top: 1px solid var(--glass-border); padding-top: 10px;">
-                                <span><i data-lucide="heart" size="18"></i> ${p.likes}</span>
-                                <span><i data-lucide="message-circle" size="18"></i> ${p.comments}</span>
-                                <span><i data-lucide="share-2" size="18"></i></span>
-                            </div>
-                        </div>
-                    `).join('');
-
-                    container.innerHTML = `
-                        <div class="feed-container">
-                            <div class="glass-card" style="margin-bottom: 2rem;">
-                                <textarea placeholder="O que está acontecendo na sua igreja?" style="width: 100%; background: transparent; border: none; color: white; font-size: 1.1rem; resize: none; outline: none;"></textarea>
-                                <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
-                                    <button class="btn-premium">Publicar</button>
-                                </div>
-                            </div>
-                            ${postsHtml}
-                        </div>
-                    `;
+                social(el) {
+                    el.innerHTML = `<div class="card"><textarea placeholder="O que Deus fez por você hoje?" style="width:100%; background:none; border:none; color:#fff; outline:none; resize:none;"></textarea><button class="btn" style="width:100px; float:right;">Postar</button></div>
+                    <div class="feed-post"><strong>Pr. Manuel:</strong><p>A paz de Cristo! Reunião amanhã às 18h.</p></div>
+                    <div class="feed-post"><strong>Irmã Maria:</strong><p>Agradeço pelas orações, meu filho está curado!</p></div>`;
                 },
-
-                tesouraria(container) {
-                    container.innerHTML = `
-                        <div class="glass-card">
-                            <h3>Gestão Financeira</h3>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
-                                <input type="number" id="valor-cont" placeholder="Valor (Kz)" style="padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white;">
-                                <select id="tipo-cont" style="padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white;">
-                                    <option>Dízimo</option>
-                                    <option>Oferta Pacto</option>
-                                    <option>Oferta Adoração</option>
-                                </select>
-                            </div>
-                            <button class="btn-premium" style="margin-top: 20px; width: 100%;" onclick="App.action.registrarContribuicao()">Registrar e Gerar Recibo PDF</button>
-                        </div>
-                    `;
+                biblia(el) {
+                    el.innerHTML = `<div class="card"><input type="text" placeholder="Pesquisar ex: João 3:16"><div style="margin-top:10px; line-height:1.6">"Porque Deus amou o mundo de tal maneira..."</div></div>`;
                 },
-
-                hinos(container) {
-                    container.innerHTML = `
-                        <div style="margin-bottom: 20px;">
-                            <input type="text" placeholder="Pesquisar hino (número ou título)..." style="width: 100%; padding: 15px; border-radius: 15px; background: var(--glass); border: 1px solid var(--glass-border); color: white;">
-                        </div>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;">
-                            ${Array.from({length: 12}, (_, i) => `
-                                <div class="glass-card" style="text-align: center; cursor: pointer;">
-                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent);">${i + 1}</div>
-                                    <div style="font-size: 0.8rem; margin-top: 5px;">Hino de Louvor</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
+                hinos(el) {
+                    let hinos = "";
+                    for(let i=1; i<=610; i++) hinos += `<div class="card" style="padding:10px; text-align:center; font-size:0.8rem;">${i}</div>`;
+                    el.innerHTML = `<div class="hino-grid">${hinos}</div>`;
                 },
-
-                chat(container) {
-                    container.innerHTML = `
-                        <div class="glass-card" style="height: 60vh; display: flex; flex-direction: column;">
-                            <div style="flex: 1; overflow-y: auto; padding: 10px;" id="chat-box">
-                                <div style="background: var(--primary); padding: 10px; border-radius: 10px; max-width: 80%; margin-bottom: 10px;">
-                                    Olá! Eu sou o assistente UNA. Como posso ajudar seu estudo bíblico hoje?
-                                </div>
-                            </div>
-                            <div style="display: flex; gap: 10px;">
-                                <input type="text" id="chat-input" placeholder="Pergunte algo sobre a bíblia..." style="flex: 1; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.05); border: none; color: white;">
-                                <button class="btn-premium" onclick="App.action.sendChat()">Enviar</button>
-                            </div>
-                        </div>
-                    `;
+                tesouraria(el) {
+                    el.innerHTML = `<div class="card"><h3>Lançamento</h3><input type="number" placeholder="Valor em Kz"><select><option>Dízimo</option><option>Oferta</option></select><button class="btn">Gerar Recibo Digital</button></div>`;
+                },
+                ia(el) {
+                    el.innerHTML = `<div class="card" style="height:400px; display:flex; flex-direction:column;"><div style="flex:1; color:var(--td)">UNA AI: Como posso ajudar seu ministério hoje?</div><input type="text" placeholder="Perguntar à IA..."></div>`;
+                },
+                secretaria(el) {
+                    el.innerHTML = `<div class="card"><h3>Lista de Membros</h3><div class="feed-post">João Afonso - Ativo</div><div class="feed-post">Carla Simão - Ativa</div><button class="btn" style="margin-top:10px">Gerar Relatório Trimestral PDF</button></div>`;
                 }
-            },
+            }
+        };
 
-            action: {
-                registrarContribuicao() {
-                    const val = document.getElementById('valor-cont').value;
-                    const tipo = document.getElementById('tipo-cont').value;
-                    if(!val) return alert("Insira um valor");
-                    
-                    alert(`Sucesso! Recibo Digital Gerado para ${tipo} de ${val} Kz`);
-                    // Simulação de PDF aconteceria aqui com jsPDF
-                },
-                sendChat() {
-                    const inp = document.getElementById('chat-input');
-                    if(!inp.value) return;
-                    const box = document.getElementById('chat-box');
-                    box.innerHTML += `<div style="align-self: flex-end; background: var(--glass); padding: 10px; border-radius: 10px; margin-bottom: 10px; text-align: right;">${inp.value}</div>`;
-                    setTimeout(() => {
-                        box.innerHTML += `<div style="background: var(--primary); padding: 10px; border-radius: 10px; max-width: 80%; margin-bottom: 10px;">Com base em
+        window.onload = () => App.init();
+    </script>
+</body>
+</html>
