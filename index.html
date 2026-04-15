@@ -3,235 +3,408 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>União Nordeste de Angola Digital</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-
+<title>UNA Digital | Veltrix OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <style>
-body{margin:0;font-family:Inter;background:#0b0f19;color:#fff;display:flex;height:100vh}
-aside{width:260px;background:#111827;padding:20px;overflow:auto}
-.nav-item{padding:10px;border-radius:8px;margin-bottom:5px;cursor:pointer}
-.nav-item:hover{background:#1f2937}
-main{flex:1;display:flex;flex-direction:column}
-header{padding:15px;background:#111827;display:flex;justify-content:space-between}
-.container{padding:20px;overflow:auto}
-.card{background:#1f2937;padding:15px;border-radius:12px;margin-bottom:10px}
-input,textarea,select{width:100%;padding:10px;margin-top:5px;border-radius:8px;border:none}
-button{margin-top:5px;padding:10px;background:#2563eb;color:#fff;border:none;border-radius:8px;cursor:pointer}
-.view{display:none}
+:root{
+  --bg:#0a0d14; --card:#131722; --card-hover:#1a1f2e; --primary:#4f46e5; --primary-hover:#6366f1;
+  --text:#e2e8f0; --text-muted:#94a3b8; --border:#1e293b; --success:#10b981; --danger:#ef4444;
+  --sidebar:280px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Inter;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden}
+#app{display:flex;width:100%}
+
+/* DYNAMIC BACKGROUND */
+#bg-slideshow{position:fixed;inset:0;z-index:-2;transition:opacity 1s}
+#bg-slideshow img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 2s}
+#bg-slideshow img.active{opacity:0.15}
+#bg-overlay{position:fixed;inset:0;background:linear-gradient(180deg, rgba(10,13,20,0.7) 0%, var(--bg) 100%);z-index:-1}
+
+/* SIDEBAR */
+aside{width:var(--sidebar);background:rgba(19,23,34,0.8);backdrop-filter:blur(20px);border-right:1px solid var(--border);padding:24px;display:flex;flex-direction:column;transition:.3s}
+.logo{display:flex;align-items:center;gap:12px;margin-bottom:32px}
+.logo h1{font-size:20px;font-weight:800;background:linear-gradient(90deg,#4f46e5,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;margin-bottom:6px;cursor:pointer;transition:.2s;color:var(--text-muted)}
+.nav-item:hover{background:var(--card);color:var(--text)}
+.nav-item.active{background:var(--primary);color:#fff}
+.nav-item i{font-size:20px}
+
+/* MAIN */
+main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+header{padding:16px 24px;background:rgba(19,23,34,0.6);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.container{padding:24px;overflow:auto;flex:1}
+.view{display:none;animation:fadeIn.3s}
 .view.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* COMPONENTS */
+.card{background:rgba(19,23,34,0.7);backdrop-filter:blur(10px);border:1px solid var(--border);padding:20px;border-radius:16px;margin-bottom:16px;transition:.2s}
+.card:hover{border-color:#334155}
+.grid{display:grid;gap:16px}
+.grid-2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.grid-3{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+input,textarea,select{width:100%;padding:12px;margin-top:8px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:Inter}
+input:focus,textarea:focus{outline:none;border-color:var(--primary)}
+button{padding:10px 16px;background:var(--primary);color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:600;transition:.2s;display:inline-flex;align-items:center;gap:8px}
+button:hover{background:var(--primary-hover)}
+button.secondary{background:var(--card);border:1px solid var(--border)}
+button.danger{background:var(--danger)}
+.badge{background:var(--primary);padding:2px 8px;border-radius:20px;font-size:12px;font-weight:600}
+.avatar{width:40px;height:40px;border-radius:50%;object-fit:cover}
+.avatar-lg{width:80px;height:80px}
+
+/* SOCIAL */
+.post-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.post-actions{display:flex;gap:16px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.post-action{display:flex;align-items:center;gap:6px;color:var(--text-muted);cursor:pointer}
+.post-action:hover{color:var(--primary)}
+.post-action.active{color:var(--primary);font-weight:600}
+.comment{margin-top:12px;padding-left:16px;border-left:2px solid var(--border)}
+
+/* LEADER CARDS */
+.leader-card{display:flex;gap:20px}
+.leader-card img{width:120px;height:120px;border-radius:16px;object-fit:cover}
+
+/* RESPONSIVE */
+.menu-toggle{display:none}
+@media(max-width: 1024px){
+  aside{position:fixed;left:-100%;z-index:100;height:100%}
+  aside.open{left:0}
+ .menu-toggle{display:block}
+}
+@media(max-width: 768px){
+ .grid-2,.grid-3{grid-template-columns:1fr}
+ .leader-card{flex-direction:column}
+ .container{padding:16px}
+}
+
+/* LOGIN SCREEN */
+#login-screen{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center}
+.login-box{width:90%;max-width:400px}
+
+/* GAMIFICATION */
+.rank{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;font-size:12px;font-weight:700}
+.rank-1{background:linear-gradient(135deg,#FFD700,#FFA500)}
+.rank-2{background:linear-gradient(135deg,#C0C0C0,#808080)}
+.rank-3{background:linear-gradient(135deg,#CD7F32,#8B4513)}
+.progress{height:6px;background:var(--border);border-radius:10px;overflow:hidden;margin-top:8px}
+.progress-bar{height:100%;background:var(--primary);transition:.5s}
+
+/* VLOG & LIVE */
+.video-thumb{position:relative;border-radius:12px;overflow:hidden;cursor:pointer}
+.video-thumb img{width:100%;height:180px;object-fit:cover}
+.video-thumb.play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);opacity:0;transition:.2s}
+.video-thumb:hover.play{opacity:1}
+.live-badge{position:absolute;top:12px;left:12px;background:var(--danger);padding:4px 8px;border-radius:6px;font-size:12px;font-weight:700;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
 </style>
 </head>
-
 <body>
 
+<!-- DYNAMIC BACKGROUND -->
+<div id="bg-slideshow"></div>
+<div id="bg-overlay"></div>
+
+<div id="app">
 <!-- LOGIN -->
-<div id="login" style="position:absolute;inset:0;background:#0b0f19;display:flex;align-items:center;justify-content:center;">
-<div class="card" style="width:300px">
-<h3>Login</h3>
-<select id="userSelect"></select>
-<button onclick="login()">Entrar</button>
-</div>
+<div id="login-screen">
+  <div class="card login-box">
+    <div class="logo" style="justify-content:center;margin-bottom:24px">
+      <i class="ri-church-line" style="font-size:32px;color:var(--primary)"></i>
+      <h1>UNA Digital</h1>
+    </div>
+    <h3 style="margin-bottom:16px">Bem-vindo de volta</h3>
+    <select id="userSelect"></select>
+    <button onclick="App.login()" style="width:100%;margin-top:16px">Entrar na Plataforma</button>
+  </div>
 </div>
 
-<aside>
-<h3>UNA Digital</h3>
-<div class="nav-item" onclick="nav('dash')">Dashboard</div>
-<div class="nav-item" onclick="nav('feed')">Feed</div>
-<div class="nav-item" onclick="nav('sec')">Secretaria</div>
-<div class="nav-item" onclick="nav('fin')">Tesouraria</div>
-<div class="nav-item" onclick="nav('dept')">Departamentos</div>
-<div class="nav-item" onclick="nav('biblia')">Bíblia</div>
-<div class="nav-item" onclick="nav('chat')">Guia IA</div>
-<div class="nav-item" onclick="nav('radio')">Rádio</div>
+<aside id="sidebar">
+  <div class="logo">
+    <i class="ri-church-line" style="font-size:28px;color:var(--primary)"></i>
+    <h1>UNA Digital</h1>
+  </div>
+  <div class="nav-item active" onclick="App.nav('home')"><i class="ri-home-5-line"></i> Início</div>
+  <div class="nav-item" onclick="App.nav('feed')"><i class="ri-group-line"></i> Comunidade</div>
+  <div class="nav-item" onclick="App.nav('membros')"><i class="ri-user-3-line"></i> Membros</div>
+  <div class="nav-item" onclick="App.nav('fin')"><i class="ri-wallet-3-line"></i> Tesouraria</div>
+  <div class="nav-item" onclick="App.nav('dept')"><i class="ri-building-2-line"></i> Departamentos</div>
+  <div class="nav-item" onclick="App.nav('vlog')"><i class="ri-video-line"></i> Vlog & Eventos</div>
+  <div class="nav-item" onclick="App.nav('live')"><i class="ri-live-line"></i> Cultos Online</div>
+  <div class="nav-item" onclick="App.nav('biblia')"><i class="ri-book-2-line"></i> Bíblia</div>
+  <div class="nav-item" onclick="App.nav('chat')"><i class="ri-robot-2-line"></i> Guia Espiritual IA</div>
 </aside>
 
 <main>
 <header>
-<span id="userInfo"></span>
-<button onclick="logout()">Sair</button>
+  <button class="menu-toggle secondary" onclick="App.toggleMenu()"><i class="ri-menu-line"></i></button>
+  <div id="userInfo" style="display:flex;align-items:center;gap:12px"></div>
+  <button class="secondary" onclick="App.logout()"><i class="ri-logout-box-line"></i> Sair</button>
 </header>
 
 <div class="container">
+  <!-- HOME -->
+  <div id="home" class="view active">
+    <h2 style="margin-bottom:20px">Mensagens dos Líderes Espirituais</h2>
+    <div id="leaders"></div>
+    <h2 style="margin:32px 0 20px">Dashboard</h2>
+    <div class="grid grid-3" id="stats"></div>
+  </div>
 
-<div id="dash" class="view active">
-<div class="card" id="stats"></div>
-</div>
+  <!-- FEED -->
+  <div id="feed" class="view">
+    <div class="card">
+      <textarea id="postText" placeholder="Compartilhe uma palavra, testemunho ou pedido de oração..."></textarea>
+      <button onclick="App.createPost()" style="margin-top:12px"><i class="ri-send-plane-line"></i> Publicar</button>
+    </div>
+    <div id="posts"></div>
+  </div>
 
-<div id="feed" class="view">
-<div class="card">
-<textarea id="postText"></textarea>
-<button onclick="createPost()">Publicar</button>
-</div>
-<div id="posts"></div>
-</div>
+  <!-- MEMBROS -->
+  <div id="membros" class="view">
+    <div class="card" id="addMemberForm">
+      <h3>Novo Membro</h3>
+      <div class="grid grid-2">
+        <input id="mName" placeholder="Nome completo">
+        <input id="mContact" placeholder="Contacto/WhatsApp">
+        <input id="mPhoto" placeholder="URL da foto de perfil">
+        <select id="mStatus"><option>Ativo</option><option>Novo Convertido</option><option>Visitante</option></select>
+      </div>
+      <button onclick="App.addMember()" style="margin-top:12px"><i class="ri-add-line"></i> Adicionar Membro</button>
+    </div>
+    <h3 style="margin:24px 0 16px">Ranking de Membros <span class="badge">Algoritmo TikTok</span></h3>
+    <div class="grid grid-2" id="members"></div>
+  </div>
 
-<div id="sec" class="view">
-<div class="card">
-<input id="mName" placeholder="Nome">
-<input id="mContact" placeholder="Contacto">
-<select id="mStatus"><option>Ativo</option><option>Inativo</option></select>
-<button onclick="addMember()">Adicionar</button>
-</div>
-<div id="members"></div>
-</div>
+  <!-- TESOURARIA -->
+  <div id="fin" class="view">
+    <div class="card">
+      <h3>Registrar Entrada</h3>
+      <div class="grid grid-3">
+        <input id="fName" placeholder="Nome do membro">
+        <input id="fAmount" type="number" placeholder="Valor em Kz">
+        <select id="fType"><option>Dízimo</option><option>Oferta</option><option>Voto</option><option>Construção</option></select>
+      </div>
+      <button onclick="App.addFinance()" style="margin-top:12px"><i class="ri-add-line"></i> Registrar</button>
+    </div>
+    <div id="finance"></div>
+  </div>
 
-<div id="fin" class="view">
-<div class="card">
-<input id="fName" placeholder="Nome">
-<input id="fAmount" placeholder="Valor">
-<select id="fType"><option>Dízimo</option><option>Oferta</option></select>
-<button onclick="addFinance()">Registrar</button>
-</div>
-<div id="finance"></div>
-</div>
+  <!-- DEPARTAMENTOS -->
+  <div id="dept" class="view">
+    <div class="card">
+      <h3>Gestão de Departamentos</h3>
+      <input id="dName" placeholder="Nome do departamento: Louvor, Jovens, Infantil...">
+      <button onclick="App.createDept()" style="margin-top:12px"><i class="ri-add-line"></i> Criar Departamento</button>
+    </div>
+    <div id="deptList" class="grid grid-2"></div>
+  </div>
 
-<div id="dept" class="view">
-<div class="card">
-<input id="dName" placeholder="Departamento">
-<button onclick="createDept()">Criar</button>
-</div>
-<div id="deptList"></div>
-</div>
+  <!-- VLOG -->
+  <div id="vlog" class="view">
+    <div class="card">
+      <h3>Adicionar Notícia/Evento</h3>
+      <input id="vTitle" placeholder="Título do evento">
+      <input id="vThumb" placeholder="URL da thumbnail">
+      <input id="vDate" type="date">
+      <textarea id="vDesc" placeholder="Descrição"></textarea>
+      <button onclick="App.addVlog()" style="margin-top:12px"><i class="ri-add-line"></i> Publicar</button>
+    </div>
+    <h3 style="margin:24px 0 16px">Calendário de Eventos</h3>
+    <div class="grid grid-3" id="vlogList"></div>
+  </div>
 
-<div id="biblia" class="view">
-<div class="card">
-<input id="bSearch">
-<button onclick="searchBible()">Buscar</button>
-<div id="bResult"></div>
-</div>
-</div>
+  <!-- LIVE -->
+  <div id="live" class="view">
+    <div class="card">
+      <h3>Transmitir Culto Online</h3>
+      <input id="liveTitle" placeholder="Título: Culto de Domingo">
+      <input id="liveUrl" placeholder="URL do stream YouTube/Twitch embed">
+      <button onclick="App.startLive()" style="margin-top:12px"><i class="ri-live-line"></i> Iniciar Transmissão</button>
+    </div>
+    <div id="liveList"></div>
+  </div>
 
-<div id="chat" class="view">
-<div class="card">
-<div id="chatBox"></div>
-<input id="chatInput">
-<button onclick="sendChat()">Enviar</button>
-</div>
-</div>
+  <!-- BÍBLIA -->
+  <div id="biblia" class="view">
+    <div class="card">
+      <input id="bSearch" placeholder="Ex: joao 3:16, salmos 23">
+      <button onclick="App.searchBible()" style="margin-top:12px"><i class="ri-search-line"></i> Buscar</button>
+      <div id="bResult" style="margin-top:16px;font-size:18px;line-height:1.6"></div>
+    </div>
+  </div>
 
-<div id="radio" class="view">
-<div class="card">
-<audio controls src="https://stream.radiojar.com/4ywdgup3bnzuv"></audio>
-</div>
-</div>
+  <!-- CHAT IA -->
+  <div id="chat" class="view">
+    <div class="card">
+      <div id="chatBox" style="height:400px;overflow:auto;margin-bottom:16px"></div>
+      <div style="display:flex;gap:8px">
+        <input id="chatInput" placeholder="Peça um conselho, versículo, oração...">
+        <button onclick="App.sendChat()"><i class="ri-send-plane-line"></i></button>
+      </div>
+    </div>
+  </div>
 
 </div>
 </main>
+</div>
 
 <script>
+// ===== VELTRIX OS - STATE MANAGEMENT =====
+const Store = {
+  state: JSON.parse(localStorage.getItem("una_v2")) || {
+    users: [
+      {id:1, name:"Pastor João", role:"admin", photo:"https://i.pravatar.cc/150?img=12", followers:[], following:[], likes:0, shares:0},
+      {id:2, name:"Ir. Maria", role:"user", photo:"https://i.pravatar.cc/150?img=5", followers:[], following:[], likes:0, shares:0},
+      {id:3, name:"Dc. Pedro", role:"admin", photo:"https://i.pravatar.cc/150?img=8", followers:[], following:[], likes:0, shares:0}
+    ],
+    posts: [], members: [], finances: [], departments: [], vlogs: [], lives: [],
+    leaders: [
+      {name:"Apóstolo Mateus", photo:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
+       msg:"<p>A paz do Senhor, amada igreja! Vivemos tempos de restauração. O Senhor tem me falado sobre o poder da unidade. Quando o povo de Deus se une em um só propósito, muralhas caem e impossíveis se tornam testemunhos.</p><p>Neste mês, quero desafiar cada família da UNA a orar 15 minutos por dia pela nossa nação. Temos visto curas, libertações e famílias sendo restauradas porque alguém decidiu se colocar na brecha.</p><p>Não negligencie os pequenos começos. Davi foi ungido no campo, não no palácio. Seu chamado está sendo forjado no secreto. Continue fiel no pouco.</p><p>Profetizo que esta será uma estação de portas abertas. Empresas, ministérios e sonhos que estavam parados vão receber o sopro de vida. Creia, tome posse e aja em fé!</p>"},
+      {name:"Bispa Rebeca", photo:"https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
+       msg:"<p>Queridos, meu coração queima pelas famílias. Deus está levantando mulheres e homens que vão curar gerações. O altar da sua casa precisa voltar a arder.</p><p>Tenho recebido testemunhos de crianças que voltaram a sonhar, casamentos que foram salvos e jovens livres das drogas. Tudo começou com um joelho no chão.</p><p>Não terceirize a educação espiritual dos seus filhos. O mundo está doutrinando eles 24h por dia. Nós precisamos ser mais intencionais. Culto doméstico não é opção, é urgência.</p><p>Declare hoje: 'Eu e a minha casa serviremos ao Senhor'. O inferno treme quando uma família se alinha. Você não está criando só filhos, está levantando um exército.</p>"},
+      {name:"Pastor Lucas", photo:"https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400",
+       msg:"<p>Família UNA, que tempo profético estamos vivendo! O Espírito Santo está soprando sobre os negócios e talentos da igreja. É tempo de empreender com propósito.</p><p>Chega de mentalidade de escassez. José administrou a crise do Egito porque ouviu Deus. Daniel governou na Babilônia porque tinha excelência. Você foi chamado para influenciar.</p><p>Nos próximos 90 dias, lance esse projeto, abra essa empresa, escreva esse livro. Não espere condições perfeitas. Noé construiu a arca no sol.</p><p>Estou orando por 100 novos empresários do Reino na nossa igreja. O dinheiro é neutro: nas mãos erradas destrói, nas mãos ungidas salva vidas. Seja um canal. Dízimo, oferta e investimento andam juntos.</p>"}
+    ],
+    bible: {
+      "joao 3:16": "Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna.",
+      "salmos 23": "O Senhor é o meu pastor, nada me faltará. Deitar-me faz em verdes pastos, guia-me mansamente a águas tranquilas.",
+      "filipenses 4:13": "Posso todas as coisas naquele que me fortalece."
+    },
+    bgImages: [
+      "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1920",
+      "https://images.unsplash.com/photo-1438032005730-c779502df39b?w=1920",
+      "https://images.unsplash.com/photo-1507692049790-de58290a4334?w=1920",
+      "https://images.unsplash.com/photo-1445112098124-3e76dd679ab7?w=1920"
+    ]
+  },
+  session: null,
 
-/* DB */
-let DB=JSON.parse(localStorage.getItem("db"))||{
-users:[{name:"Pastor",role:"admin"},{name:"Membro",role:"user"}],
-posts:[],members:[],finances:[],departments:[]
+  save() { localStorage.setItem("una_v2", JSON.stringify(this.state)); },
+
+  // ALGORITMO TIKTOK: score = followers*3 + shares*2 + likes
+  getScore(userId) {
+    const u = this.state.users.find(x => x.id === userId);
+    return u? (u.followers.length * 3 + u.shares * 2 + u.likes) : 0;
+  },
+
+  getRankedMembers() {
+    return [...this.state.members].sort((a,b) => {
+      return this.getScore(b.id) - this.getScore(a.id);
+    });
+  }
 };
 
-let session=null;
+// ===== VELTRIX OS - APP CONTROLLER =====
+const App = {
+  init() {
+    this.renderBg();
+    this.loadUsers();
+    this.renderLeaders();
+    setInterval(() => this.rotateBg(), 8000);
+  },
 
-/* LOGIN */
-function loadUsers(){
-userSelect.innerHTML="";
-DB.users.forEach(u=>{
-userSelect.innerHTML+=`<option>${u.name}</option>`;
-});
-}
-function login(){
-let name=userSelect.value;
-session=DB.users.find(u=>u.name===name);
-userInfo.innerText=session.name;
-login.style.display="none";
-renderAll();
-}
-function logout(){location.reload();}
+  renderBg() {
+    const container = document.getElementById('bg-slideshow');
+    Store.state.bgImages.forEach((url, i) => {
+      const img = document.createElement('img');
+      img.src = url;
+      if(i === 0) img.classList.add('active');
+      container.appendChild(img);
+    });
+  },
 
-/* NAV */
-function nav(id){
-document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
-document.getElementById(id).classList.add("active");
-}
+  rotateBg() {
+    const imgs = document.querySelectorAll('#bg-slideshow img');
+    const active = document.querySelector('#bg-slideshow img.active');
+    let next = active.nextElementSibling || imgs[0];
+    active.classList.remove('active');
+    next.classList.add('active');
+  },
 
-/* FEED */
-function createPost(){
-DB.posts.unshift({id:Date.now(),user:session.name,text:postText.value,likes:0});
-save();renderPosts();
-}
-function like(id){
-let p=DB.posts.find(x=>x.id===id);
-p.likes++;save();renderPosts();
-}
-function renderPosts(){
-posts.innerHTML="";
-DB.posts.forEach(p=>{
-posts.innerHTML+=`<div class="card">${p.user}: ${p.text}<br>❤️ ${p.likes}
-<button onclick="like(${p.id})">Like</button></div>`;
-});
-}
+  loadUsers() {
+    userSelect.innerHTML = "";
+    Store.state.users.forEach(u => {
+      userSelect.innerHTML += `<option value="${u.id}">${u.name} - ${u.role}</option>`;
+    });
+  },
 
-/* SECRETARIA */
-function addMember(){
-DB.members.push({name:mName.value,contact:mContact.value,status:mStatus.value});
-save();renderMembers();
-}
-function renderMembers(){
-members.innerHTML="";
-DB.members.forEach(m=>{
-members.innerHTML+=`<div class="card">${m.name} - ${m.status}</div>`;
-});
-}
+  login() {
+    const id = Number(userSelect.value);
+    Store.session = Store.state.users.find(u => u.id === id);
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('userInfo').innerHTML = `
+      <img src="${Store.session.photo}" class="avatar">
+      <div><div style="font-weight:600">${Store.session.name}</div><div style="font-size:12px;color:var(--text-muted)">${Store.session.role}</div></div>
+    `;
+    this.renderAll();
+    if(Store.session.role!== 'admin') {
+      document.getElementById('addMemberForm').style.display = 'none';
+    }
+  },
 
-/* FINANCE */
-function addFinance(){
-DB.finances.push({name:fName.value,amount:Number(fAmount.value),type:fType.value});
-save();renderFinance();
-}
-function renderFinance(){
-finance.innerHTML="";
-let total=0;
-DB.finances.forEach(f=>{
-total+=f.amount;
-finance.innerHTML+=`<div class="card">${f.name} - ${f.amount}</div>`;
-});
-stats.innerText="Total: "+total+" Kz";
-}
+  logout() { location.reload(); },
+  toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); },
 
-/* DEPT */
-function createDept(){
-DB.departments.push({name:dName.value,data:[]});
-save();renderDept();
-}
-function renderDept(){
-deptList.innerHTML="";
-DB.departments.forEach(d=>{
-deptList.innerHTML+=`<div class="card">${d.name}</div>`;
-});
-}
+  nav(id) {
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    document.querySelectorAll(".nav-item").forEach(v => v.classList.remove("active"));
+    event.target.closest('.nav-item').classList.add("active");
+    if(window.innerWidth < 1024) document.getElementById('sidebar').classList.remove('open');
+  },
 
-/* BIBLE */
-const bible={"joao 3:16":"Deus amou o mundo..."};
-function searchBible(){
-bResult.innerText=bible[bSearch.value.toLowerCase()]||"Não encontrado";
-}
+  renderAll() {
+    this.renderStats();
+    this.renderPosts();
+    this.renderMembers();
+    this.renderFinance();
+    this.renderDept();
+    this.renderVlog();
+    this.renderLive();
+  },
 
-/* CHAT */
-function sendChat(){
-chatBox.innerHTML+="<div>Você: "+chatInput.value+"</div>";
-chatBox.innerHTML+="<div>IA: Confie em Deus</div>";
-}
+  renderLeaders() {
+    leaders.innerHTML = Store.state.leaders.map(l => `
+      <div class="card leader-card">
+        <img src="${l.photo}">
+        <div><h3>${l.name}</h3>${l.msg}</div>
+      </div>
+    `).join('');
+  },
 
-/* SAVE */
-function save(){localStorage.setItem("db",JSON.stringify(DB));}
+  renderStats() {
+    const totalFin = Store.state.finances.reduce((s,f) => s+f.amount, 0);
+    stats.innerHTML = `
+      <div class="card"><div style="color:var(--text-muted);font-size:14px">Membros</div><div style="font-size:28px;font-weight:700">${Store.state.members.length}</div></div>
+      <div class="card"><div style="color:var(--text-muted);font-size:14px">Total Arrecadado</div><div style="font-size:28px;font-weight:700">${totalFin.toLocaleString()} Kz</div></div>
+      <div class="card"><div style="color:var(--text-muted);font-size:14px">Departamentos</div><div style="font-size:28px;font-weight:700">${Store.state.departments.length}</div></div>
+    `;
+  },
 
-/* INIT */
-loadUsers();
-function renderAll(){
-renderPosts();
-renderMembers();
-renderFinance();
-renderDept();
-}
+  // POSTS + SOCIAL
+  createPost() {
+    if(!postText.value.trim()) return alert('Escreva algo primeiro');
+    Store.state.posts.unshift({
+      id: Date.now(), userId: Store.session.id, text: postText.value,
+      likes: [], comments: [], shares: 0, created: new Date().toISOString()
+    });
+    postText.value = '';
+    Store.save(); this.renderPosts();
+  },
 
-</script>
+  likePost(postId) {
+    const p = Store.state.posts.find(x => x.id === postId);
+    const idx = p.likes.indexOf(Store.session.id);
+    if(idx > -1) p.likes.splice(idx,1);
+    else p.likes.push(Store.session.id);
+    Store.save(); this.renderPosts();
+  },
 
-</body>
-    </html>
+  commentPost(postId) {
+    const text = prompt('Seu comentário:');
+    if(!text) return;
+    const p = Store.state.po
