@@ -1,255 +1,428 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UNA Digital | Veltrix OS</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNA Digital Platform | Super App</title>
+    
+    <!-- Fontes e Ícones -->
+    <link href="https://googleapis.com" rel="stylesheet">
+    <script src="https://unpkg.com"></script>
+    <script src="https://jsdelivr.net"></script>
+    <script src="https://cloudflare.com"></script>
 
-<meta name="theme-color" content="#4f46e5">
+    <style>
+        :root {
+            --primary: #002D5E; /* Azul Profundo */
+            --accent: #C5A059;  /* Dourado */
+            --bg: #050a0f;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+            --text-dim: #a0a0a0;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            background: radial-gradient(circle at top right, #001f3f, #050a0f);
+            min-height: 100vh;
+        }
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        /* --- Layout --- */
+        .app-container { display: flex; min-height: 100vh; }
 
-<style>
-:root {
---bg:#0a0d14; --card:#161b22; --primary:#4f46e5;
---text:#e6edf3; --border:#30363d;
-}
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter';}
-body{background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden}
+        /* Sidebar Glassmorphism */
+        .sidebar {
+            width: 260px;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border-right: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1rem;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: var(--transition);
+        }
 
-/* AUTH */
-#auth{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:#000;z-index:1000}
-.auth-box{background:var(--card);padding:30px;border-radius:15px;width:300px;text-align:center}
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 1rem 2.5rem;
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: -1px;
+        }
 
-/* LAYOUT */
-#app{display:none;width:100%}
-aside{width:260px;background:#0d1117;padding:20px}
-main{flex:1;display:flex;flex-direction:column}
-header{padding:10px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between}
-.view{display:none;padding:20px;overflow:auto}
-.view.active{display:block}
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.8rem 1rem;
+            color: var(--text-dim);
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 0.3rem;
+            transition: var(--transition);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
 
-/* UI */
-.nav{padding:10px;border-radius:8px;cursor:pointer;margin-bottom:5px}
-.nav.active,.nav:hover{background:var(--primary)}
-.card{background:var(--card);padding:15px;border-radius:12px;margin-bottom:10px}
-input,select{width:100%;padding:10px;margin-top:5px;background:#000;border:1px solid var(--border);color:#fff}
-button{padding:10px;background:var(--primary);color:#fff;border:none;border-radius:8px;margin-top:5px;cursor:pointer}
+        .nav-item:hover, .nav-item.active {
+            background: var(--glass);
+            color: var(--accent);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
 
-</style>
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 2rem;
+            max-width: 1400px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        /* --- UI Components --- */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .glass-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+
+        .btn-premium {
+            background: linear-gradient(135deg, var(--accent), #8e7037);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-premium:hover { opacity: 0.9; transform: scale(1.02); }
+
+        .grid-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* --- Social Feed --- */
+        .feed-container { max-width: 700px; margin: 0 auto; }
+        .post-card { margin-bottom: 1.5rem; }
+        .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); }
+
+        /* --- Player --- */
+        .radio-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            z-index: 1000;
+        }
+
+        /* --- Auth Modal --- */
+        .auth-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            display: none; justify-content: center; align-items: center; z-index: 2000;
+        }
+
+        /* --- Mobile Responsive --- */
+        @media (max-width: 768px) {
+            .sidebar { width: 0; padding: 0; overflow: hidden; }
+            .main-content { margin-left: 0; }
+            .radio-player { width: calc(100% - 40px); left: 20px; }
+        }
+        
+        .lang-selector { background: transparent; color: var(--text); border: 1px solid var(--glass-border); border-radius: 5px; padding: 5px; }
+    </style>
 </head>
-
 <body>
 
-<!-- LOGIN -->
-<div id="auth">
-<div class="auth-box">
-<h2>UNA Digital</h2>
-<select id="role">
-<option value="member">Membro</option>
-<option value="pastor">Pastor</option>
-<option value="treasurer">Tesoureiro</option>
-<option value="secretary">Secretário</option>
-</select>
-<button onclick="App.login()">Entrar</button>
-</div>
-</div>
+    <!-- Sistema de Login -->
+    <div id="auth-screen" class="auth-overlay" style="display: flex;">
+        <div class="glass-card" style="width: 400px; text-align: center;">
+            <h2 style="margin-bottom: 1rem; color: var(--accent);">UNA Digital</h2>
+            <p style="margin-bottom: 2rem; color: var(--text-dim);">Acesse sua plataforma espiritual</p>
+            <input type="text" id="user-name" placeholder="Nome de Usuário" style="width: 100%; padding: 12px; margin-bottom: 1rem; border-radius: 10px; border: none; background: rgba(255,255,255,0.1); color: white;">
+            <select id="user-role" style="width: 100%; padding: 12px; margin-bottom: 1.5rem; border-radius: 10px; background: rgba(255,255,255,0.1); color: white; border: none;">
+                <option value="membro">Membro</option>
+                <option value="pastor">Pastor</option>
+                <option value="tesoureiro">Tesoureiro</option>
+                <option value="admin">Administrador</option>
+            </select>
+            <button class="btn-premium" style="width: 100%;" onclick="App.auth.login()">Entrar</button>
+        </div>
+    </div>
 
-<div id="app">
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <i data-lucide="shield-check"></i> UNA DIGITAL
+            </div>
+            <nav id="menu-items">
+                <!-- Injetado via JS -->
+            </nav>
+        </aside>
 
-<aside>
-<h3>UNA</h3>
-<div class="nav active" onclick="App.nav('home',this)">Dashboard</div>
-<div class="nav" onclick="App.nav('feed',this)">Feed</div>
-<div class="nav" onclick="App.nav('bible',this)">Bíblia</div>
-<div class="nav" onclick="App.nav('hymn',this)">Hinário</div>
-<div class="nav" onclick="App.nav('finance',this)">Tesouraria</div>
-<div class="nav" onclick="App.nav('secret',this)">Secretaria</div>
-<div class="nav" onclick="App.nav('chat',this)">Chat</div>
-<button onclick="App.logout()">Sair</button>
-</aside>
+        <!-- Main -->
+        <main class="main-content">
+            <header class="topbar">
+                <div id="page-title">
+                    <h1 style="font-size: 1.5rem;">Dashboard</h1>
+                    <span id="current-date" style="color: var(--text-dim); font-size: 0.8rem;"></span>
+                </div>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <select class="lang-selector" onchange="App.translate(this.value)">
+                        <option value="pt">Português</option>
+                        <option value="en">English</option>
+                        <option value="um">Umbundo</option>
+                        <option value="ki">Kimbundo</option>
+                    </select>
+                    <div class="glass-card" style="padding: 8px 15px; border-radius: 30px; display: flex; align-items: center; gap: 10px;">
+                        <span id="user-display">Membro</span>
+                        <div class="avatar" style="width: 25px; height: 25px;"></div>
+                    </div>
+                </div>
+            </header>
 
-<main>
-<header>
-<div id="user"></div>
-</header>
+            <div id="app-view">
+                <!-- Conteúdo Dinâmico -->
+            </div>
+        </main>
+    </div>
 
-<!-- DASH -->
-<div id="home" class="view active">
-<div class="card">Bem-vindo ao sistema UNA Digital</div>
-<canvas id="chart"></canvas>
-</div>
+    <!-- Mini Player Rádio -->
+    <div class="radio-player glass-card">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="width: 50px; height: 50px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="radio" style="color: var(--accent);"></i>
+            </div>
+            <div style="flex: 1;">
+                <p style="font-size: 0.8rem; font-weight: 600;">Rádio Adventista</p>
+                <p style="font-size: 0.7rem; color: var(--text-dim);">Ao Vivo: Lição da Escola Sabatina</p>
+            </div>
+            <button style="background: none; border: none; color: white; cursor: pointer;">
+                <i data-lucide="play-circle"></i>
+            </button>
+        </div>
+    </div>
 
-<!-- FEED -->
-<div id="feed" class="view">
-<div class="card">
-<textarea id="post"></textarea>
-<button onclick="App.post()">Publicar</button>
-</div>
-<div id="posts"></div>
-</div>
+    <script>
+        // --- Core Application Engine ---
+        const App = {
+            state: {
+                user: null,
+                currentLang: 'pt',
+                view: 'dashboard',
+                data: JSON.parse(localStorage.getItem('una_data')) || {
+                    membros: 1250,
+                    dizimos: 45000,
+                    posts: [
+                        { id: 1, author: 'Pr. Silva', content: 'Que a paz de Deus esteja com todos hoje!', likes: 24, comments: 5 },
+                        { id: 2, author: 'Secretaria', content: 'Novo mutirão de limpeza no sábado.', likes: 12, comments: 2 }
+                    ],
+                    contribuicoes: []
+                }
+            },
 
-<!-- BIBLE -->
-<div id="bible" class="view">
-<input id="ref" placeholder="João 3:16">
-<button onclick="App.bible()">Buscar</button>
-<div id="verse"></div>
-</div>
+            init() {
+                lucide.createIcons();
+                this.renderMenu();
+                this.router('dashboard');
+                document.getElementById('current-date').innerText = new Date().toLocaleDateString();
+            },
 
-<!-- HYMNS -->
-<div id="hymn" class="view">
-<div id="hlist"></div>
-</div>
+            auth: {
+                login() {
+                    const name = document.getElementById('user-name').value || 'Usuário';
+                    const role = document.getElementById('user-role').value;
+                    App.state.user = { name, role };
+                    document.getElementById('auth-screen').style.display = 'none';
+                    document.getElementById('user-display').innerText = name;
+                    App.renderMenu();
+                    App.router('dashboard');
+                }
+            },
 
-<!-- FINANCE -->
-<div id="finance" class="view">
-<input id="name" placeholder="Nome">
-<input id="val" placeholder="Valor">
-<button onclick="App.pay()">Registrar</button>
-<div id="fin"></div>
-</div>
+            // --- Gerenciador de Rotas/Views ---
+            router(view) {
+                this.state.view = view;
+                const container = document.getElementById('app-view');
+                
+                // Update active menu
+                document.querySelectorAll('.nav-item').forEach(el => {
+                    el.classList.toggle('active', el.dataset.view === view);
+                });
 
-<!-- SECRET -->
-<div id="secret" class="view">
-<input id="mname">
-<button onclick="App.addMember()">Adicionar</button>
-<div id="members"></div>
-</div>
+                switch(view) {
+                    case 'dashboard': this.views.dashboard(container); break;
+                    case 'social': this.views.social(container); break;
+                    case 'secretaria': this.views.secretaria(container); break;
+                    case 'tesouraria': this.views.tesouraria(container); break;
+                    case 'biblia': this.views.biblia(container); break;
+                    case 'hinos': this.views.hinos(container); break;
+                    case 'chat': this.views.chat(container); break;
+                }
+                lucide.createIcons();
+            },
 
-<!-- CHAT -->
-<div id="chat" class="view">
-<div id="chatbox"></div>
-<input id="msg">
-<button onclick="App.send()">Enviar</button>
-</div>
+            views: {
+                dashboard(container) {
+                    container.innerHTML = `
+                        <div class="grid-dashboard">
+                            <div class="glass-card">
+                                <h4 style="color: var(--text-dim)">Total de Membros</h4>
+                                <h2 style="font-size: 2.5rem; margin: 10px 0;">${App.state.data.membros}</h2>
+                                <div style="color: #4cd137; font-size: 0.8rem;">+12% este mês</div>
+                            </div>
+                            <div class="glass-card">
+                                <h4 style="color: var(--text-dim)">Faturamento (Kz)</h4>
+                                <h2 style="font-size: 2.5rem; margin: 10px 0;">${App.state.data.dizimos.toLocaleString()}</h2>
+                                <canvas id="chartDizimos" height="100"></canvas>
+                            </div>
+                            <div class="glass-card" style="background: linear-gradient(45deg, var(--primary), #004a99);">
+                                <h4 style="color: var(--accent)">Versículo do Dia</h4>
+                                <p style="font-style: italic; margin-top: 15px;">"Pois eu bem sei os planos que tenho para vós, diz o Senhor..."</p>
+                                <p style="text-align: right; margin-top: 10px; font-weight: bold;">Jeremias 29:11</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    const ctx = document.getElementById('chartDizimos').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Jan', 'Fev', 'Mar', 'Abr'],
+                            datasets: [{
+                                label: 'Crescimento',
+                                data: [12000, 19000, 15000, 45000],
+                                borderColor: '#C5A059',
+                                tension: 0.4
+                            }]
+                        },
+                        options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { display: false } } }
+                    });
+                },
 
-</main>
-</div>
+                social(container) {
+                    let postsHtml = App.state.data.posts.map(p => `
+                        <div class="glass-card post-card">
+                            <div class="post-header">
+                                <div class="avatar"></div>
+                                <div>
+                                    <div style="font-weight: 600;">${p.author}</div>
+                                    <div style="font-size: 0.7rem; color: var(--text-dim);">Há 2 horas • Igreja Central</div>
+                                </div>
+                            </div>
+                            <p style="margin-bottom: 1.5rem;">${p.content}</p>
+                            <div style="display: flex; gap: 20px; color: var(--text-dim); border-top: 1px solid var(--glass-border); padding-top: 10px;">
+                                <span><i data-lucide="heart" size="18"></i> ${p.likes}</span>
+                                <span><i data-lucide="message-circle" size="18"></i> ${p.comments}</span>
+                                <span><i data-lucide="share-2" size="18"></i></span>
+                            </div>
+                        </div>
+                    `).join('');
 
-<script>
-const DB = JSON.parse(localStorage.getItem("db")) || {posts:[],members:[],fin:[]}
+                    container.innerHTML = `
+                        <div class="feed-container">
+                            <div class="glass-card" style="margin-bottom: 2rem;">
+                                <textarea placeholder="O que está acontecendo na sua igreja?" style="width: 100%; background: transparent; border: none; color: white; font-size: 1.1rem; resize: none; outline: none;"></textarea>
+                                <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                                    <button class="btn-premium">Publicar</button>
+                                </div>
+                            </div>
+                            ${postsHtml}
+                        </div>
+                    `;
+                },
 
-const App = {
+                tesouraria(container) {
+                    container.innerHTML = `
+                        <div class="glass-card">
+                            <h3>Gestão Financeira</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                                <input type="number" id="valor-cont" placeholder="Valor (Kz)" style="padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white;">
+                                <select id="tipo-cont" style="padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white;">
+                                    <option>Dízimo</option>
+                                    <option>Oferta Pacto</option>
+                                    <option>Oferta Adoração</option>
+                                </select>
+                            </div>
+                            <button class="btn-premium" style="margin-top: 20px; width: 100%;" onclick="App.action.registrarContribuicao()">Registrar e Gerar Recibo PDF</button>
+                        </div>
+                    `;
+                },
 
-user:null,
+                hinos(container) {
+                    container.innerHTML = `
+                        <div style="margin-bottom: 20px;">
+                            <input type="text" placeholder="Pesquisar hino (número ou título)..." style="width: 100%; padding: 15px; border-radius: 15px; background: var(--glass); border: 1px solid var(--glass-border); color: white;">
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;">
+                            ${Array.from({length: 12}, (_, i) => `
+                                <div class="glass-card" style="text-align: center; cursor: pointer;">
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent);">${i + 1}</div>
+                                    <div style="font-size: 0.8rem; margin-top: 5px;">Hino de Louvor</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                },
 
-login(){
-this.user={role:role.value,name:role.value}
-localStorage.setItem("user",JSON.stringify(this.user))
-auth.style.display="none"
-app.style.display="flex"
-user.innerText=this.user.name
-this.init()
-},
+                chat(container) {
+                    container.innerHTML = `
+                        <div class="glass-card" style="height: 60vh; display: flex; flex-direction: column;">
+                            <div style="flex: 1; overflow-y: auto; padding: 10px;" id="chat-box">
+                                <div style="background: var(--primary); padding: 10px; border-radius: 10px; max-width: 80%; margin-bottom: 10px;">
+                                    Olá! Eu sou o assistente UNA. Como posso ajudar seu estudo bíblico hoje?
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="chat-input" placeholder="Pergunte algo sobre a bíblia..." style="flex: 1; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.05); border: none; color: white;">
+                                <button class="btn-premium" onclick="App.action.sendChat()">Enviar</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
 
-logout(){localStorage.clear();location.reload()},
-
-nav(id,el){
-document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"))
-document.getElementById(id).classList.add("active")
-document.querySelectorAll(".nav").forEach(n=>n.classList.remove("active"))
-el.classList.add("active")
-},
-
-init(){
-this.renderPosts()
-this.renderMembers()
-this.renderFin()
-this.hymns()
-this.chart()
-},
-
-post(){
-DB.posts.unshift({u:this.user.name,t:post.value})
-this.save();this.renderPosts()
-},
-
-renderPosts(){
-posts.innerHTML=""
-DB.posts.forEach(p=>{
-posts.innerHTML+=`<div class="card"><b>${p.u}</b><br>${p.t}</div>`
-})
-},
-
-addMember(){
-DB.members.push({n:mname.value})
-this.save();this.renderMembers()
-},
-
-renderMembers(){
-members.innerHTML=""
-DB.members.forEach(m=>{
-members.innerHTML+=`<div class="card">${m.n}</div>`
-})
-},
-
-pay(){
-DB.fin.push({n:name.value,v:val.value})
-this.save();this.renderFin()
-},
-
-renderFin(){
-fin.innerHTML=""
-DB.fin.forEach(f=>{
-fin.innerHTML+=`<div class="card">${f.n} - ${f.v}</div>`
-})
-},
-
-hymns(){
-for(let i=1;i<=50;i++){
-hlist.innerHTML+=`<div class="card">Hino ${i}</div>`
-}
-},
-
-async bible(){
-try{
-let r=await fetch("https://bible-api.com/"+ref.value)
-let d=await r.json()
-verse.innerText=d.text
-}catch{
-verse.innerText="Offline"
-}
-},
-
-send(){
-chatbox.innerHTML+=`<div>${this.user.name}: ${msg.value}</div>`
-},
-
-chart(){
-new Chart(chart,{type:'bar',data:{labels:["Jan","Fev"],datasets:[{data:[10,20]}]}})
-},
-
-save(){
-localStorage.setItem("db",JSON.stringify(DB))
-}
-
-}
-
-window.onload=()=>{
-let u=JSON.parse(localStorage.getItem("user"))
-if(u){
-App.user=u
-auth.style.display="none"
-app.style.display="flex"
-user.innerText=u.name
-App.init()
-}
-}
-
-/* PWA OFFLINE */
-if("serviceWorker" in navigator){
-const code=`
-self.addEventListener('fetch',e=>{
-e.respondWith(fetch(e.request).catch(()=>new Response("Offline")))
-})
-`
-const blob=new Blob([code],{type:"text/javascript"})
-navigator.serviceWorker.register(URL.createObjectURL(blob))
-}
-</script>
-
-</body>
-    </html>
+            action: {
+                registrarContribuicao() {
+                    const val = document.getElementById('valor-cont').value;
+                    const tipo = document.getElementById('tipo-cont').value;
+                    if(!val) return alert("Insira um valor");
+                    
+                    alert(`Sucesso! Recibo Digital Gerado para ${tipo} de ${val} Kz`);
+                    // Simulação de PDF aconteceria aqui com jsPDF
+                },
+                sendChat() {
+                    const inp = document.getElementById('chat-input');
+                    if(!inp.value) return;
+                    const box = document.getElementById('chat-box');
+                    box.innerHTML += `<div style="align-self: flex-end; background: var(--glass); padding: 10px; border-radius: 10px; margin-bottom: 10px; text-align: right;">${inp.value}</div>`;
+                    setTimeout(() => {
+                        box.innerHTML += `<div style="background: var(--primary); padding: 10px; border-radius: 10px; max-width: 80%; margin-bottom: 10px;">Com base em
