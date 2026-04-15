@@ -1,410 +1,302 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UNA Digital | Veltrix OS</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-<style>
-:root{
-  --bg:#0a0d14; --card:#131722; --card-hover:#1a1f2e; --primary:#4f46e5; --primary-hover:#6366f1;
-  --text:#e2e8f0; --text-muted:#94a3b8; --border:#1e293b; --success:#10b981; --danger:#ef4444;
-  --sidebar:280px;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Inter;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden}
-#app{display:flex;width:100%}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNA Digital | Veltrix OS - Adventist Ecosystem</title>
+    
+    <!-- Bibliotecas Externas -->
+    <link href="https://googleapis.com" rel="stylesheet">
+    <link href="https://jsdelivr.net" rel="stylesheet">
+    <script src="https://jsdelivr.net"></script>
+    <script src="https://cloudflare.com"></script>
 
-/* DYNAMIC BACKGROUND */
-#bg-slideshow{position:fixed;inset:0;z-index:-2;transition:opacity 1s}
-#bg-slideshow img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 2s}
-#bg-slideshow img.active{opacity:0.15}
-#bg-overlay{position:fixed;inset:0;background:linear-gradient(180deg, rgba(10,13,20,0.7) 0%, var(--bg) 100%);z-index:-1}
+    <style>
+        :root {
+            --bg: #0f172a; --card: #1e293b; --primary: #6366f1; --success: #10b981; 
+            --danger: #ef4444; --text: #f8fafc; --text-muted: #94a3b8; --border: #334155;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
 
-/* SIDEBAR */
-aside{width:var(--sidebar);background:rgba(19,23,34,0.8);backdrop-filter:blur(20px);border-right:1px solid var(--border);padding:24px;display:flex;flex-direction:column;transition:.3s}
-.logo{display:flex;align-items:center;gap:12px;margin-bottom:32px}
-.logo h1{font-size:20px;font-weight:800;background:linear-gradient(90deg,#4f46e5,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.nav-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;margin-bottom:6px;cursor:pointer;transition:.2s;color:var(--text-muted)}
-.nav-item:hover{background:var(--card);color:var(--text)}
-.nav-item.active{background:var(--primary);color:#fff}
-.nav-item i{font-size:20px}
+        /* Layout */
+        aside { width: 280px; background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; transition: 0.3s; z-index: 1000; }
+        main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        header { padding: 15px 25px; background: rgba(15, 23, 42, 0.8); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        
+        .view { display: none; padding: 25px; height: 100%; overflow-y: auto; animation: fadeIn 0.4s ease; }
+        .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* MAIN */
-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-header{padding:16px 24px;background:rgba(19,23,34,0.6);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.container{padding:24px;overflow:auto;flex:1}
-.view{display:none;animation:fadeIn.3s}
-.view.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-
-/* COMPONENTS */
-.card{background:rgba(19,23,34,0.7);backdrop-filter:blur(10px);border:1px solid var(--border);padding:20px;border-radius:16px;margin-bottom:16px;transition:.2s}
-.card:hover{border-color:#334155}
-.grid{display:grid;gap:16px}
-.grid-2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
-.grid-3{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
-input,textarea,select{width:100%;padding:12px;margin-top:8px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:Inter}
-input:focus,textarea:focus{outline:none;border-color:var(--primary)}
-button{padding:10px 16px;background:var(--primary);color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:600;transition:.2s;display:inline-flex;align-items:center;gap:8px}
-button:hover{background:var(--primary-hover)}
-button.secondary{background:var(--card);border:1px solid var(--border)}
-button.danger{background:var(--danger)}
-.badge{background:var(--primary);padding:2px 8px;border-radius:20px;font-size:12px;font-weight:600}
-.avatar{width:40px;height:40px;border-radius:50%;object-fit:cover}
-.avatar-lg{width:80px;height:80px}
-
-/* SOCIAL */
-.post-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.post-actions{display:flex;gap:16px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
-.post-action{display:flex;align-items:center;gap:6px;color:var(--text-muted);cursor:pointer}
-.post-action:hover{color:var(--primary)}
-.post-action.active{color:var(--primary);font-weight:600}
-.comment{margin-top:12px;padding-left:16px;border-left:2px solid var(--border)}
-
-/* LEADER CARDS */
-.leader-card{display:flex;gap:20px}
-.leader-card img{width:120px;height:120px;border-radius:16px;object-fit:cover}
-
-/* RESPONSIVE */
-.menu-toggle{display:none}
-@media(max-width: 1024px){
-  aside{position:fixed;left:-100%;z-index:100;height:100%}
-  aside.open{left:0}
- .menu-toggle{display:block}
-}
-@media(max-width: 768px){
- .grid-2,.grid-3{grid-template-columns:1fr}
- .leader-card{flex-direction:column}
- .container{padding:16px}
-}
-
-/* LOGIN SCREEN */
-#login-screen{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center}
-.login-box{width:90%;max-width:400px}
-
-/* GAMIFICATION */
-.rank{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;font-size:12px;font-weight:700}
-.rank-1{background:linear-gradient(135deg,#FFD700,#FFA500)}
-.rank-2{background:linear-gradient(135deg,#C0C0C0,#808080)}
-.rank-3{background:linear-gradient(135deg,#CD7F32,#8B4513)}
-.progress{height:6px;background:var(--border);border-radius:10px;overflow:hidden;margin-top:8px}
-.progress-bar{height:100%;background:var(--primary);transition:.5s}
-
-/* VLOG & LIVE */
-.video-thumb{position:relative;border-radius:12px;overflow:hidden;cursor:pointer}
-.video-thumb img{width:100%;height:180px;object-fit:cover}
-.video-thumb.play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);opacity:0;transition:.2s}
-.video-thumb:hover.play{opacity:1}
-.live-badge{position:absolute;top:12px;left:12px;background:var(--danger);padding:4px 8px;border-radius:6px;font-size:12px;font-weight:700;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
-</style>
+        /* Components */
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+        .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 10px; cursor: pointer; color: var(--text-muted); margin-bottom: 5px; transition: 0.2s; }
+        .nav-item:hover, .nav-item.active { background: var(--primary); color: white; }
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        
+        /* Auth Screen */
+        #auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        
+        /* Responsive */
+        @media (max-width: 1024px) { aside { position: fixed; left: -280px; height: 100%; } aside.open { left: 0; } }
+        
+        /* Custom UI */
+        .hymn-item { padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; border-radius: 8px; }
+        .hymn-item:hover { background: rgba(99, 102, 241, 0.1); }
+        .chat-box { height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 10px; background: #0003; border-radius: 10px; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; text-transform: uppercase; font-weight: 700; }
+    </style>
 </head>
 <body>
 
-<!-- DYNAMIC BACKGROUND -->
-<div id="bg-slideshow"></div>
-<div id="bg-overlay"></div>
-
-<div id="app">
-<!-- LOGIN -->
-<div id="login-screen">
-  <div class="card login-box">
-    <div class="logo" style="justify-content:center;margin-bottom:24px">
-      <i class="ri-church-line" style="font-size:32px;color:var(--primary)"></i>
-      <h1>UNA Digital</h1>
+<!-- TELA DE LOGIN -->
+<div id="auth-screen">
+    <div class="card" style="width: 400px; text-align: center;">
+        <h1 style="font-weight: 800; margin-bottom: 10px; background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">UNA DIGITAL</h1>
+        <p style="color: var(--text-muted); margin-bottom: 25px;">Ecossistema Global Adventista</p>
+        <select id="loginRole" style="width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; background: var(--bg); color: white; border: 1px solid var(--border);">
+            <option value="member">Membro</option>
+            <option value="pastor">Pastor</option>
+            <option value="treasurer">Tesoureiro</option>
+            <option value="secretary">Secretário</option>
+        </select>
+        <button class="btn btn-primary" style="width: 100%;" onclick="App.login()">Entrar no Sistema</button>
     </div>
-    <h3 style="margin-bottom:16px">Bem-vindo de volta</h3>
-    <select id="userSelect"></select>
-    <button onclick="App.login()" style="width:100%;margin-top:16px">Entrar na Plataforma</button>
-  </div>
 </div>
 
+<!-- SIDEBAR -->
 <aside id="sidebar">
-  <div class="logo">
-    <i class="ri-church-line" style="font-size:28px;color:var(--primary)"></i>
-    <h1>UNA Digital</h1>
-  </div>
-  <div class="nav-item active" onclick="App.nav('home')"><i class="ri-home-5-line"></i> Início</div>
-  <div class="nav-item" onclick="App.nav('feed')"><i class="ri-group-line"></i> Comunidade</div>
-  <div class="nav-item" onclick="App.nav('membros')"><i class="ri-user-3-line"></i> Membros</div>
-  <div class="nav-item" onclick="App.nav('fin')"><i class="ri-wallet-3-line"></i> Tesouraria</div>
-  <div class="nav-item" onclick="App.nav('dept')"><i class="ri-building-2-line"></i> Departamentos</div>
-  <div class="nav-item" onclick="App.nav('vlog')"><i class="ri-video-line"></i> Vlog & Eventos</div>
-  <div class="nav-item" onclick="App.nav('live')"><i class="ri-live-line"></i> Cultos Online</div>
-  <div class="nav-item" onclick="App.nav('biblia')"><i class="ri-book-2-line"></i> Bíblia</div>
-  <div class="nav-item" onclick="App.nav('chat')"><i class="ri-robot-2-line"></i> Guia Espiritual IA</div>
+    <div style="margin-bottom: 30px;">
+        <h2 style="font-size: 20px;">Veltrix <span style="color: var(--primary);">OS</span></h2>
+        <p id="userDisplay" style="font-size: 12px; color: var(--text-muted);"></p>
+    </div>
+    
+    <div class="nav-item active" onclick="App.nav('home')"><i class="ri-dashboard-line"></i> Início</div>
+    <div class="nav-item" onclick="App.nav('bible')"><i class="ri-book-open-line"></i> Bíblia Sagrada</div>
+    <div class="nav-item" onclick="App.nav('hymnal')"><i class="ri-music-2-line"></i> Hinário (HASD)</div>
+    <div class="nav-item" onclick="App.nav('spiritual')"><i class="ri-heart-pulse-line"></i> Área Espiritual</div>
+    
+    <!-- Restritos -->
+    <div id="nav-treasury" class="nav-item" style="display:none;" onclick="App.nav('treasury')"><i class="ri-bank-card-line"></i> Tesouraria</div>
+    <div id="nav-secretary" class="nav-item" style="display:none;" onclick="App.nav('secretary')"><i class="ri-file-user-line"></i> Secretaria</div>
+    
+    <div class="nav-item" onclick="App.nav('chat')"><i class="ri-message-3-line"></i> Chat Comunitário</div>
+    
+    <div style="margin-top: auto; padding-top: 20px;">
+        <button class="btn btn-danger" style="width: 100%;" onclick="location.reload()">Sair</button>
+    </div>
 </aside>
 
 <main>
-<header>
-  <button class="menu-toggle secondary" onclick="App.toggleMenu()"><i class="ri-menu-line"></i></button>
-  <div id="userInfo" style="display:flex;align-items:center;gap:12px"></div>
-  <button class="secondary" onclick="App.logout()"><i class="ri-logout-box-line"></i> Sair</button>
-</header>
+    <header>
+        <button class="btn" style="background: transparent;" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="ri-menu-2-line" style="font-size: 24px;"></i></button>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <i class="ri-notification-3-line"></i>
+            <img id="userAvatar" src="https://ui-avatars.com" style="width: 35px; border-radius: 50%;">
+        </div>
+    </header>
 
-<div class="container">
-  <!-- HOME -->
-  <div id="home" class="view active">
-    <h2 style="margin-bottom:20px">Mensagens dos Líderes Espirituais</h2>
-    <div id="leaders"></div>
-    <h2 style="margin:32px 0 20px">Dashboard</h2>
-    <div class="grid grid-3" id="stats"></div>
-  </div>
+    <div class="container">
+        <!-- HOME -->
+        <div id="home" class="view active">
+            <h2 style="margin-bottom: 20px;">Bem-vindo, <span id="welcomeName">Irmão</span></h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Versículo do Dia</h3>
+                    <p id="dailyVerse" style="margin-top: 10px; font-style: italic; color: var(--text-muted);">Carregando...</p>
+                </div>
+                <div class="card">
+                    <h3>Rádio Adventos</h3>
+                    <audio controls style="width: 100%; margin-top: 10px;">
+                        <source src="https://awr.org" type="audio/mpeg">
+                    </audio>
+                </div>
+            </div>
+            <div id="memberStats" class="card" style="display: none;">
+                <h3>Crescimento de Membros</h3>
+                <canvas id="chartMembers" height="100"></canvas>
+            </div>
+        </div>
 
-  <!-- FEED -->
-  <div id="feed" class="view">
-    <div class="card">
-      <textarea id="postText" placeholder="Compartilhe uma palavra, testemunho ou pedido de oração..."></textarea>
-      <button onclick="App.createPost()" style="margin-top:12px"><i class="ri-send-plane-line"></i> Publicar</button>
+        <!-- BIBLE -->
+        <div id="bible" class="view">
+            <h2>Bíblia Sagrada Online</h2>
+            <div class="card" style="display: flex; gap: 10px;">
+                <input type="text" id="bibleSearch" placeholder="Ex: João 3:16" style="flex:1; padding: 10px; background: var(--bg); border: 1px solid var(--border); color: white; border-radius: 8px;">
+                <button class="btn btn-primary" onclick="App.searchBible()">Ler</button>
+            </div>
+            <div id="bibleResult" class="card" style="min-height: 200px;"></div>
+        </div>
+
+        <!-- HYMNAL -->
+        <div id="hymnal" class="view">
+            <h2>Hinário Adventista (695 Hinos)</h2>
+            <input type="text" id="hymnSearch" placeholder="Número ou título..." onkeyup="App.filterHymns()" style="width: 100%; padding: 12px; margin: 15px 0; background: var(--card); border: 1px solid var(--border); color: white; border-radius: 8px;">
+            <div id="hymnList" class="card hymn-list"></div>
+        </div>
+
+        <!-- TREASURY -->
+        <div id="treasury" class="view">
+            <h2>Gestão Financeira</h2>
+            <div class="grid">
+                <div class="card"><h3>Entradas</h3><p style="color: var(--success); font-size: 24px; font-weight: 800;">Kz 1.250.000,00</p></div>
+                <div class="card"><h3>Saídas</h3><p style="color: var(--danger); font-size: 24px; font-weight: 800;">Kz 450.000,00</p></div>
+            </div>
+            <div class="card">
+                <canvas id="chartFinance" height="120"></canvas>
+            </div>
+        </div>
+
+        <!-- SECRETARY -->
+        <div id="secretary" class="view">
+            <h2>Secretaria e Certificados</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Emissão Rápida</h3>
+                    <input type="text" id="certName" placeholder="Nome Completo" style="width: 100%; padding: 10px; margin-top: 10px; background: var(--bg); border: 1px solid var(--border); color: white;">
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button class="btn btn-primary" onclick="App.genCert('Baptismo')">Baptismo</button>
+                        <button class="btn btn-primary" onclick="App.genCert('Dedicação')">Dedicação</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHAT -->
+        <div id="chat" class="view">
+            <h2>Chat da Comunidade</h2>
+            <div class="card">
+                <div id="chatMessages" class="chat-box"></div>
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <input type="text" id="chatInput" style="flex:1; padding: 10px; background: var(--bg); border: 1px solid var(--border); color: white;">
+                    <button class="btn btn-primary" onclick="App.sendMsg()">Enviar</button>
+                </div>
+            </div>
+        </div>
     </div>
-    <div id="posts"></div>
-  </div>
-
-  <!-- MEMBROS -->
-  <div id="membros" class="view">
-    <div class="card" id="addMemberForm">
-      <h3>Novo Membro</h3>
-      <div class="grid grid-2">
-        <input id="mName" placeholder="Nome completo">
-        <input id="mContact" placeholder="Contacto/WhatsApp">
-        <input id="mPhoto" placeholder="URL da foto de perfil">
-        <select id="mStatus"><option>Ativo</option><option>Novo Convertido</option><option>Visitante</option></select>
-      </div>
-      <button onclick="App.addMember()" style="margin-top:12px"><i class="ri-add-line"></i> Adicionar Membro</button>
-    </div>
-    <h3 style="margin:24px 0 16px">Ranking de Membros <span class="badge">Algoritmo TikTok</span></h3>
-    <div class="grid grid-2" id="members"></div>
-  </div>
-
-  <!-- TESOURARIA -->
-  <div id="fin" class="view">
-    <div class="card">
-      <h3>Registrar Entrada</h3>
-      <div class="grid grid-3">
-        <input id="fName" placeholder="Nome do membro">
-        <input id="fAmount" type="number" placeholder="Valor em Kz">
-        <select id="fType"><option>Dízimo</option><option>Oferta</option><option>Voto</option><option>Construção</option></select>
-      </div>
-      <button onclick="App.addFinance()" style="margin-top:12px"><i class="ri-add-line"></i> Registrar</button>
-    </div>
-    <div id="finance"></div>
-  </div>
-
-  <!-- DEPARTAMENTOS -->
-  <div id="dept" class="view">
-    <div class="card">
-      <h3>Gestão de Departamentos</h3>
-      <input id="dName" placeholder="Nome do departamento: Louvor, Jovens, Infantil...">
-      <button onclick="App.createDept()" style="margin-top:12px"><i class="ri-add-line"></i> Criar Departamento</button>
-    </div>
-    <div id="deptList" class="grid grid-2"></div>
-  </div>
-
-  <!-- VLOG -->
-  <div id="vlog" class="view">
-    <div class="card">
-      <h3>Adicionar Notícia/Evento</h3>
-      <input id="vTitle" placeholder="Título do evento">
-      <input id="vThumb" placeholder="URL da thumbnail">
-      <input id="vDate" type="date">
-      <textarea id="vDesc" placeholder="Descrição"></textarea>
-      <button onclick="App.addVlog()" style="margin-top:12px"><i class="ri-add-line"></i> Publicar</button>
-    </div>
-    <h3 style="margin:24px 0 16px">Calendário de Eventos</h3>
-    <div class="grid grid-3" id="vlogList"></div>
-  </div>
-
-  <!-- LIVE -->
-  <div id="live" class="view">
-    <div class="card">
-      <h3>Transmitir Culto Online</h3>
-      <input id="liveTitle" placeholder="Título: Culto de Domingo">
-      <input id="liveUrl" placeholder="URL do stream YouTube/Twitch embed">
-      <button onclick="App.startLive()" style="margin-top:12px"><i class="ri-live-line"></i> Iniciar Transmissão</button>
-    </div>
-    <div id="liveList"></div>
-  </div>
-
-  <!-- BÍBLIA -->
-  <div id="biblia" class="view">
-    <div class="card">
-      <input id="bSearch" placeholder="Ex: joao 3:16, salmos 23">
-      <button onclick="App.searchBible()" style="margin-top:12px"><i class="ri-search-line"></i> Buscar</button>
-      <div id="bResult" style="margin-top:16px;font-size:18px;line-height:1.6"></div>
-    </div>
-  </div>
-
-  <!-- CHAT IA -->
-  <div id="chat" class="view">
-    <div class="card">
-      <div id="chatBox" style="height:400px;overflow:auto;margin-bottom:16px"></div>
-      <div style="display:flex;gap:8px">
-        <input id="chatInput" placeholder="Peça um conselho, versículo, oração...">
-        <button onclick="App.sendChat()"><i class="ri-send-plane-line"></i></button>
-      </div>
-    </div>
-  </div>
-
-</div>
 </main>
-</div>
 
 <script>
-// ===== VELTRIX OS - STATE MANAGEMENT =====
-const Store = {
-  state: JSON.parse(localStorage.getItem("una_v2")) || {
-    users: [
-      {id:1, name:"Pastor João", role:"admin", photo:"https://i.pravatar.cc/150?img=12", followers:[], following:[], likes:0, shares:0},
-      {id:2, name:"Ir. Maria", role:"user", photo:"https://i.pravatar.cc/150?img=5", followers:[], following:[], likes:0, shares:0},
-      {id:3, name:"Dc. Pedro", role:"admin", photo:"https://i.pravatar.cc/150?img=8", followers:[], following:[], likes:0, shares:0}
+const { jsPDF } = window.jspdf;
+
+const App = {
+    user: null,
+    hymns: [
+        { n: 1, t: "Ó Valha-me, Senhor", c: "Harpa" },
+        { n: 33, t: "Castelo Forte", c: "HASD" },
+        { n: 100, t: "Grande Tu És", c: "HASD" },
+        { n: 695, t: "Amém", c: "HASD" }
     ],
-    posts: [], members: [], finances: [], departments: [], vlogs: [], lives: [],
-    leaders: [
-      {name:"Apóstolo Mateus", photo:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
-       msg:"<p>A paz do Senhor, amada igreja! Vivemos tempos de restauração. O Senhor tem me falado sobre o poder da unidade. Quando o povo de Deus se une em um só propósito, muralhas caem e impossíveis se tornam testemunhos.</p><p>Neste mês, quero desafiar cada família da UNA a orar 15 minutos por dia pela nossa nação. Temos visto curas, libertações e famílias sendo restauradas porque alguém decidiu se colocar na brecha.</p><p>Não negligencie os pequenos começos. Davi foi ungido no campo, não no palácio. Seu chamado está sendo forjado no secreto. Continue fiel no pouco.</p><p>Profetizo que esta será uma estação de portas abertas. Empresas, ministérios e sonhos que estavam parados vão receber o sopro de vida. Creia, tome posse e aja em fé!</p>"},
-      {name:"Bispa Rebeca", photo:"https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
-       msg:"<p>Queridos, meu coração queima pelas famílias. Deus está levantando mulheres e homens que vão curar gerações. O altar da sua casa precisa voltar a arder.</p><p>Tenho recebido testemunhos de crianças que voltaram a sonhar, casamentos que foram salvos e jovens livres das drogas. Tudo começou com um joelho no chão.</p><p>Não terceirize a educação espiritual dos seus filhos. O mundo está doutrinando eles 24h por dia. Nós precisamos ser mais intencionais. Culto doméstico não é opção, é urgência.</p><p>Declare hoje: 'Eu e a minha casa serviremos ao Senhor'. O inferno treme quando uma família se alinha. Você não está criando só filhos, está levantando um exército.</p>"},
-      {name:"Pastor Lucas", photo:"https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400",
-       msg:"<p>Família UNA, que tempo profético estamos vivendo! O Espírito Santo está soprando sobre os negócios e talentos da igreja. É tempo de empreender com propósito.</p><p>Chega de mentalidade de escassez. José administrou a crise do Egito porque ouviu Deus. Daniel governou na Babilônia porque tinha excelência. Você foi chamado para influenciar.</p><p>Nos próximos 90 dias, lance esse projeto, abra essa empresa, escreva esse livro. Não espere condições perfeitas. Noé construiu a arca no sol.</p><p>Estou orando por 100 novos empresários do Reino na nossa igreja. O dinheiro é neutro: nas mãos erradas destrói, nas mãos ungidas salva vidas. Seja um canal. Dízimo, oferta e investimento andam juntos.</p>"}
-    ],
-    bible: {
-      "joao 3:16": "Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna.",
-      "salmos 23": "O Senhor é o meu pastor, nada me faltará. Deitar-me faz em verdes pastos, guia-me mansamente a águas tranquilas.",
-      "filipenses 4:13": "Posso todas as coisas naquele que me fortalece."
+
+    async init() {
+        this.renderHymns();
+        this.fetchVerse();
     },
-    bgImages: [
-      "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1920",
-      "https://images.unsplash.com/photo-1438032005730-c779502df39b?w=1920",
-      "https://images.unsplash.com/photo-1507692049790-de58290a4334?w=1920",
-      "https://images.unsplash.com/photo-1445112098124-3e76dd679ab7?w=1920"
-    ]
-  },
-  session: null,
 
-  save() { localStorage.setItem("una_v2", JSON.stringify(this.state)); },
+    login() {
+        const role = document.getElementById('loginRole').value;
+        this.user = { role: role, name: role.charAt(0).toUpperCase() + role.slice(1) };
+        
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('userDisplay').innerText = `Acesso: ${this.user.name}`;
+        document.getElementById('welcomeName').innerText = this.user.name;
 
-  // ALGORITMO TIKTOK: score = followers*3 + shares*2 + likes
-  getScore(userId) {
-    const u = this.state.users.find(x => x.id === userId);
-    return u? (u.followers.length * 3 + u.shares * 2 + u.likes) : 0;
-  },
+        // RBAC Logic
+        if(role === 'treasurer' || role === 'pastor') {
+            document.getElementById('nav-treasury').style.display = 'flex';
+            this.initFinanceChart();
+        }
+        if(role === 'secretary' || role === 'pastor') {
+            document.getElementById('nav-secretary').style.display = 'flex';
+            document.getElementById('memberStats').style.display = 'block';
+            this.initMemberChart();
+        }
+    },
 
-  getRankedMembers() {
-    return [...this.state.members].sort((a,b) => {
-      return this.getScore(b.id) - this.getScore(a.id);
-    });
-  }
+    nav(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        event.currentTarget.classList.add('active');
+    },
+
+    async fetchVerse() {
+        try {
+            const res = await fetch('https://bible-api.com');
+            const data = await res.json();
+            document.getElementById('dailyVerse').innerText = data.text;
+        } catch(e) { document.getElementById('dailyVerse').innerText = "O Senhor é o meu pastor..."; }
+    },
+
+    async searchBible() {
+        const query = document.getElementById('bibleSearch').value;
+        const res = await fetch(`https://bible-api.com{query}`);
+        const data = await res.json();
+        document.getElementById('bibleResult').innerHTML = `<h3>${data.reference}</h3><p style="margin-top:10px">${data.text}</p>`;
+    },
+
+    renderHymns() {
+        const container = document.getElementById('hymnList');
+        container.innerHTML = this.hymns.map(h => `
+            <div class="hymn-item">
+                <span class="badge" style="background:var(--primary)">#${h.n}</span>
+                <strong>${h.t}</strong> <small style="color:var(--text-muted)">(${h.c})</small>
+            </div>
+        `).join('');
+    },
+
+    filterHymns() {
+        const q = document.getElementById('hymnSearch').value.toLowerCase();
+        document.querySelectorAll('.hymn-item').forEach(el => {
+            el.style.display = el.innerText.toLowerCase().includes(q) ? 'block' : 'none';
+        });
+    },
+
+    initFinanceChart() {
+        new Chart(document.getElementById('chartFinance'), {
+            type: 'line',
+            data: { labels: ['Jan','Fev','Mar','Abr'], datasets: [{ label: 'Dízimos', data: [500, 700, 450, 900], borderColor: '#6366f1' }] },
+            options: { responsive: true, plugins: { legend: { labels: { color: '#fff' } } } }
+        });
+    },
+
+    initMemberChart() {
+        new Chart(document.getElementById('chartMembers'), {
+            type: 'bar',
+            data: { labels: ['2021','2022','2023','2024'], datasets: [{ label: 'Novos Membros', data: [20, 35, 15, 50], backgroundColor: '#10b981' }] },
+            options: { responsive: true }
+        });
+    },
+
+    genCert(type) {
+        const name = document.getElementById('certName').value || "Nome do Candidato";
+        const doc = new jsPDF({ orientation: 'landscape' });
+        doc.setFillColor(30, 41, 59);
+        doc.rect(0, 0, 300, 210, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(40);
+        doc.text(`Certificado de ${type}`, 150, 60, { align: 'center' });
+        doc.setFontSize(20);
+        doc.text(`Certificamos que ${name}`, 150, 100, { align: 'center' });
+        doc.text(`foi oficialmente registrado no sistema UNA Digital.`, 150, 120, { align: 'center' });
+        doc.save(`Certificado_${type}.pdf`);
+    },
+
+    sendMsg() {
+        const input = document.getElementById('chatInput');
+        if(!input.value) return;
+        const msg = `<div style="padding:10px; background:var(--primary); border-radius:10px; align-self:flex-end; max-width:80%;">
+            <strong>Você:</strong><br>${input.value}</div>`;
+        document.getElementById('chatMessages').innerHTML += msg;
+        input.value = '';
+    }
 };
 
-// ===== VELTRIX OS - APP CONTROLLER =====
-const App = {
-  init() {
-    this.renderBg();
-    this.loadUsers();
-    this.renderLeaders();
-    setInterval(() => this.rotateBg(), 8000);
-  },
-
-  renderBg() {
-    const container = document.getElementById('bg-slideshow');
-    Store.state.bgImages.forEach((url, i) => {
-      const img = document.createElement('img');
-      img.src = url;
-      if(i === 0) img.classList.add('active');
-      container.appendChild(img);
-    });
-  },
-
-  rotateBg() {
-    const imgs = document.querySelectorAll('#bg-slideshow img');
-    const active = document.querySelector('#bg-slideshow img.active');
-    let next = active.nextElementSibling || imgs[0];
-    active.classList.remove('active');
-    next.classList.add('active');
-  },
-
-  loadUsers() {
-    userSelect.innerHTML = "";
-    Store.state.users.forEach(u => {
-      userSelect.innerHTML += `<option value="${u.id}">${u.name} - ${u.role}</option>`;
-    });
-  },
-
-  login() {
-    const id = Number(userSelect.value);
-    Store.session = Store.state.users.find(u => u.id === id);
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('userInfo').innerHTML = `
-      <img src="${Store.session.photo}" class="avatar">
-      <div><div style="font-weight:600">${Store.session.name}</div><div style="font-size:12px;color:var(--text-muted)">${Store.session.role}</div></div>
-    `;
-    this.renderAll();
-    if(Store.session.role!== 'admin') {
-      document.getElementById('addMemberForm').style.display = 'none';
-    }
-  },
-
-  logout() { location.reload(); },
-  toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); },
-
-  nav(id) {
-    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-    document.querySelectorAll(".nav-item").forEach(v => v.classList.remove("active"));
-    event.target.closest('.nav-item').classList.add("active");
-    if(window.innerWidth < 1024) document.getElementById('sidebar').classList.remove('open');
-  },
-
-  renderAll() {
-    this.renderStats();
-    this.renderPosts();
-    this.renderMembers();
-    this.renderFinance();
-    this.renderDept();
-    this.renderVlog();
-    this.renderLive();
-  },
-
-  renderLeaders() {
-    leaders.innerHTML = Store.state.leaders.map(l => `
-      <div class="card leader-card">
-        <img src="${l.photo}">
-        <div><h3>${l.name}</h3>${l.msg}</div>
-      </div>
-    `).join('');
-  },
-
-  renderStats() {
-    const totalFin = Store.state.finances.reduce((s,f) => s+f.amount, 0);
-    stats.innerHTML = `
-      <div class="card"><div style="color:var(--text-muted);font-size:14px">Membros</div><div style="font-size:28px;font-weight:700">${Store.state.members.length}</div></div>
-      <div class="card"><div style="color:var(--text-muted);font-size:14px">Total Arrecadado</div><div style="font-size:28px;font-weight:700">${totalFin.toLocaleString()} Kz</div></div>
-      <div class="card"><div style="color:var(--text-muted);font-size:14px">Departamentos</div><div style="font-size:28px;font-weight:700">${Store.state.departments.length}</div></div>
-    `;
-  },
-
-  // POSTS + SOCIAL
-  createPost() {
-    if(!postText.value.trim()) return alert('Escreva algo primeiro');
-    Store.state.posts.unshift({
-      id: Date.now(), userId: Store.session.id, text: postText.value,
-      likes: [], comments: [], shares: 0, created: new Date().toISOString()
-    });
-    postText.value = '';
-    Store.save(); this.renderPosts();
-  },
-
-  likePost(postId) {
-    const p = Store.state.posts.find(x => x.id === postId);
-    const idx = p.likes.indexOf(Store.session.id);
-    if(idx > -1) p.likes.splice(idx,1);
-    else p.likes.push(Store.session.id);
-    Store.save(); this.renderPosts();
-  },
-
-  commentPost(postId) {
-    const text = prompt('Seu comentário:');
-    if(!text) return;
-    const p = Store.state.po
+App.init();
+</script>
+</body>
+          </html>
+  
