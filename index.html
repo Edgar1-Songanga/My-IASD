@@ -1,139 +1,311 @@
 <!DOCTYPE html>
-<html lang="pt-ao">
+<html lang="pt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNA Digital Platform</title>
-    
-    <link href="https://googleapis.com" rel="stylesheet">
-    <script src="https://unpkg.com"></script>
-    <script src="https://jsdelivr.net"></script>
-
-    <style>
-        :root {
-            --primary: #002D5E; --accent: #C5A059; --bg: #050a0f;
-            --glass: rgba(255, 255, 255, 0.06); --glass-border: rgba(255, 255, 255, 0.1);
-            --text: #ffffff; --text-dim: #a0a0a0;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
-
-        .app-container { display: flex; min-height: 100vh; }
-        
-        /* Sidebar Otimizada */
-        .sidebar {
-            width: 260px; background: var(--glass); backdrop-filter: blur(20px); border-right: 1px solid var(--glass-border);
-            display: flex; flex-direction: column; padding: 1.5rem; position: fixed; height: 100vh; z-index: 100;
-        }
-        .main-content { flex: 1; margin-left: 260px; padding: 2rem; width: calc(100% - 260px); }
-
-        .logo { font-weight: 700; color: var(--accent); font-size: 1.3rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 8px; }
-        .nav-item {
-            display: flex; align-items: center; gap: 12px; padding: 0.8rem 1rem; color: var(--text-dim);
-            border-radius: 10px; margin-bottom: 4px; transition: 0.2s; cursor: pointer; font-size: 0.9rem;
-        }
-        .nav-item:hover, .nav-item.active { background: var(--glass); color: var(--accent); }
-
-        .glass-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; }
-        .btn { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.2s; }
-        
-        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.05); color: #fff; margin-bottom: 1rem; outline: none; }
-
-        @media (max-width: 900px) { .sidebar { width: 70px; padding: 1rem 0.5rem; } .nav-item span { display: none; } .main-content { margin-left: 70px; width: calc(100% - 70px); } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNA Digital | IASD Angola</title>
+<meta name="theme-color" content="#003366">
+<style>
+:root{
+  --iasd-azul:#003366; /* Azul oficial IASD */
+  --iasd-dourado:#FFB612; /* Dourado oficial */
+  --iasd-branco:#FFFFFF;
+  --iasd-cinza:#F5F7FA;
+  --iasd-texto:#1A1A1A;
+  --radius:12px;
+  --sombra:0 4px 20px rgba(0,51,102,0.1);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,-apple-system,sans-serif}
+body{background:var(--iasd-cinza);color:var(--iasd-texto);line-height:1.6}
+.container{max-width:1200px;margin:0 auto;padding:0 16px}
+header{background:var(--iasd-azul);color:var(--iasd-branco);padding:12px 0;position:sticky;top:0;z-index:100;box-shadow:var(--sombra)}
+.nav{display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:12px;font-weight:700;font-size:1.2rem}
+.logo svg{width:32px;height:32px}
+.btn{background:var(--iasd-dourado);color:var(--iasd-azul);border:none;padding:10px 20px;border-radius:var(--radius);font-weight:600;cursor:pointer;transition:.2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(255,182,18,0.3)}
+.btn-ghost{background:transparent;color:var(--iasd-branco);border:1px solid rgba(255,255,255,0.3)}
+.grid{display:grid;gap:20px}
+.grid-4{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.card{background:var(--iasd-branco);border-radius:var(--radius);padding:24px;box-shadow:var(--sombra);transition:.3s;border-top:4px solid var(--iasd-dourado)}
+.card:hover{transform:translateY(-4px)}
+.card h3{color:var(--iasd-azul);margin-bottom:8px;font-size:1.1rem}
+.card p{font-size:0.9rem;opacity:0.8}
+.hero{padding:60px 0;background:linear-gradient(135deg,var(--iasd-azul) 0%,#004B8D 100%);color:var(--iasd-branco);margin-bottom:40px}
+.hero h1{font-size:2.5rem;margin-bottom:16px;line-height:1.2}
+.hero p{font-size:1.1rem;opacity:0.9;max-width:600px;margin-bottom:24px}
+.badge{background:var(--iasd-dourado);color:var(--iasd-azul);padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;display:inline-block;margin-bottom:16px}
+section{padding:40px 0}
+.section-title{color:var(--iasd-azul);font-size:1.8rem;margin-bottom:24px;text-align:center}
+.hide{display:none}
+#loginScreen{max-width:400px;margin:80px auto}
+input,select{width:100%;padding:12px;border:2px solid #E0E6ED;border-radius:var(--radius);margin-bottom:16px;font-size:1rem}
+input:focus{outline:none;border-color:var(--iasd-dourado)}
+.dashboard-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px}
+.user-chip{display:flex;align-items:center;gap:12px;background:var(--iasd-branco);padding:8px 16px;border-radius:30px;box-shadow:var(--sombra)}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--iasd-dourado);display:grid;place-items:center;font-weight:700;color:var(--iasd-azul)}
+.module-icon{width:48px;height:48px;background:linear-gradient(135deg,var(--iasd-azul),#004B8D);border-radius:var(--radius);display:grid;place-items:center;margin-bottom:16px;font-size:1.5rem}
+table{width:100%;border-collapse:collapse;background:var(--iasd-branco);border-radius:var(--radius);overflow:hidden;box-shadow:var(--sombra)}
+th{background:var(--iasd-azul);color:var(--iasd-branco);padding:12px;text-align:left}
+td{padding:12px;border-bottom:1px solid #EEF2F7}
+.hymn-list{max-height:400px;overflow-y:auto}
+.hymn-item{padding:12px;border-bottom:1px solid #EEF2F7;cursor:pointer}
+.hymn-item:hover{background:var(--iasd-cinza)}
+footer{background:var(--iasd-azul);color:var(--iasd-branco);padding:40px 0;margin-top:60px;text-align:center}
+@media(max-width:768px){.hero h1{font-size:1.8rem}.grid-4{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
+<header>
+  <div class="container nav">
+    <div class="logo">
+      <svg viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="48" stroke="#FFB612" stroke-width="4"/><path d="M50 20 L65 45 L50 40 L35 45 Z" fill="#FFB612"/><path d="M30 55 Q50 45 70 55" stroke="#FFB612" stroke-width="3" fill="none"/><path d="M50 60 L50 80" stroke="#FFB612" stroke-width="4"/></svg>
+      UNA Digital
+    </div>
+    <button id="logoutBtn" class="btn btn-ghost hide">Sair</button>
+  </div>
+</header>
 
-    <div class="app-container">
-        <aside class="sidebar">
-            <div class="logo"><i data-lucide="shield"></i> UNA</div>
-            <nav id="menu">
-                <div class="nav-item active" onclick="App.go('dash')" id="m-dash"><i data-lucide="grid"></i><span>Dashboard</span></div>
-                <div class="nav-item" onclick="App.go('sec')" id="m-sec"><i data-lucide="users"></i><span>Secretaria</span></div>
-                <div class="nav-item" onclick="App.go('tes')" id="m-tes"><i data-lucide="landmark"></i><span>Tesouraria</span></div>
-                <div class="nav-item" onclick="App.go('bib')" id="m-bib"><i data-lucide="book"></i><span>Bíblia</span></div>
-                <div class="nav-item" onclick="App.go('hin')" id="m-hin"><i data-lucide="music"></i><span>Hinário</span></div>
-            </nav>
-        </aside>
+<main class="container">
+  <!-- TELA LOGIN -->
+  <div id="loginScreen">
+    <div class="card">
+      <h2 style="color:var(--iasd-azul);margin-bottom:8px">Bem-vindo à UNA Digital</h2>
+      <p style="margin-bottom:24px;opacity:0.7">Plataforma integrada da IASD Angola</p>
+      <input type="email" id="email" placeholder="Email" value="tesoureiro@iasd.ao">
+      <input type="password" id="senha" placeholder="Senha" value="123456">
+      <select id="perfil">
+        <option value="Membro">Membro</option>
+        <option value="Tesoureiro" selected>Tesoureiro</option>
+        <option value="Secretário">Secretário</option>
+        <option value="Pastor">Pastor</option>
+        <option value="Administrador">Administrador</option>
+      </select>
+      <button class="btn" style="width:100%" onclick="login()">Entrar</button>
+      <p style="font-size:0.8rem;margin-top:16px;opacity:0.6;text-align:center">Demo: qualquer email/senha funciona</p>
+    </div>
+  </div>
 
-        <main class="main-content">
-            <header style="margin-bottom: 2rem;"><h2 id="v-title">Dashboard</h2></header>
-            <div id="v-content"></div>
-        </main>
+  <!-- DASHBOARD -->
+  <div id="app" class="hide">
+    <div class="hero">
+      <div class="container">
+        <span class="badge">FASE 1 MVP ATIVO</span>
+        <h1>Unificando missão, gestão e comunhão</h1>
+        <p>Todos os módulos da Igreja Adventista do Sétimo Dia em Angola numa única plataforma digital, leve e segura.</p>
+      </div>
     </div>
 
-    <script>
-        const App = {
-            init() {
-                this.go('dash');
-            },
+    <div class="dashboard-header">
+      <h2 class="section-title" style="text-align:left;margin:0">Painel Principal</h2>
+      <div class="user-chip">
+        <div class="avatar" id="avatar">T</div>
+        <div>
+          <div id="userName" style="font-weight:600">Usuário</div>
+          <div id="userRole" style="font-size:0.8rem;opacity:0.7">Perfil</div>
+        </div>
+      </div>
+    </div>
 
-            go(view) {
-                const content = document.getElementById('v-content');
-                const title = document.getElementById('v-title');
-                
-                // Limpa estados do menu
-                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-                document.getElementById(`m-${view}`).classList.add('active');
+    <!-- MÓDULOS 4,5,6,7 -->
+    <section>
+      <h2 class="section-title">Gestão Eclesiástica</h2>
+      <div class="grid grid-4">
+        <div class="card" onclick="abrirModulo('admin')">
+          <div class="module-icon">👥</div>
+          <h3>Admin. Eclesiástica</h3>
+          <p>Membros, transferências, histórico espiritual e disciplina.</p>
+        </div>
+        <div class="card" onclick="abrirModulo('tesouraria')">
+          <div class="module-icon">💰</div>
+          <h3>Tesouraria Inteligente</h3>
+          <p>Dízimos, ofertas, relatórios, recibos e foto de relatórios físicos.</p>
+        </div>
+        <div class="card" onclick="abrirModulo('secretaria')">
+          <div class="module-icon">📋</div>
+          <h3>Secretaria Digital</h3>
+          <p>Presenças, relatórios mensais e digitalização de documentos.</p>
+        </div>
+        <div class="card" onclick="abrirModulo('departamentos')">
+          <div class="module-icon">🏛️</div>
+          <h3>Departamentos</h3>
+          <p>Jovens, M. Mulher, E. Sabatina, Música, M. Pessoal.</p>
+        </div>
+      </div>
+    </section>
 
-                const routes = {
-                    dash: () => {
-                        title.innerText = "Estatísticas da Igreja";
-                        content.innerHTML = `
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                                <div class="glass-card"><h4>Membros</h4><h2>14.250</h2></div>
-                                <div class="glass-card"><h4>Tesouraria</h4><h2>1.280k Kz</h2></div>
-                            </div>
-                            <div class="glass-card" style="margin-top: 15px; height: 200px;"><canvas id="c"></canvas></div>`;
-                        this.chart();
-                    },
-                    sec: () => {
-                        title.innerText = "Secretaria Digital";
-                        content.innerHTML = `<div class="glass-card"><h3>Membros Registados</h3><p>• Gaspar Afonso</p><p>• Maria Teka</p></div>`;
-                    },
-                    tes: () => {
-                        title.innerText = "Tesouraria";
-                        content.innerHTML = `<div class="glass-card"><input type="number" placeholder="Valor Kz"><button class="btn">Lançar Dízimo</button></div>`;
-                    },
-                    bib: () => {
-                        title.innerText = "Bíblia Real";
-                        content.innerHTML = `<div class="glass-card"><input type="text" id="bi" placeholder="João 3:16" onchange="App.bible()"><div id="bo" style="margin-top:15px"></div></div>`;
-                    },
-                    hin: () => {
-                        title.innerText = "Hinário IASD";
-                        content.innerHTML = `<div class="glass-card"><div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(50px,1fr)); gap:8px;">${Array.from({length: 50}, (_, i) => `<div style="background:var(--glass); padding:10px; border-radius:8px; text-align:center; cursor:pointer;" onclick="alert('Hino ${i+1}')">${i+1}</div>`).join('')}</div></div>`;
-                    }
-                };
+    <!-- MÓDULOS 8,9,10,11 -->
+    <section>
+      <h2 class="section-title">Comunhão & Espiritual</h2>
+      <div class="grid grid-4">
+        <div class="card" onclick="abrirModulo('rede')">
+          <div class="module-icon">🌐</div>
+          <h3>Rede Social Adventista</h3>
+          <p>Feed, testemunhos, curtidas e perfis entre membros.</p>
+        </div>
+        <div class="card" onclick="abrirModulo('espiritual')">
+          <div class="module-icon">📖</div>
+          <h3>Módulo Espiritual</h3>
+          <p>Bíblia, devocionais, Lição E.S e Hinário completo.</p>
+        </div>
+        <div class="card" onclick="abrirModulo('midia')">
+          <div class="module-icon">📡</div>
+          <h3>Mídia & Lives</h3>
+          <p>Rádio online, cultos ao vivo e biblioteca de sermões.</p>
+        </div>
+        <div class="card" onclick="abrirModulo('ia')">
+          <div class="module-icon">🤖</div>
+          <h3>Assistente IA</h3>
+          <p>Perguntas bíblicas, sugestões e relatórios automáticos.</p>
+        </div>
+      </div>
+    </section>
 
-                routes[view] ? routes[view]() : null;
-                lucide.createIcons();
-            },
+    <!-- CONTEÚDO DINÂMICO DOS MÓDULOS -->
+    <section id="moduloConteudo" class="hide">
+      <div class="card">
+        <h3 id="moduloTitulo" style="color:var(--iasd-azul);margin-bottom:16px"></h3>
+        <div id="moduloBody"></div>
+        <button class="btn btn-ghost" style="margin-top:20px;color:var(--iasd-azul);border-color:var(--iasd-azul)" onclick="fecharModulo()">← Voltar aos módulos</button>
+      </div>
+    </section>
+  </div>
+</main>
 
-            chart() {
-                const el = document.getElementById('c');
-                if(!el) return;
-                new Chart(el.getContext('2d'), {
-                    type: 'line',
-                    data: { labels: ['S1','S2','S3','S4'], datasets: [{ data: [10, 25, 15, 30], borderColor: '#C5A059', tension: 0.4 }] },
-                    options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
-                });
-            },
+<footer>
+  <div class="container">
+    <p><strong>UNA Digital v1.0 MVP</strong> © 2026 Igreja Adventista do Sétimo Dia - União Angolana</p>
+    <p style="opacity:0.7;font-size:0.9rem;margin-top:8px">Português | English | Umbundo | Kimbundo | Oshiwambo | Swahili</p>
+  </div>
+</footer>
 
-            async bible() {
-                const ref = document.getElementById('bi').value;
-                const out = document.getElementById('bo');
-                out.innerText = "Buscando...";
-                try {
-                    const r = await fetch(`https://bible-api.com{ref}`);
-                    const d = await r.json();
-                    out.innerHTML = `<strong>${d.reference}</strong><p>${d.text}</p>`;
-                } catch { out.innerText = "Erro ao buscar."; }
-            }
-        };
+<script>
+// ESTADO
+let usuario = null;
 
-        // Início seguro
-        document.addEventListener('DOMContentLoaded', () => App.init());
-    </script>
+// DADOS MOCK
+const hinario = [
+  {num: 1, titulo: "Saudai o Nome de Jesus", letra: "Saudai o nome de Jesus..."},
+  {num: 2, titulo: "Foi na Cruz", letra: "Foi na cruz, foi na cruz..."},
+  {num: 15, titulo: "Quão Bondoso Amigo é Cristo", letra: "Quão bondoso amigo é Cristo..."},
+  {num: 50, titulo: "Rocha Eterna", letra: "Rocha eterna, meu Jesus..."},
+  {num: 173, titulo: "Careço de Jesus", letra: "Careço de Jesus, de Seu terno amor..."},
+  {num: 247, titulo: "Ao Pé da Cruz", letra: "Ao pé da cruz, onde meu Salvador..."},
+  {num: 330, titulo: "A Mensagem ao Mundo", letra: "Proclamai ao mundo inteiro..."},
+  {num: 400, titulo: "Jerusalém", letra: "Jerusalém, meu lar feliz..."},
+  {num: 518, titulo: "Quando vier Jesus", letra: "Quando vier Jesus, que alegria..."},
+  {num: 609, titulo: "O Céu É Meu Lar", letra: "O céu é meu lar, oh glória..."}
+];
+
+const membros = [
+  {nome:"João Silva", estado:"Ativo", batismo:"12/03/2020", funcao:"Diácono"},
+  {nome:"Maria Santos", estado:"Ativo", batismo:"05/07/2018", funcao:"Dir. M. Mulher"},
+  {nome:"Pedro Costa", estado:"Transferido", batismo:"22/01/2019", funcao:"Ancião"}
+];
+
+// FUNÇÕES
+function login(){
+  const email = document.getElementById('email').value;
+  const perfil = document.getElementById('perfil').value;
+  if(!email) return alert('Preencha o email');
+  usuario = {nome: email.split('@')[0], email, perfil};
+  document.getElementById('loginScreen').classList.add('hide');
+  document.getElementById('app').classList.remove('hide');
+  document.getElementById('logoutBtn').classList.remove('hide');
+  document.getElementById('userName').textContent = usuario.nome;
+  document.getElementById('userRole').textContent = usuario.perfil;
+  document.getElementById('avatar').textContent = usuario.nome[0].toUpperCase();
+}
+
+function logout(){
+  usuario = null;
+  document.getElementById('loginScreen').classList.remove('hide');
+  document.getElementById('app').classList.add('hide');
+  document.getElementById('logoutBtn').classList.add('hide');
+  fecharModulo();
+}
+
+function abrirModulo(mod){
+  const titulos = {
+    admin:"Administração Eclesiástica",
+    tesouraria:"Tesouraria Inteligente",
+    secretaria:"Secretaria Digital",
+    departamentos:"Gestão de Departamentos",
+    rede:"Rede Social Adventista",
+    espiritual:"Módulo Espiritual",
+    midia:"Mídia e Transmissões",
+    ia:"Inteligência Artificial"
+  };
+  document.getElementById('moduloTitulo').textContent = titulos[mod];
+
+  let html = '';
+  if(mod === 'admin'){
+    html = `<table><thead><tr><th>Nome</th><th>Estado</th><th>Batismo</th><th>Função</th></tr></thead><tbody>
+      ${membros.map(m=>`<tr><td>${m.nome}</td><td>${m.estado}</td><td>${m.batismo}</td><td>${m.funcao}</td></tr>`).join('')}
+    </tbody></table><p style="margin-top:16px;font-size:0.9rem">Total: ${membros.length} membros | <a href="#" style="color:var(--iasd-azul)">+ Novo membro</a></p>`;
+  }
+  else if(mod === 'tesouraria'){
+    html = `<div class="grid grid-4" style="margin-bottom:20px">
+      <div class="card" style="border-top-color:#00A651"><h3>1.250.000 Kz</h3><p>Dízimos do mês</p></div>
+      <div class="card" style="border-top-color:#00A651"><h3>430.000 Kz</h3><p>Ofertas do mês</p></div>
+      <div class="card" style="border-top-color:#00A651"><h3>85%</h3><p>Meta atingida</p></div>
+      <div class="card" style="border-top-color:#00A651"><h3>📷</h3><p>Capturar relatório físico</p></div>
+    </div><button class="btn">Gerar relatório em PDF</button>`;
+  }
+  else if(mod === 'espiritual'){
+    html = `<input type="text" placeholder="Buscar hino por número ou título" onkeyup="buscarHino(this.value)">
+    <div class="hymn-list" id="listaHinos">${renderHinos(hinario)}</div>
+    <p style="margin-top:16px;font-size:0.8rem;opacity:0.7">* Demo com 10 hinos. Hinário completo possui 610 hinos + suplemento. Versão final requer licença CPB.</p>`;
+  }
+  else if(mod === 'ia'){
+    html = `<input type="text" id="perguntaIA" placeholder="Ex: O que a Bíblia diz sobre esperança?">
+    <button class="btn" onclick="responderIA()">Perguntar ao Assistente</button>
+    <div id="respostaIA" style="margin-top:20px;padding:16px;background:var(--iasd-cinza);border-radius:var(--radius)" class="hide"></div>`;
+  }
+  else {
+    html = `<p>Módulo <strong>${titulos[mod]}</strong> em desenvolvimento na Fase 2/3.</p>
+    <p style="margin-top:12px">Este MVP demonstra a arquitetura e UI/UX. A versão completa terá:</p>
+    <ul style="margin:12px 0 0 20px;line-height:2">
+      <li>CRUD completo com backend</li>
+      <li>Controle de acesso por nível: União → Missão → Distrito → Igreja Local</li>
+      <li>Sincronização offline para baixa conectividade</li>
+      <li>Multi-idioma: Português, Inglês, Umbundo, Kimbundo, Oshiwambo, Swahili</li>
+    </ul>`;
+  }
+
+  document.getElementById('moduloBody').innerHTML = html;
+  document.getElementById('moduloConteudo').classList.remove('hide');
+  window.scrollTo({top: document.getElementById('moduloConteudo').offsetTop - 100, behavior:'smooth'});
+}
+
+function fecharModulo(){
+  document.getElementById('moduloConteudo').classList.add('hide');
+}
+
+function renderHinos(lista){
+  return lista.map(h=>`<div class="hymn-item" onclick="alert('Hino ${h.num}: ${h.titulo}\\n\\n${h.letra}\\n\\n[Letra completa na versão com licença]')">
+    <strong>${h.num}</strong> - ${h.titulo}
+  </div>`).join('');
+}
+
+function buscarHino(termo){
+  const filtrados = hinario.filter(h=>
+    h.num.toString().includes(termo) ||
+    h.titulo.toLowerCase().includes(termo.toLowerCase())
+  );
+  document.getElementById('listaHinos').innerHTML = renderHinos(filtrados);
+}
+
+function responderIA(){
+  const p = document.getElementById('perguntaIA').value;
+  if(!p) return;
+  const res = document.getElementById('respostaIA');
+  res.classList.remove('hide');
+  res.innerHTML = `<strong>Assistente UNA:</strong><br>Baseado em Romanos 15:13 - "Ora, o Deus de esperança vos encha de todo o gozo e paz..."
+  <br><br><em>Nota: Esta é uma resposta demo. A IA final usará modelo treinado com literatura oficial IASD e validação teológica.</em>`;
+}
+
+document.getElementById('logoutBtn').onclick = logout;
+</script>
 </body>
 </html>
