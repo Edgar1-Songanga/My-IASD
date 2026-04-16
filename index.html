@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNIÃO NORDESTE DE ANGOLA Digital Platform | Ecossistema Integrado</title>
+    <title>UNA Digital Platform</title>
     
     <link href="https://googleapis.com" rel="stylesheet">
     <script src="https://unpkg.com"></script>
@@ -12,153 +12,128 @@
     <style>
         :root {
             --primary: #002D5E; --accent: #C5A059; --bg: #050a0f;
-            --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.1);
-            --text: #ffffff; --text-dim: #a0a0a0; --transition: all 0.3s ease;
+            --glass: rgba(255, 255, 255, 0.06); --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff; --text-dim: #a0a0a0;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); background: radial-gradient(circle at top right, #001f3f, #050a0f); min-height: 100vh; overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
         .app-container { display: flex; min-height: 100vh; }
         
-        /* Sidebar Glassmorphism */
+        /* Sidebar Otimizada */
         .sidebar {
             width: 260px; background: var(--glass); backdrop-filter: blur(20px); border-right: 1px solid var(--glass-border);
-            display: flex; flex-direction: column; padding: 2rem 1rem; position: fixed; height: 100vh; z-index: 100;
+            display: flex; flex-direction: column; padding: 1.5rem; position: fixed; height: 100vh; z-index: 100;
         }
         .main-content { flex: 1; margin-left: 260px; padding: 2rem; width: calc(100% - 260px); }
 
-        .logo { font-weight: 700; color: var(--accent); font-size: 1.4rem; margin-bottom: 2.5rem; display: flex; align-items: center; gap: 10px; }
-        .nav-label { font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin: 1rem 0 0.5rem 1rem; opacity: 0.7; }
-        
+        .logo { font-weight: 700; color: var(--accent); font-size: 1.3rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 8px; }
         .nav-item {
             display: flex; align-items: center; gap: 12px; padding: 0.8rem 1rem; color: var(--text-dim);
-            border-radius: 12px; margin-bottom: 2px; transition: var(--transition); cursor: pointer; font-size: 0.9rem;
+            border-radius: 10px; margin-bottom: 4px; transition: 0.2s; cursor: pointer; font-size: 0.9rem;
         }
         .nav-item:hover, .nav-item.active { background: var(--glass); color: var(--accent); }
 
-        .glass-card { background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; }
-        .btn-premium { background: var(--accent); color: white; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.2s; }
+        .glass-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; }
+        .btn { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.2s; }
         
-        input, select, textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.05); color: #fff; margin-bottom: 1rem; outline: none; }
+        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.05); color: #fff; margin-bottom: 1rem; outline: none; }
 
-        .hino-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 10px; }
-        .hino-btn { padding: 12px 5px; background: var(--glass); border-radius: 10px; text-align: center; cursor: pointer; transition: 0.2s; font-size: 0.8rem; }
-        .hino-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(197, 160, 89, 0.1); }
-
-        @media (max-width: 1024px) { .sidebar { width: 70px; padding: 1rem 0.5rem; } .nav-label, .nav-item span { display: none; } .main-content { margin-left: 70px; width: calc(100% - 70px); } }
+        @media (max-width: 900px) { .sidebar { width: 70px; padding: 1rem 0.5rem; } .nav-item span { display: none; } .main-content { margin-left: 70px; width: calc(100% - 70px); } }
     </style>
 </head>
 <body>
 
     <div class="app-container">
         <aside class="sidebar">
-            <div class="logo"><i data-lucide="cross"></i> UNA</div>
-            
+            <div class="logo"><i data-lucide="shield"></i> UNA</div>
             <nav id="menu">
-                <div class="nav-label">Gestão</div>
-                <div class="nav-item active" onclick="App.router('dashboard')" id="m-dashboard"><i data-lucide="layout-dashboard"></i><span>Estatísticas</span></div>
-                <div class="nav-item" onclick="App.router('secretaria')" id="m-secretaria"><i data-lucide="users"></i><span>Secretaria</span></div>
-                <div class="nav-item" onclick="App.router('tesouraria')" id="m-tesouraria"><i data-lucide="landmark"></i><span>Tesouraria</span></div>
-
-                <div class="nav-label">Espiritual</div>
-                <div class="nav-item" onclick="App.router('biblia')" id="m-biblia"><i data-lucide="book-open"></i><span>Bíblia Real</span></div>
-                <div class="nav-item" onclick="App.router('hinos')" id="m-hinos"><i data-lucide="music"></i><span>Hinário 610</span></div>
-                <div class="nav-item" onclick="App.router('licao')" id="m-licao"><i data-lucide="library"></i><span>Escola Sabatina</span></div>
-
-                <div class="nav-label">Extra</div>
-                <div class="nav-item" onclick="App.router('social')" id="m-social"><i data-lucide="share-2"></i><span>Rede Social</span></div>
-                <div class="nav-item" onclick="App.router('ia')" id="m-ia"><i data-lucide="bot"></i><span>UNA AI</span></div>
+                <div class="nav-item active" onclick="App.go('dash')" id="m-dash"><i data-lucide="grid"></i><span>Dashboard</span></div>
+                <div class="nav-item" onclick="App.go('sec')" id="m-sec"><i data-lucide="users"></i><span>Secretaria</span></div>
+                <div class="nav-item" onclick="App.go('tes')" id="m-tes"><i data-lucide="landmark"></i><span>Tesouraria</span></div>
+                <div class="nav-item" onclick="App.go('bib')" id="m-bib"><i data-lucide="book"></i><span>Bíblia</span></div>
+                <div class="nav-item" onclick="App.go('hin')" id="m-hin"><i data-lucide="music"></i><span>Hinário</span></div>
             </nav>
         </aside>
 
         <main class="main-content">
-            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem;">
-                <h2 id="view-title">Dashboard</h2>
-                <div style="display: flex; gap: 15px; align-items: center;">
-                    <span style="font-size: 0.8rem; color: var(--text-dim);">Plataforma Aberta</span>
-                    <div style="width: 35px; height: 35px; background: var(--accent); border-radius: 50%;"></div>
-                </div>
-            </header>
-
-            <div id="content"></div>
+            <header style="margin-bottom: 2rem;"><h2 id="v-title">Dashboard</h2></header>
+            <div id="v-content"></div>
         </main>
     </div>
 
     <script>
         const App = {
-            db: {
-                hinos: {
-                    1: { t: "Cantai ao Senhor", l: "Cantai ao Senhor um cântico novo..." },
-                    2: { t: "Ó Adorai o Senhor", l: "Ó adorai o Senhor na beleza da santidade..." }
-                },
-                licao: "O Grande Conflito: O amor de Deus triunfará sobre o mal. Lição da semana 4 disponível."
-            },
-
             init() {
-                this.router('dashboard');
-                lucide.createIcons();
+                this.go('dash');
             },
 
-            router(view) {
-                const container = document.getElementById('content');
-                document.getElementById('view-title').innerText = view.toUpperCase();
-                document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.id === `m-${view}`));
+            go(view) {
+                const content = document.getElementById('v-content');
+                const title = document.getElementById('v-title');
                 
-                const views = {
-                    dashboard: () => `
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;">
-                            <div class="glass-card"><h4>Membros</h4><h2 style="color:var(--accent)">14.250</h2></div>
-                            <div class="glass-card"><h4>Tesouraria</h4><h2 style="color:var(--accent)">1.280.400 Kz</h2></div>
-                        </div>
-                        <div class="glass-card" style="margin-top:20px; height: 250px;"><canvas id="mainChart"></canvas></div>
-                    `,
-                    secretaria: () => `<div class="glass-card"><h3>Lista de Membros</h3><div style="margin-top:15px; opacity:0.7"><p>• João Gaspar (Ativo)</p><p>• Maria Teka (Ativa)</p></div><button class="btn-premium" style="margin-top:20px; width:auto">Adicionar Membro</button></div>`,
-                    tesouraria: () => `<div class="glass-card"><h3>Lançamento Financeiro</h3><input type="number" placeholder="Valor Kz"><select><option>Dízimo</option><option>Oferta</option></select><button class="btn-premium">Processar Relatório</button></div>`,
-                    biblia: () => `<div class="glass-card"><h3>Pesquisa Bíblica Real</h3><input type="text" id="b-in" placeholder="Ex: João 3:16" onchange="App.actions.getBible()"><div id="b-out" style="margin-top:20px; line-height:1.7;">Digite a referência...</div></div>`,
-                    hinos: () => {
-                        let btns = "";
-                        for(let i=1; i<=610; i++) btns += `<div class="hino-btn" onclick="App.actions.openHino(${i})">${i}</div>`;
-                        return `<div class="glass-card"><h3>Hinário Completo</h3><div class="hino-grid">${btns}</div></div>`;
+                // Limpa estados do menu
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                document.getElementById(`m-${view}`).classList.add('active');
+
+                const routes = {
+                    dash: () => {
+                        title.innerText = "Estatísticas da Igreja";
+                        content.innerHTML = `
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                                <div class="glass-card"><h4>Membros</h4><h2>14.250</h2></div>
+                                <div class="glass-card"><h4>Tesouraria</h4><h2>1.280k Kz</h2></div>
+                            </div>
+                            <div class="glass-card" style="margin-top: 15px; height: 200px;"><canvas id="c"></canvas></div>`;
+                        this.chart();
                     },
-                    licao: () => `<div class="glass-card"><h3>Escola Sabatina</h3><p>${this.db.licao}</p></div>`,
-                    social: () => `<div class="glass-card"><textarea placeholder="Partilhe seu testemunho..."></textarea><button class="btn-premium">Publicar</button></div>`,
-                    ia: () => `<div class="glass-card" style="height:350px; display:flex; flex-direction:column;"><div style="flex:1; color:var(--text-dim)">UNA AI: Como posso ajudar no seu estudo hoje?</div><input type="text" placeholder="Pergunte à IA..."></div>`
+                    sec: () => {
+                        title.innerText = "Secretaria Digital";
+                        content.innerHTML = `<div class="glass-card"><h3>Membros Registados</h3><p>• Gaspar Afonso</p><p>• Maria Teka</p></div>`;
+                    },
+                    tes: () => {
+                        title.innerText = "Tesouraria";
+                        content.innerHTML = `<div class="glass-card"><input type="number" placeholder="Valor Kz"><button class="btn">Lançar Dízimo</button></div>`;
+                    },
+                    bib: () => {
+                        title.innerText = "Bíblia Real";
+                        content.innerHTML = `<div class="glass-card"><input type="text" id="bi" placeholder="João 3:16" onchange="App.bible()"><div id="bo" style="margin-top:15px"></div></div>`;
+                    },
+                    hin: () => {
+                        title.innerText = "Hinário IASD";
+                        content.innerHTML = `<div class="glass-card"><div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(50px,1fr)); gap:8px;">${Array.from({length: 50}, (_, i) => `<div style="background:var(--glass); padding:10px; border-radius:8px; text-align:center; cursor:pointer;" onclick="alert('Hino ${i+1}')">${i+1}</div>`).join('')}</div></div>`;
+                    }
                 };
 
-                container.innerHTML = views[view]();
-                if(view === 'dashboard') this.loadChart();
+                routes[view] ? routes[view]() : null;
                 lucide.createIcons();
             },
 
-            actions: {
-                async getBible() {
-                    const ref = document.getElementById('b-in').value;
-                    const out = document.getElementById('b-out');
-                    out.innerText = "Consultando...";
-                    try {
-                        const r = await fetch(`https://bible-api.com{ref}`);
-                        const d = await r.json();
-                        out.innerHTML = `<h4 style="color:var(--accent)">${d.reference}</h4><p>${d.text}</p>`;
-                    } catch { out.innerText = "Não encontrado."; }
-                },
-                openHino(n) {
-                    const h = App.db.hinos[n] || { t: "Hino IASD", l: "Letra completa integrada." };
-                    alert(`Hino ${n}: ${h.t}\n\n${h.l}`);
-                }
+            chart() {
+                const el = document.getElementById('c');
+                if(!el) return;
+                new Chart(el.getContext('2d'), {
+                    type: 'line',
+                    data: { labels: ['S1','S2','S3','S4'], datasets: [{ data: [10, 25, 15, 30], borderColor: '#C5A059', tension: 0.4 }] },
+                    options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
             },
 
-            loadChart() {
-                const ctx = document.getElementById('mainChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'line',
-                    data: { labels: ['Jan','Fev','Mar','Abr'], datasets: [{ label: 'Crescimento', data:, borderColor: '#C5A059', tension: 0.4 }] },
-                    options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false } } }
-                });
+            async bible() {
+                const ref = document.getElementById('bi').value;
+                const out = document.getElementById('bo');
+                out.innerText = "Buscando...";
+                try {
+                    const r = await fetch(`https://bible-api.com{ref}`);
+                    const d = await r.json();
+                    out.innerHTML = `<strong>${d.reference}</strong><p>${d.text}</p>`;
+                } catch { out.innerText = "Erro ao buscar."; }
             }
         };
 
-        window.onload = () => App.init();
+        // Início seguro
+        document.addEventListener('DOMContentLoaded', () => App.init());
     </script>
 </body>
 </html>
