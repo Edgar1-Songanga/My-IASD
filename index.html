@@ -13,50 +13,29 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--t); overflow-x: hidden; }
         
-        /* Sistema de Grid Otimizado */
-        .app-shell { display: none; min-height: 100vh; }
+        .app-shell { display: flex; min-height: 100vh; }
         .sidebar { width: 260px; background: var(--g); backdrop-filter: blur(15px); border-right: 1px solid var(--gb); position: fixed; height: 100vh; padding: 1.5rem; z-index: 10; transition: 0.3s; }
         .main { flex: 1; margin-left: 260px; padding: 2rem; width: calc(100% - 260px); }
 
-        /* Estética Premium (Glassmorphism) */
-        .card { background: var(--g); border: 1px solid var(--gb); border-radius: 16px; padding: 1.5rem; transition: 0.3s ease; }
+        .card { background: var(--g); border: 1px solid var(--gb); border-radius: 16px; padding: 1.5rem; transition: 0.3s ease; margin-bottom: 1rem; }
         .card:hover { border-color: var(--a); transform: translateY(-2px); }
         
         .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 10px; cursor: pointer; color: var(--td); margin-bottom: 4px; font-size: 0.9rem; }
         .nav-item.active { background: var(--g); color: var(--a); border-left: 3px solid var(--a); }
         
         .btn { background: var(--a); color: #fff; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; width: 100%; transition: 0.2s; }
-        .btn:active { transform: scale(0.98); }
-
-        #auth-screen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        
         input, select { width: 100%; padding: 12px; margin-bottom: 1rem; border-radius: 8px; border: 1px solid var(--gb); background: rgba(255,255,255,0.05); color: #fff; outline: none; }
         
-        /* Módulos Específicos */
         .hino-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
         .feed-post { border-bottom: 1px solid var(--gb); padding: 15px 0; }
-        .radio-mini { position: fixed; bottom: 20px; right: 20px; width: 250px; background: var(--p); border-radius: 12px; padding: 10px; display: flex; align-items: center; gap: 10px; }
+        .radio-mini { position: fixed; bottom: 20px; right: 20px; width: 250px; background: var(--p); border-radius: 12px; padding: 10px; display: flex; align-items: center; gap: 10px; z-index: 100; }
 
         @media (max-width: 768px) { .sidebar { width: 0; padding: 0; overflow: hidden; } .main { margin-left: 0; width: 100%; } }
     </style>
 </head>
 <body>
 
-    <div id="auth-screen">
-        <div class="card" style="width: 340px; text-align: center;">
-            <h2 style="color: var(--a); margin-bottom: 2rem;">UNA Digital</h2>
-            <input type="text" id="user" placeholder="Seu nome">
-            <select id="role">
-                <option value="membro">Membro</option>
-                <option value="pastor">Pastor</option>
-                <option value="tesoureiro">Tesoureiro</option>
-                <option value="admin">Administrador</option>
-            </select>
-            <button class="btn" onclick="App.login()">Entrar na Plataforma</button>
-        </div>
-    </div>
-
-    <div id="app-shell" class="app-shell">
+    <div class="app-shell">
         <aside class="sidebar">
             <div style="font-weight: 700; color: var(--a); font-size: 1.4rem; margin-bottom: 2rem;">UNA.</div>
             <nav id="menu-nav"></nav>
@@ -65,13 +44,13 @@
         <main class="main">
             <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                 <h2 id="view-title">Dashboard</h2>
-                <div id="user-tag" style="font-size: 0.8rem; opacity: 0.6;"></div>
+                <div style="font-size: 0.8rem; opacity: 0.6;">Acesso Livre | UNA Platform</div>
             </header>
             <div id="view-content"></div>
         </main>
     </div>
 
-    <div class="radio-mini card" id="player" style="display:none;">
+    <div class="radio-mini card">
         <i data-lucide="radio" style="color: var(--a)"></i>
         <marquee style="font-size: 0.7rem; flex: 1;">Rádio Adventista UNA - Ao Vivo: Lição da Escola Sabatina</marquee>
         <i data-lucide="play" size="18" style="cursor:pointer"></i>
@@ -79,44 +58,29 @@
 
     <script>
         const App = {
-            state: { user: null, view: 'dashboard' },
+            state: { view: 'dashboard' },
 
             init() {
-                const session = localStorage.getItem('una_session');
-                if (session) { this.state.user = JSON.parse(session); this.launch(); }
-            },
-
-            login() {
-                const name = document.getElementById('user').value;
-                const role = document.getElementById('role').value;
-                if (!name) return alert("Identifique-se");
-                this.state.user = { name, role };
-                localStorage.setItem('una_session', JSON.stringify(this.state.user));
-                this.launch();
-            },
-
-            launch() {
-                document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('app-shell').style.display = 'flex';
-                document.getElementById('player').style.display = 'flex';
-                document.getElementById('user-tag').innerText = `${this.state.user.name} | ${this.state.user.role.toUpperCase()}`;
                 this.renderMenu();
                 this.go('dashboard');
             },
 
             renderMenu() {
                 const routes = [
-                    { id: 'dashboard', icon: 'layout-grid', label: 'Início', roles: ['admin', 'pastor', 'tesoureiro', 'membro'] },
-                    { id: 'social', icon: 'heart', label: 'Rede Social', roles: ['admin', 'pastor', 'membro', 'tesoureiro'] },
-                    { id: 'secretaria', icon: 'file-text', label: 'Secretaria', roles: ['admin', 'pastor'] },
-                    { id: 'tesouraria', icon: 'trending-up', label: 'Finanças', roles: ['admin', 'tesoureiro'] },
-                    { id: 'biblia', icon: 'book', label: 'Bíblia', roles: ['admin', 'pastor', 'membro'] },
-                    { id: 'hinos', icon: 'music', label: 'Hinos', roles: ['admin', 'pastor', 'membro'] },
-                    { id: 'ia', icon: 'cpu', label: 'UNA AI', roles: ['admin', 'pastor', 'membro'] }
+                    { id: 'dashboard', icon: 'layout-grid', label: 'Início' },
+                    { id: 'social', icon: 'heart', label: 'Rede Social' },
+                    { id: 'secretaria', icon: 'file-text', label: 'Secretaria' },
+                    { id: 'tesouraria', icon: 'trending-up', label: 'Finanças' },
+                    { id: 'biblia', icon: 'book', label: 'Bíblia' },
+                    { id: 'hinos', icon: 'music', label: 'Hinos' },
+                    { id: 'ia', icon: 'cpu', label: 'UNA AI' }
                 ];
                 const nav = document.getElementById('menu-nav');
-                nav.innerHTML = routes.filter(r => r.roles.includes(this.state.user.role))
-                    .map(r => `<div class="nav-item" onclick="App.go('${r.id}')" id="n-${r.id}"><i data-lucide="${r.icon}" size="18"></i><span>${r.label}</span></div>`).join('');
+                nav.innerHTML = routes.map(r => `
+                    <div class="nav-item" onclick="App.go('${r.id}')" id="n-${r.id}">
+                        <i data-lucide="${r.icon}" size="18"></i>
+                        <span>${r.label}</span>
+                    </div>`).join('');
                 lucide.createIcons();
             },
 
@@ -135,19 +99,19 @@
                 dashboard(el) {
                     el.innerHTML = `
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
-                            <div class="card"><h4>Membros</h4><h2>1.240</h2></div>
-                            <div class="card"><h4>Dízimos</h4><h2>45.200 Kz</h2></div>
+                            <div class="card"><h4>Membros Ativos</h4><h2>1.240</h2></div>
+                            <div class="card"><h4>Arrecadação</h4><h2>45.200 Kz</h2></div>
                         </div>
                         <div class="card" style="margin-top: 20px; height: 300px;"><canvas id="chart"></canvas></div>`;
-                    new Chart(document.getElementById('chart'), { type: 'line', data: { labels: ['Jan', 'Fev', 'Mar', 'Abr'], datasets: [{ label: 'Fiel', data:, borderColor: '#C5A059' }] }, options: { maintainAspectRatio: false }});
+                    new Chart(document.getElementById('chart'), { type: 'line', data: { labels: ['Jan', 'Fev', 'Mar', 'Abr'], datasets: [{ label: 'Atividade', data:, borderColor: '#C5A059' }] }, options: { maintainAspectRatio: false }});
                 },
                 social(el) {
-                    el.innerHTML = `<div class="card"><textarea placeholder="O que Deus fez por você hoje?" style="width:100%; background:none; border:none; color:#fff; outline:none; resize:none;"></textarea><button class="btn" style="width:100px; float:right;">Postar</button></div>
+                    el.innerHTML = `<div class="card"><textarea placeholder="O que deseja compartilhar?" style="width:100%; background:none; border:none; color:#fff; outline:none; resize:none;"></textarea><button class="btn" style="width:100px; float:right;">Postar</button></div>
                     <div class="feed-post"><strong>Pr. Manuel:</strong><p>A paz de Cristo! Reunião amanhã às 18h.</p></div>
-                    <div class="feed-post"><strong>Irmã Maria:</strong><p>Agradeço pelas orações, meu filho está curado!</p></div>`;
+                    <div class="feed-post"><strong>Comunidade:</strong><p>Bem-vindos à nova rede UNA.</p></div>`;
                 },
                 biblia(el) {
-                    el.innerHTML = `<div class="card"><input type="text" placeholder="Pesquisar ex: João 3:16"><div style="margin-top:10px; line-height:1.6">"Porque Deus amou o mundo de tal maneira..."</div></div>`;
+                    el.innerHTML = `<div class="card"><input type="text" placeholder="Pesquisar ex: Salmos 23"><div style="margin-top:10px; line-height:1.6">"O Senhor é o meu pastor, nada me faltará."</div></div>`;
                 },
                 hinos(el) {
                     let hinos = "";
@@ -155,13 +119,13 @@
                     el.innerHTML = `<div class="hino-grid">${hinos}</div>`;
                 },
                 tesouraria(el) {
-                    el.innerHTML = `<div class="card"><h3>Lançamento</h3><input type="number" placeholder="Valor em Kz"><select><option>Dízimo</option><option>Oferta</option></select><button class="btn">Gerar Recibo Digital</button></div>`;
+                    el.innerHTML = `<div class="card"><h3>Lançamento</h3><input type="number" placeholder="Valor em Kz"><select><option>Dízimo</option><option>Oferta</option></select><button class="btn">Lançar</button></div>`;
                 },
                 ia(el) {
-                    el.innerHTML = `<div class="card" style="height:400px; display:flex; flex-direction:column;"><div style="flex:1; color:var(--td)">UNA AI: Como posso ajudar seu ministério hoje?</div><input type="text" placeholder="Perguntar à IA..."></div>`;
+                    el.innerHTML = `<div class="card" style="height:400px; display:flex; flex-direction:column;"><div style="flex:1; color:var(--td)">UNA AI: Olá! Como posso ajudar hoje?</div><input type="text" placeholder="Escreva aqui..."></div>`;
                 },
                 secretaria(el) {
-                    el.innerHTML = `<div class="card"><h3>Lista de Membros</h3><div class="feed-post">João Afonso - Ativo</div><div class="feed-post">Carla Simão - Ativa</div><button class="btn" style="margin-top:10px">Gerar Relatório Trimestral PDF</button></div>`;
+                    el.innerHTML = `<div class="card"><h3>Gestão</h3><div class="feed-post">João Afonso - Ativo</div><div class="feed-post">Carla Simão - Ativa</div></div>`;
                 }
             }
         };
