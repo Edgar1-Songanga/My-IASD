@@ -110,17 +110,20 @@ users:[
 churches:["Igreja Central Luanda","Igreja Betel Benguela"]
 }
 
-// Carrega DB e garante que as contas de teste existem
+// Carrega DB e garante que as contas de teste existem e estão atualizadas
 function loadDB(){
 let db = JSON.parse(localStorage.getItem("zion_db"));
 if(!db || !db.users || db.users.length === 0){
 db = DEFAULT_DB;
-localStorage.setItem("zion_db", JSON.stringify(db));
 } else {
-// Garante que as 3 contas de teste existem mesmo se o DB antigo não tiver
+// Garante que as contas de teste existem e estão atualizadas (ex: campo approved)
 DEFAULT_DB.users.forEach(testUser => {
-if(!db.users.find(u => u.username === testUser.username)){
+let existingUserIndex = db.users.findIndex(u => u.username.toLowerCase() === testUser.username.toLowerCase());
+if(existingUserIndex === -1){
 db.users.push(testUser);
+} else {
+// Atualiza o usuário existente com os dados padrão para garantir que campos como 'approved' existam
+db.users[existingUserIndex] = { ...db.users[existingUserIndex], ...testUser };
 }
 });
 DEFAULT_DB.churches.forEach(church => {
@@ -128,8 +131,8 @@ if(!db.churches.includes(church)){
 db.churches.push(church);
 }
 });
-localStorage.setItem("zion_db", JSON.stringify(db));
 }
+localStorage.setItem("zion_db", JSON.stringify(db));
 return db;
 }
 
@@ -227,6 +230,7 @@ App.user=u
 auth.style.display='none'
 app.style.display='block'
 App.init()
+}
 }
 </script>
 </body>
