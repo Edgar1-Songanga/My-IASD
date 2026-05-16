@@ -22,16 +22,14 @@ body{background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:h
 .auth-box{background:var(--glass);backdrop-filter:blur(40px);padding:40px;border-radius:28px;width:480px;border:1px solid var(--border);box-shadow:var(--shadow)}
 .auth-box h2{margin-bottom:8px;font-size:28px}
 .auth-box p{opacity:0.7;margin-bottom:24px}
-.tab{display:flex;gap:8px;margin-bottom:24px}
-.tab-btn{flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer;font-weight:600}
-.tab-btn.active{background:var(--gradient);border-color:transparent}
+.test-accounts{background:var(--card);padding:16px;border-radius:12px;margin-bottom:20px;border-left:3px solid var(--primary);font-size:13px}
+.test-accounts b{display:block;margin-bottom:8px;color:var(--primary)}
+.test-accounts code{background:var(--bg);padding:2px 6px;border-radius:4px;font-size:12px}
 
 input,select{width:100%;padding:14px;margin-bottom:14px;background:var(--bg);border:2px solid var(--border);color:var(--text);border-radius:12px;font-size:15px}
 input:focus,select:focus{outline:none;border-color:var(--primary)}
 .btn{width:100%;padding:16px;background:var(--gradient);color:#fff;border:none;border-radius:12px;cursor:pointer;font-weight:700;font-size:15px;margin-top:8px}
-.btn-ghost{background:transparent;border:1px solid var(--border)}
 .error{color:#ef4444;font-size:13px;margin-top:-10px;margin-bottom:10px;display:none}
-.level-info{background:var(--card);padding:12px;border-radius:10px;margin-bottom:14px;font-size:13px;border-left:3px solid var(--primary)}
 
 #app{display:none;width:100%}
 .app-wrapper{display:flex;width:100%;height:100vh}
@@ -44,8 +42,8 @@ header{padding:20px 36px;border-bottom:1px solid var(--border);display:flex;just
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
 .nav{padding:14px 16px;border-radius:14px;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:12px;font-weight:600;opacity:0.7}
 .nav:hover,.nav.active{opacity:1;background:var(--gradient);color:#fff}
+.nav.hidden{display:none}
 .badge{padding:6px 12px;border-radius:12px;font-size:11px;font-weight:700;background:var(--gradient)}
-.toast{position:fixed;bottom:36px;right:36px;background:var(--gradient);padding:18px 32px;border-radius:16px;display:none;z-index:2000;font-weight:600}
 </style>
 </head>
 <body>
@@ -55,64 +53,24 @@ header{padding:20px 36px;border-bottom:1px solid var(--border);display:flex;just
 <h2>Zion OS</h2>
 <p>União Nordeste de Angola</p>
 
-<div class="tab">
-<button class="tab-btn active" onclick="App.switchTab('login')">Entrar</button>
-<button class="tab-btn" onclick="App.switchTab('register')">Registar</button>
+<div class="test-accounts">
+<b>Contas de Teste:</b>
+<code>Super Admin</code> - Nível: Geral | Usuário: super | Senha: admin123<br>
+<code>Tesoureiro</code> - Nível: Igreja | Igreja: Igreja Central Luanda | Usuário: tesoureiro | Senha: 123456<br>
+<code>Membro</code> - Nível: Igreja | Igreja: Igreja Central Luanda | Usuário: membro | Senha: 123456
 </div>
 
-<div id="loginTab">
 <select id="loginLevel" onchange="App.onLevelChange()">
-<option value="igreja">Igreja Local</option>
-<option value="missao">Missão</option>
-<option value="uniao">União</option>
-<option value="divisao">Divisão</option>
 <option value="geral">Conferência Geral</option>
-</select>
-
-<select id="loginRole">
-<option value="super">Super Admin</option>
-<option value="admin">Admin</option>
-<option value="pastor">Pastor</option>
-<option value="tesoureiro">Tesoureiro</option>
-<option value="secretario">Secretário</option>
-<option value="membro">Membro</option>
+<option value="igreja">Igreja Local</option>
 </select>
 
 <select id="loginChurch" style="display:none"></select>
+
 <input id="loginUsername" placeholder="Usuário">
 <input id="loginPassword" type="password" placeholder="Password">
 <div class="error" id="loginError"></div>
 <button class="btn" onclick="App.login()">Entrar</button>
-</div>
-
-<div id="registerTab" style="display:none">
-<div class="level-info">Escolhe o nível e a função. Membros devem selecionar a igreja existente.</div>
-
-<select id="regLevel" onchange="App.onRegLevelChange()">
-<option value="igreja">Igreja Local</option>
-<option value="missao">Missão</option>
-<option value="uniao">União</option>
-<option value="divisao">Divisão</option>
-<option value="geral">Conferência Geral</option>
-</select>
-
-<select id="regRole">
-<option value="super">Super Admin</option>
-<option value="admin">Admin</option>
-<option value="pastor">Pastor</option>
-<option value="tesoureiro">Tesoureiro</option>
-<option value="secretario">Secretário</option>
-<option value="membro">Membro</option>
-</select>
-
-<select id="regChurch" style="display:none"></select>
-<input id="regChurchName" placeholder="Nome da Igreja" style="display:none">
-<input id="regUsername" placeholder="Usuário">
-<input id="regPassword" type="password" placeholder="Password">
-<input id="regConfirm" type="password" placeholder="Confirmar Password">
-<div class="error" id="regError"></div>
-<button class="btn" onclick="App.register()">Registar</button>
-</div>
 </div>
 </div>
 
@@ -123,14 +81,14 @@ header{padding:20px 36px;border-bottom:1px solid var(--border);display:flex;just
 <div id="userBadge" style="margin-bottom:20px"></div>
 <div class="nav active" onclick="App.nav('dashboard',this)">📊 Dashboard</div>
 <div class="nav" data-role="all" onclick="App.nav('bible',this)">📖 Bíblia</div>
-<div class="nav" data-role="tesoureiro,admin,super" onclick="App.nav('finance',this)">💰 Tesouraria</div>
-<div class="nav" data-role="secretario,admin,super" onclick="App.nav('members',this)">👤 Membros</div>
+<div class="nav" data-role="tesoureiro,super" onclick="App.nav('finance',this)">💰 Tesouraria</div>
+<div class="nav" data-role="secretario,super" onclick="App.nav('members',this)">👤 Membros</div>
 </aside>
 
 <main>
 <header>
 <div id="userInfo"></div>
-<button class="btn-ghost" onclick="App.logout()">Sair</button>
+<button onclick="App.logout()" style="padding:10px 20px;background:transparent;border:1px solid var(--border);border-radius:10px;cursor:pointer;color:var(--text)">Sair</button>
 </header>
 
 <div id="dashboard" class="view active">
@@ -139,47 +97,30 @@ header{padding:20px 36px;border-bottom:1px solid var(--border);display:flex;just
 <div class="card"><h4>Função</h4><h2 id="userRole">-</h2></div>
 <div class="card"><h4>Escopo</h4><h2 id="userScope">-</h2></div>
 </div>
+<p style="margin-top:20px;opacity:0.7">Testa trocar de conta para ver as permissões mudarem</p>
 </div>
 
-<div id="bible" class="view"><div class="card"><h4>Bíblia</h4><p>Acesso liberado para todos os níveis</p></div></div>
-<div id="finance" class="view"><div class="card"><h4>Tesouraria</h4><p>Apenas Tesoureiro, Admin e Super Admin</p></div></div>
-<div id="members" class="view"><div class="card"><h4>Membros</h4><p>Apenas Secretário, Admin e Super Admin</p></div></div>
+<div id="bible" class="view"><div class="card"><h4>Bíblia</h4><p>Acesso liberado para todos</p></div></div>
+<div id="finance" class="view"><div class="card"><h4>Tesouraria</h4><p>Apenas Tesoureiro e Super Admin veem isto</p></div></div>
+<div id="members" class="view"><div class="card"><h4>Membros</h4><p>Apenas Secretário e Super Admin veem isto</p></div></div>
 
 </main>
 </div>
 </div>
 
-<div id="toast" class="toast"></div>
-
 <script>
-// DB simulado
-const DB=JSON.parse(localStorage.getItem("zion_db"))||{
+// DB com contas de teste já criadas e aprovadas
+const DB={
 users:[
-{username:"super",password:"admin123",level:"geral",role:"super",scope:"Conferência Geral",church:null}
+{username:"super",password:"admin123",level:"geral",role:"super",scope:"Conferência Geral",church:null,approved:true},
+{username:"tesoureiro",password:"123456",level:"igreja",role:"tesoureiro",scope:"Igreja Central Luanda",church:"Igreja Central Luanda",approved:true},
+{username:"membro",password:"123456",level:"igreja",role:"membro",scope:"Igreja Central Luanda",church:"Igreja Central Luanda",approved:true}
 ],
-churches:["Igreja Central Luanda","Igreja Betel Benguela"],
-pending:[]
-}
-
-const PERMISSIONS={
-super:{all:true},
-admin:{dashboard:true,bible:true,finance:true,members:true},
-pastor:{dashboard:true,bible:true,finance:false,members:true},
-tesoureiro:{dashboard:true,bible:true,finance:true,members:false},
-secretario:{dashboard:true,bible:true,finance:false,members:true},
-membro:{dashboard:true,bible:true,finance:false,members:false}
+churches:["Igreja Central Luanda","Igreja Betel Benguela"]
 }
 
 const App={
-user:null,currentTab:'login',
-
-switchTab(tab){
-this.currentTab=tab
-document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'))
-event.target.classList.add('active')
-document.getElementById('loginTab').style.display=tab==='login'?'block':'none'
-document.getElementById('registerTab').style.display=tab==='register'?'block':'none'
-},
+user:null,
 
 onLevelChange(){
 let level=document.getElementById('loginLevel').value
@@ -192,97 +133,18 @@ churchSelect.style.display='none'
 }
 },
 
-onRegLevelChange(){
-let level=document.getElementById('regLevel').value
-let churchSelect=document.getElementById('regChurch')
-let churchInput=document.getElementById('regChurchName')
-if(level==='igreja'){
-churchSelect.style.display='block'
-churchInput.style.display='none'
-churchSelect.innerHTML='<option value="">Selecionar Igreja</option>'+DB.churches.map(c=>`<option>${c}</option>`).join('')
-}else{
-churchSelect.style.display='none'
-churchInput.style.display='block'
-}
-},
-
-register(){
-let level=document.getElementById('regLevel').value
-let role=document.getElementById('regRole').value
-let username=document.getElementById('regUsername').value.trim()
-let pass=document.getElementById('regPassword').value
-let confirm=document.getElementById('regConfirm').value
-let error=document.getElementById('regError')
-
-error.style.display='none'
-
-// Validações
-if(!username||!pass){
-error.textContent='Preenche todos os campos'
-error.style.display='block'
-return
-}
-if(pass!==confirm){
-error.textContent='Passwords não coincidem'
-error.style.display='block'
-return
-}
-if(DB.users.find(u=>u.username===username)){
-error.textContent='Usuário já existe'
-error.style.display='block'
-return
-}
-
-let scope,church=null
-if(level==='igreja'){
-church=document.getElementById('regChurch').value||document.getElementById('regChurchName').value.trim()
-if(!church){
-error.textContent='Seleciona ou cria uma igreja'
-error.style.display='block'
-return
-}
-// Anti-duplicidade de igreja
-if(!DB.churches.includes(church)){
-DB.churches.push(church)
-}
-scope=church
-}else{
-scope=level.charAt(0).toUpperCase()+level.slice(1)
-}
-
-let newUser={username,password:pass,level,role,scope,church,approved:role==='super'}
-
-if(role==='super'){
-DB.users.push(newUser)
-this.toast('Super Admin criado com sucesso')
-}else{
-DB.pending.push(newUser)
-this.toast('Aguarda aprovação do Super Admin')
-}
-
-this.save()
-setTimeout(()=>location.reload(),1500)
-},
-
 login(){
 let level=document.getElementById('loginLevel').value
-let role=document.getElementById('loginRole').value
 let username=document.getElementById('loginUsername').value.trim()
 let pass=document.getElementById('loginPassword').value
 let error=document.getElementById('loginError')
 
 error.style.display='none'
 
-let user=DB.users.find(u=>u.username===username&&u.password===pass&&u.level===level&&u.role===role)
+let user=DB.users.find(u=>u.username===username&&u.password===pass&&u.level===level&&u.approved)
 
 if(!user){
-error.textContent='Credenciais inválidas'
-error.style.display='block'
-return
-}
-
-if(!user.approved){
-error.textContent='Aguarda aprovação do Super Admin'
+error.textContent='Credenciais inválidas ou usuário não aprovado'
 error.style.display='block'
 return
 }
@@ -295,8 +157,8 @@ this.init()
 },
 
 init(){
-userInfo.innerText=`${this.user.username} - ${this.user.scope}`
-userBadge.innerHTML=`<span class="badge">${this.user.role.toUpperCase()}</span>`
+document.getElementById('userInfo').innerText=`${this.user.username} - ${this.user.scope}`
+document.getElementById('userBadge').innerHTML=`<span class="badge">${this.user.role.toUpperCase()}</span>`
 document.getElementById('userLevel').innerText=this.user.level.toUpperCase()
 document.getElementById('userRole').innerText=this.user.role.toUpperCase()
 document.getElementById('userScope').innerText=this.user.scope
@@ -308,7 +170,7 @@ document.querySelectorAll('[data-role]').forEach(el=>{
 let roles=el.getAttribute('data-role')
 if(roles==='all')return
 if(!roles.split(',').includes(this.user.role)){
-el.style.display='none'
+el.classList.add('hidden')
 }
 })
 },
@@ -323,20 +185,11 @@ el.classList.add('active')
 logout(){
 localStorage.removeItem('zion_user')
 location.reload()
-},
-
-toast(msg){
-toast.innerText=msg
-toast.style.display='block'
-setTimeout(()=>toast.style.display='none',3000)
-},
-
-save(){localStorage.setItem('zion_db',JSON.stringify(DB))}
+}
 }
 
 window.onload=()=>{
 App.onLevelChange()
-App.onRegLevelChange()
 let u=JSON.parse(localStorage.getItem('zion_user'))
 if(u){
 App.user=u
@@ -346,4 +199,4 @@ App.init()
 }
 </script>
 </body>
-</html>
+  </html>
