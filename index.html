@@ -4,48 +4,110 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zion OS | UNA Digital</title>
-<meta name="theme-color" content="#4f46e5">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-:root {
---bg:#0a0d14; --card:#161b22; --primary:#4f46e5; --success:#16a34a;
---text:#e6edf3; --border:#30363d; --danger:#dc2626; --warn:#f59e0b;
+:root{
+--bg:#0b0f1a; --card:#131927; --primary:#6366f1; --primary-glow:#818cf8;
+--text:#f1f5f9; --text-muted:#94a3b8; --border:#1e293b;
+--glass:rgba(19,25,39,0.6); --glass-strong:rgba(19,25,39,0.85);
+--gradient:linear-gradient(135deg,#6366f1,#8b5cf6,#d946ef);
+--shadow:0 20px 60px rgba(0,0,0,0.5);
+--shadow-glow:0 0 40px rgba(99,102,241,0.4);
 }
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
-body{background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden}
-button,input,select,textarea{font-family:inherit}
-#auth{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:#000;z-index:1000}
-.auth-box{background:var(--card);padding:30px;border-radius:15px;width:360px;text-align:center;border:1px solid var(--border)}
-.logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:15px}
-.logo svg{width:42px;height:42px}
+[data-theme="light"]{
+--bg:#f8fafc; --card:#ffffff; --text:#0f172a; --text-muted:#64748b; --border:#e2e8f0;
+--glass:rgba(255,255,255,0.7); --glass-strong:rgba(255,255,255,0.9);
+--shadow:0 20px 60px rgba(0,0,0,0.1);
+--shadow-glow:0 0 40px rgba(99,102,241,0.2);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;transition:all 0.5s cubic-bezier(0.4,0,0.2,1)}
+
+body::before{
+content:'';position:fixed;inset:0;
+background:radial-gradient(circle at 20% 20%,rgba(99,102,241,0.15),transparent 50%),
+radial-gradient(circle at 80% 80%,rgba(139,92,246,0.15),transparent 50%);
+pointer-events:none;z-index:0;
+}
+
+#auth{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:var(--bg);z-index:1000}
+.auth-box{background:var(--glass-strong);backdrop-filter:blur(40px);padding:50px;border-radius:28px;width:440px;text-align:center;border:1px solid var(--border);box-shadow:var(--shadow)}
+.logo{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:28px}
+.logo svg{width:56px;height:56px;filter:drop-shadow(0 8px 20px rgba(99,102,241,0.5))}
+
 #app{display:none;width:100%}
-aside{width:260px;background:#0d1117;padding:15px;overflow:auto;border-right:1px solid var(--border)}
-main{flex:1;display:flex;flex-direction:column}
-header{padding:15px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.view{display:none;padding:20px;overflow:auto}
+.app-wrapper{display:flex;width:100%;height:100vh;position:relative;z-index:1}
+.app-wrapper.sidebar-right{flex-direction:row-reverse}
+
+aside{width:290px;background:var(--glass-strong);backdrop-filter:blur(40px);padding:28px;border-right:1px solid var(--border);overflow:auto;transition:all 0.5s cubic-bezier(0.4,0,0.2,1);box-shadow:var(--shadow)}
+.app-wrapper.sidebar-right aside{border-right:none;border-left:1px solid var(--border)}
+aside.collapsed{width:0;padding:0;overflow:hidden}
+
+main{flex:1;display:flex;flex-direction:column;min-width:0}
+header{padding:20px 36px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--glass-strong);backdrop-filter:blur(40px);box-shadow:var(--shadow);position:sticky;top:0;z-index:100}
+.view{display:none;padding:36px;overflow:auto;animation:slideUp 0.6s cubic-bezier(0.4,0,0.2,1)}
 .view.active{display:block}
-.nav{padding:10px 12px;border-radius:8px;cursor:pointer;margin-bottom:4px;display:flex;align-items:center;gap:10px;font-size:14px}
-.nav:hover,.nav.active{background:var(--primary)}
-.card{background:var(--card);padding:15px;border-radius:12px;margin-bottom:10px;border:1px solid var(--border)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
-input,select,textarea{width:100%;padding:10px;margin-top:5px;background:#000;border:1px solid var(--border);color:#fff;border-radius:8px}
-textarea{min-height:80px;resize:vertical}
-button{padding:10px 15px;background:var(--primary);color:#fff;border:none;border-radius:8px;margin-top:5px;cursor:pointer;font-weight:600}
-button:hover{opacity:0.9}
-button.success{background:var(--success)}
-button.danger{background:var(--danger)}
-button.warn{background:var(--warn)}
-.btn-group{display:flex;gap:8px;flex-wrap:wrap}
-.badge{padding:4px 8px;border-radius:20px;background:#1f2937;font-size:12px}
-.table{width:100%;border-collapse:collapse;font-size:14px}
-.table th,.table td{padding:10px;text-align:left;border-bottom:1px solid var(--border)}
-.table tr:hover{background:#0f172a}
-.tabs{display:flex;gap:8px;border-bottom:1px solid var(--border);margin-bottom:15px}
-.tab{padding:10px 15px;cursor:pointer;opacity:0.6}
-.tab.active{opacity:1;border-bottom:2px solid var(--primary)}
-.toast{position:fixed;bottom:20px;right:20px;background:var(--success);padding:12px 20px;border-radius:8px;display:none}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* NAV ULTRA MODERNO */
+.nav{padding:16px 18px;border-radius:16px;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;gap:16px;font-weight:600;opacity:0.7;transition:all 0.4s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden}
+.nav::before{content:'';position:absolute;inset:0;background:var(--gradient);opacity:0;transition:opacity 0.4s}
+.nav:hover::before,.nav.active::before{opacity:1}
+.nav:hover,.nav.active{opacity:1;transform:translateX(8px);color:#fff}
+.nav span{position:relative;z-index:1}
+
+/* BOTÕES ULTRA MODERNOS */
+.btn{padding:16px 28px;background:var(--gradient);color:#fff;border:none;border-radius:16px;cursor:pointer;font-weight:700;font-size:15px;transition:all 0.4s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:10px}
+.btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#fff,#fff);opacity:0;transition:opacity 0.3s}
+.btn:hover::before{opacity:0.2}
+.btn:hover{transform:translateY(-3px);box-shadow:var(--shadow-glow)}
+.btn:active{transform:translateY(0)}
+.btn-ghost{background:var(--glass);border:1px solid var(--border);backdrop-filter:blur(20px)}
+.btn-ghost:hover{background:var(--card);box-shadow:var(--shadow)}
+.btn-icon{width:48px;height:48px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:16px;background:var(--glass);border:1px solid var(--border);backdrop-filter:blur(20px);cursor:pointer;transition:all 0.4s}
+.btn-icon:hover{background:var(--gradient);transform:scale(1.1) rotate(5deg);box-shadow:var(--shadow-glow)}
+.btn-pulse{animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,0.7)}70%{box-shadow:0 0 0 20px rgba(99,102,241,0)}}
+
+.card{background:var(--glass);backdrop-filter:blur(40px);padding:28px;border-radius:24px;margin-bottom:20px;border:1px solid var(--border);box-shadow:var(--shadow);transition:all 0.4s;cursor:pointer;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:var(--gradient);transform:scaleX(0);transition:transform 0.4s}
+.card:hover::before{transform:scaleX(1)}
+.card:hover{transform:translateY(-6px);box-shadow:var(--shadow-glow)}
+.card.clickable:active{transform:scale(0.98)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+input,select,textarea{width:100%;padding:16px;margin-top:10px;background:var(--bg);border:2px solid var(--border);color:var(--text);border-radius:14px;font-size:15px;transition:all 0.3s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px rgba(99,102,241,0.1)}
+.top-actions{display:flex;gap:14px;align-items:center}
+.badge{padding:8px 16px;border-radius:20px;background:var(--gradient);font-size:12px;font-weight:700;color:#fff}
+.toast{position:fixed;bottom:36px;right:36px;background:var(--gradient);padding:18px 32px;border-radius:16px;display:none;box-shadow:var(--shadow-glow);z-index:2000;font-weight:600}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;z-index:1500;animation:fadeIn 0.3s}
+.modal.active{display:flex}
+.modal-content{background:var(--card);padding:36px;border-radius:28px;max-width:700px;width:90%;max-height:85vh;overflow:auto;border:1px solid var(--border);box-shadow:var(--shadow)}
+.mobile-menu{display:none}
+
+/* ASSISTENTE INTELIGENTE */
+.assistant{position:fixed;bottom:36px;right:36px;width:60px;height:60px;border-radius:50%;background:var(--gradient);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-glow);z-index:1200;transition:all 0.4s}
+.assistant:hover{transform:scale(1.1) rotate(10deg)}
+.assistant-panel{position:fixed;bottom:120px;right:36px;width:380px;max-height:500px;background:var(--glass-strong);backdrop-filter:blur(40px);border-radius:24px;border:1px solid var(--border);box-shadow:var(--shadow);display:none;flex-direction:column;z-index:1200;overflow:hidden}
+.assistant-panel.active{display:flex;animation:slideUp 0.4s}
+.assistant-header{padding:20px;border-bottom:1px solid var(--border);background:var(--gradient);color:#fff;font-weight:700}
+.assistant-body{padding:20px;overflow:auto;flex:1}
+.assistant-msg{background:var(--card);padding:14px 18px;border-radius:14px;margin-bottom:12px;border-left:3px solid var(--primary)}
+.assistant-input{display:flex;gap:10px;padding:20px;border-top:1px solid var(--border)}
+
+@media(max-width:1024px){
+aside{position:fixed;left:0;top:0;height:100vh;z-index:999}
+.app-wrapper.sidebar-right aside{left:auto;right:0}
+aside.collapsed{transform:translateX(-100%)}
+.app-wrapper.sidebar-right aside.collapsed{transform:translateX(100%)}
+.mobile-menu{display:flex}
+.assistant-panel{width:90%;right:5%}
+@media(max-width:768px){
+.view{padding:24px}
+.grid{grid-template-columns:1fr}
+header{padding:16px 24px}
 </style>
 </head>
 <body>
@@ -54,367 +116,376 @@ button.warn{background:var(--warn)}
 <div class="auth-box">
 <div class="logo">
 <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="50" cy="50" r="48" stroke="#4f46e5" stroke-width="4"/>
-<path d="M50 20V80M20 50H80" stroke="#4f46e5" stroke-width="4" stroke-linecap="round"/>
+<defs><linearGradient id="grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#d946ef"/></linearGradient></defs>
+<path d="M30 25C30 20 35 15 50 15C65 15 70 20 70 25V75C70 80 65 85 50 85C35 85 30 80 30 75V25Z" stroke="url(#grad)" stroke-width="3" fill="none"/>
+<path d="M40 40H60M40 50H60M40 60H60" stroke="url(#grad)" stroke-width="2" stroke-linecap="round"/>
+<path d="M50 20C45 18 50 15 50 10C50 15 55 18 50 20Z" fill="url(#grad)"/>
 </svg>
-<h2>Zion OS</h2>
+<h2 data-i18n="title">Zion OS</h2>
 </div>
-<p style="margin-bottom:15px;font-size:13px;opacity:0.8">União Nordeste de Angola</p>
-<select id="role"><option value="admin">Admin</option><option value="pastor">Pastor</option><option value="treasurer">Tesoureiro</option><option value="secretary">Secretário</option><option value="member">Membro</option></select>
-<input id="church" placeholder="Igreja" value="Igreja Central Luanda">
-<button onclick="App.login()">Entrar no Sistema</button>
+<p style="margin-bottom:24px;opacity:0.8" data-i18n="subtitle">União Nordeste de Angola</p>
+<select id="role" class="btn-ghost">
+<option value="admin" data-i18n="role_admin">Admin</option>
+<option value="pastor" data-i18n="role_pastor">Pastor</option>
+<option value="treasurer" data-i18n="role_treasurer">Tesoureiro</option>
+<option value="secretary" data-i18n="role_secretary">Secretário</option>
+<option value="member" data-i18n="role_member">Membro</option>
+</select>
+<input id="church" data-i18n-placeholder="church_placeholder">
+<div class="lang-selector" id="langSelect"></div>
+<button class="btn btn-pulse" onclick="App.login()" data-i18n="login_btn">Entrar</button>
 </div>
 </div>
 
 <div id="app">
-<aside>
-<h3 style="margin-bottom:15px;font-size:16px">Zion OS</h3>
-<div class="nav active" onclick="App.nav('dashboard',this)">📊 Dashboard</div>
-<div class="nav" onclick="App.nav('inbox',this)">📥 Inbox</div>
-<div class="nav" onclick="App.nav('automations',this)">⚡ Automações</div>
-<div class="nav" onclick="App.nav('ai',this)">🤖 IA Assistente</div>
-<div class="nav" onclick="App.nav('bookings',this)">📅 Reservas</div>
-<div class="nav" onclick="App.nav('ecommerce',this)">🛒 E-commerce</div>
-<div class="nav" onclick="App.nav('analytics',this)">📈 Analytics</div>
-<div class="nav" onclick="App.nav('channels',this)">📱 Canais</div>
-<div class="nav" onclick="App.nav('crm',this)">👥 CRM</div>
-<div class="nav" onclick="App.nav('finance',this)">💰 Tesouraria</div>
-<div class="nav" onclick="App.nav('members',this)">👤 Membros</div>
-<div class="nav" onclick="App.nav('departments',this)">🏛️ Departamentos</div>
-<div class="nav" onclick="App.nav('requests',this)">📝 Pedidos</div>
-<div class="nav" onclick="App.nav('settings',this)">⚙️ Definições</div>
-<button onclick="App.logout()" style="width:100%;margin-top:20px">Sair</button>
+<div class="app-wrapper" id="appWrapper">
+<aside id="sidebar">
+<h3 style="margin-bottom:32px;font-size:20px;font-weight:800;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Zion OS</h3>
+<div class="nav active" onclick="App.nav('dashboard',this)">📊 <span data-i18n="nav_dashboard">Dashboard</span></div>
+<div class="nav" onclick="App.nav('bible',this)">📖 <span data-i18n="nav_bible">Bíblia</span></div>
+<div class="nav" onclick="App.nav('hymn',this)">🎵 <span data-i18n="nav_hymn">Hinário</span></div>
+<div class="nav" onclick="App.nav('lesson',this)">📚 <span data-i18n="nav_lesson">Lições ES</span></div>
+<div class="nav" onclick="App.nav('social',this)">🌐 <span data-i18n="nav_social">Social</span></div>
+<div class="nav" onclick="App.nav('live',this)">🔴 <span data-i18n="nav_live">Live Studio</span></div>
+<div class="nav" onclick="App.nav('finance',this)">💰 <span data-i18n="nav_finance">Tesouraria</span></div>
+<div class="nav" onclick="App.nav('members',this)">👤 <span data-i18n="nav_members">Membros</span></div>
 </aside>
 
 <main>
-<header><div id="user"></div><div class="badge">Modo Demo Offline</div></header>
+<header>
+<div style="display:flex;align-items:center;gap:16px">
+<div class="mobile-menu btn-icon" onclick="App.toggleSidebar()">☰</div>
+<div id="user" onclick="App.openProfile()" style="cursor:pointer;font-weight:600"></div>
+</div>
+<div class="top-actions">
+<select id="langSwitch" onchange="App.changeLang(this.value)" class="btn-ghost" style="width:auto;padding:12px 16px;cursor:pointer"></select>
+<div class="btn-icon" onclick="App.toggleTheme()" id="themeBtn">🌓</div>
+<div class="btn-icon" onclick="App.toggleSidebarPosition()" title="Mover sidebar">⇄</div>
+<button class="btn-ghost" onclick="App.logout()" data-i18n="logout">Sair</button>
+</div>
+</header>
 
 <div id="dashboard" class="view active">
 <div class="grid">
-<div class="card"><h4>Membros</h4><h2 id="statMembers">0</h2></div>
-<div class="card"><h4>Receita Mês</h4><h2 id="statFinance">0 Kz</h2></div>
-<div class="card"><h4>Pedidos</h4><h2 id="statRequests">0</h2></div>
-<div class="card"><h4>Automações Ativas</h4><h2 id="statAuto">3</h2></div>
+<div class="card clickable" onclick="App.openModal('Membros', App.getMembersHTML())">
+<h4 data-i18n="stat_members">Membros Ativos</h4>
+<h2 id="statMembers" style="font-size:42px;margin:16px 0;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800">0</h2>
+<p style="opacity:0.7">Clique para ver todos</p>
 </div>
-<canvas id="chart" style="margin-top:20px"></canvas>
+<div class="card clickable" onclick="App.openModal('Financeiro', App.getFinanceHTML())">
+<h4 data-i18n="stat_revenue">Receita</h4>
+<h2 id="statFinance" style="font-size:42px;margin:16px 0;font-weight:800">0 Kz</h2>
+<p style="opacity:0.7">Clique para detalhes</p>
+</div>
+<div class="card clickable" onclick="App.openModal('Lições', App.getLessonsHTML())">
+<h4 data-i18n="stat_lessons">Lições Lidas</h4>
+<h2 id="statLessons" style="font-size:42px;margin:16px 0;font-weight:800">0</h2>
+<p style="opacity:0.7">Clique para continuar</p>
+</div>
+<div class="card clickable" onclick="App.openModal('Hinário', App.getHymnsHTML())">
+<h4 data-i18n="stat_hymns">Hinos Cantados</h4>
+<h2 id="statHymns" style="font-size:42px;margin:16px 0;font-weight:800">0</h2>
+<p style="opacity:0.7">Clique para cantar</p>
+</div>
+</div>
+<canvas id="chart" style="margin-top:32px;cursor:pointer" onclick="App.openModal('Analytics', 'Gráfico detalhado com filtros')"></canvas>
 </div>
 
-<div id="inbox" class="view">
-<div class="tabs">
-<div class="tab active" onclick="App.tab('inbox','all',this)">Todas</div>
-<div class="tab" onclick="App.tab('inbox','whatsapp',this)">WhatsApp</div>
-<div class="tab" onclick="App.tab('inbox','email',this)">Email</div>
+<div id="bible" class="view">
+<div class="card clickable" onclick="document.getElementById('bibleRef').focus()">
+<h4 data-i18n="bible_search">Buscar Versículo</h4>
+<input id="bibleRef" data-i18n-placeholder="bible_placeholder">
+<button class="btn" onclick="event.stopPropagation();App.searchBible()" data-i18n="search">Buscar</button>
+<div id="bibleResult" style="margin-top:20px;line-height:1.9;font-size:16px"></div>
 </div>
+</div>
+
+<div id="hymn" class="view">
 <div class="card">
-<input id="msg" placeholder="Escreve mensagem...">
-<button onclick="App.sendMsg()">Enviar</button>
+<input id="hymnSearch" data-i18n-placeholder="hymn_search" onkeyup="App.searchHymn()">
 </div>
-<div id="inboxList"></div>
-</div>
-
-<div id="automations" class="view">
-<div class="card">
-<h4>Nova Automação</h4>
-<input id="autoName" placeholder="Nome da automação">
-<select id="autoTrigger"><option>Boas-vindas</option><option>Aniversário</option><option>Doação Recebida</option></select>
-<button onclick="App.addAutomation()">Criar</button>
-</div>
-<div id="automationList"></div>
+<div id="hymnList" class="grid"></div>
 </div>
 
-<div id="ai" class="view">
-<div class="card">
-<h4>IA Assistente</h4>
-<textarea id="aiPrompt" placeholder="Pergunta sobre Bíblia, procedimentos, relatórios..."></textarea>
-<button onclick="App.askAI()">Perguntar</button>
-<div id="aiResponse" style="margin-top:10px;line-height:1.6"></div>
+<div id="lesson" class="view">
+<div class="card clickable" onclick="App.openModal('Lições', '13 lições do trimestre disponíveis')">
+<h4 data-i18n="lesson_title">Lições da Escola Sabatina</h4>
 </div>
+<div id="lessonList" class="grid"></div>
 </div>
 
-<div id="bookings" class="view">
-<div class="card">
-<h4>Nova Reserva</h4>
-<input id="bookName" placeholder="Nome do evento">
-<input id="bookDate" type="date">
-<button onclick="App.addBooking()">Reservar</button>
+<div id="social" class="view">
+<div class="card clickable" onclick="document.getElementById('postText').focus()">
+<h4 data-i18n="create_post">Criar Post</h4>
+<textarea id="postText" data-i18n-placeholder="post_placeholder"></textarea>
+<button class="btn" onclick="event.stopPropagation();App.createPost()" data-i18n="publish">Publicar</button>
 </div>
-<div id="bookingList"></div>
-</div>
-
-<div id="ecommerce" class="view">
-<div class="card">
-<h4>Produto</h4>
-<input id="prodName" placeholder="Nome">
-<input id="prodPrice" type="number" placeholder="Preço Kz">
-<button onclick="App.addProduct()">Adicionar</button>
-</div>
-<div id="productList" class="grid"></div>
+<div id="feed"></div>
 </div>
 
-<div id="analytics" class="view">
-<div class="card">
-<h4>Relatório</h4>
-<button onclick="App.genReport()">Gerar PDF</button>
+<div id="live" class="view">
+<div class="card clickable" onclick="App.openModal('Live', 'Entrar na sala da Escola Sabatina')">
+<h4><span style="color:#ef4444">●</span> <span data-i18n="live_title">Escola Sabatina</span></h4>
+<button class="btn" onclick="event.stopPropagation();App.toast('Entrando...')" data-i18n="join">Entrar</button>
 </div>
-<div id="reportArea"></div>
-</div>
-
-<div id="channels" class="view">
-<div class="grid">
-<div class="card"><h4>WhatsApp</h4><span class="badge">Conectado</span><button onclick="App.toast('Conectando WhatsApp...')">Conectar</button></div>
-<div class="card"><h4>Telegram</h4><span class="badge">Offline</span><button onclick="App.toast('Conectando Telegram...')">Conectar</button></div>
-<div class="card"><h4>Instagram</h4><span class="badge">Offline</span><button onclick="App.toast('Conectando Instagram...')">Conectar</button></div>
-</div>
-</div>
-
-<div id="crm" class="view">
-<div class="card">
-<h4>Novo Lead</h4>
-<input id="leadName" placeholder="Nome">
-<input id="leadPhone" placeholder="Telefone">
-<button onclick="App.addLead()">Adicionar</button>
-</div>
-<div id="leadList"></div>
 </div>
 
 <div id="finance" class="view">
-<div class="card">
-<h4>Lançamento</h4>
-<input id="fName" placeholder="Nome">
-<select id="fType"><option>Dízimo</option><option>Oferta</option><option>Missionário</option></select>
-<input id="fVal" type="number" placeholder="Valor Kz">
-<div class="btn-group">
-<button onclick="App.addFinance()">Registrar</button>
-<button onclick="App.exportFinance()">Exportar PDF</button>
-</div>
+<div class="card clickable" onclick="document.getElementById('fName').focus()">
+<h4 data-i18n="new_entry">Novo Lançamento</h4>
+<input id="fName" data-i18n-placeholder="name">
+<select id="fType"><option data-i18n="tithe">Dízimo</option><option data-i18n="offering">Oferta</option></select>
+<input id="fVal" type="number" data-i18n-placeholder="amount">
+<button class="btn" onclick="event.stopPropagation();App.addFinance()" data-i18n="register">Registrar</button>
 </div>
 <div id="financeList"></div>
 </div>
 
 <div id="members" class="view">
-<div class="card">
-<h4>Novo Membro</h4>
-<input id="mName" placeholder="Nome Completo">
-<input id="mPhone" placeholder="Telefone">
-<button onclick="App.addMember()">Adicionar</button>
+<div class="card clickable" onclick="document.getElementById('mName').focus()">
+<h4 data-i18n="new_member">Novo Membro</h4>
+<input id="mName" data-i18n-placeholder="full_name">
+<input id="mPhone" data-i18n-placeholder="phone">
+<button class="btn" onclick="event.stopPropagation();App.addMember()" data-i18n="add">Adicionar</button>
 </div>
-<table class="table"><thead><tr><th>Nome</th><th>Telefone</th><th>Ações</th></tr></thead><tbody id="memberList"></tbody></table>
-</div>
-
-<div id="departments" class="view">
-<div class="card">
-<h4>Novo Departamento</h4>
-<input id="dName" placeholder="Ex: Jovens, Escola Sabatina">
-<button onclick="App.addDept()">Criar</button>
-</div>
-<div id="deptList" class="grid"></div>
-</div>
-
-<div id="requests" class="view">
-<div class="card">
-<h4>Novo Pedido</h4>
-<select id="rType"><option>Carta de Recomendação</option><option>Transferência</option><option>Batismo</option><option>Dedicação</option></select>
-<input id="rName" placeholder="Nome">
-<textarea id="rNote" placeholder="Observações"></textarea>
-<button onclick="App.addRequest()">Enviar</button>
-</div>
-<div id="requestList"></div>
-</div>
-
-<div id="settings" class="view">
-<div class="card">
-<h4>Workspace</h4>
-<input id="wsName" placeholder="Nome da Igreja" value="Igreja Central Luanda">
-<button onclick="App.saveSettings()">Salvar</button>
-</div>
-<div class="card">
-<h4>Auditoria</h4>
-<div id="auditList"></div>
-</div>
+<div id="memberList"></div>
 </div>
 
 </main>
 </div>
+</div>
 
-<div id="toast" class="toast">Ação executada</div>
+<div id="modal" class="modal" onclick="App.closeModal()">
+<div class="modal-content" onclick="event.stopPropagation()">
+<h3 id="modalTitle"></h3>
+<div id="modalBody" style="margin-top:24px"></div>
+<button class="btn" onclick="App.closeModal()" style="margin-top:24px">Fechar</button>
+</div>
+</div>
+
+<div class="assistant" onclick="App.toggleAssistant()">💬</div>
+<div class="assistant-panel" id="assistantPanel">
+<div class="assistant-header">Zion AI Assistant</div>
+<div class="assistant-body" id="assistantBody">
+<div class="assistant-msg">Olá! Sou o assistente do Zion OS. Posso ajudar com navegação, explicar funções, ou responder sobre a igreja. O que precisas?</div>
+</div>
+<div class="assistant-input">
+<input id="assistantInput" placeholder="Pergunta-me qualquer coisa..." onkeypress="if(event.key==='Enter')App.askAssistant()">
+<button class="btn" onclick="App.askAssistant()">Enviar</button>
+</div>
+</div>
+
+<div id="toast" class="toast"></div>
 
 <script>
-const DB=JSON.parse(localStorage.getItem("zion_db"))||{messages:[],automations:[],bookings:[],products:[],leads:[],finance:[],members:[],depts:[],requests:[],audit:[]}
+const i18n={
+pt:{title:"Zion OS",subtitle:"União Nordeste de Angola",login_btn:"Entrar",logout:"Sair",church_placeholder:"Igreja",role_admin:"Admin",role_pastor:"Pastor",role_treasurer:"Tesoureiro",role_secretary:"Secretário",role_member:"Membro",nav_dashboard:"Dashboard",nav_bible:"Bíblia",nav_hymn:"Hinário",nav_lesson:"Lições ES",nav_social:"Social",nav_live:"Live Studio",nav_finance:"Tesouraria",nav_members:"Membros",stat_members:"Membros Ativos",stat_revenue:"Receita",stat_lessons:"Lições Lidas",stat_hymns:"Hinos Cantados",bible_search:"Buscar Versículo",bible_placeholder:"Ex: João 3:16",search:"Buscar",hymn_search:"Buscar hino...",lesson_title:"Lições da Escola Sabatina",create_post:"Criar Post",post_placeholder:"Partilha um versículo...",publish:"Publicar",live_title:"Escola Sabatina",join:"Entrar",new_entry:"Novo Lançamento",name:"Nome",tithe:"Dízimo",offering:"Oferta",amount:"Valor Kz",register:"Registrar",new_member:"Novo Membro",full_name:"Nome Completo",phone:"Telefone",add:"Adicionar"},
+en:{title:"Zion OS",subtitle:"Northeast Angola Union",login_btn:"Login",logout:"Logout",church_placeholder:"Church",role_admin:"Admin",role_pastor:"Pastor",role_treasurer:"Treasurer",role_secretary:"Secretary",role_member:"Member",nav_dashboard:"Dashboard",nav_bible:"Bible",nav_hymn:"Hymnal",nav_lesson:"Sabbath School",nav_social:"Social",nav_live:"Live Studio",nav_finance:"Finance",nav_members:"Members",stat_members:"Active Members",stat_revenue:"Revenue",stat_lessons:"Lessons Read",stat_hymns:"Hymns Sung",bible_search:"Search Verse",bible_placeholder:"Ex: John 3:16",search:"Search",hymn_search:"Search hymn...",lesson_title:"Sabbath School Lessons",create_post:"Create Post",post_placeholder:"Share a verse...",publish:"Publish",live_title:"Sabbath School",join:"Join",new_entry:"New Entry",name:"Name",tithe:"Tithe",offering:"Offering",amount:"Amount",register:"Register",new_member:"New Member",full_name:"Full Name",phone:"Phone",add:"Add"}
+}
+
+const langs=[{code:"pt",name:"PT"},{code:"en",name:"EN"},{code:"fr",name:"FR"},{code:"es",name:"ES"},{code:"sw",name:"SW"},{code:"umb",name:"UMB"},{code:"kw",name:"KW"},{code:"osh",name:"OSH"}]
+
+const DATA={
+hymns:[{id:1,title:"A Deus Demos Glória",lyrics:"1. A Deus demos glória\nPelo Seu amor tão grande"},{id:2,title:"Graça Maravilhosa",lyrics:"1. Graça maravilhosa\nQue salvou um pecador"}],
+lessons:[{id:1,title:"Semana 1: O Deus que Cria",content:"Verso Áureo: Gênesis 1:1"}]
+}
+
+const DB=JSON.parse(localStorage.getItem("zion_db"))||{posts:[],finance:[],members:[],lang:"pt",theme:"system",sidebarPos:"left",stats:{lessons:0,hymns:0}}
+
 const App={
-user:null,
+user:null,lang:"pt",
+initLang(){
+this.lang=DB.lang||navigator.language.split("-")[0]||"pt"
+if(!i18n[this.lang])this.lang="pt"
+langs.forEach(l=>{
+langSelect.innerHTML+=`<option value="${l.code}" ${l.code===this.lang?'selected':''}>${l.name}</option>`
+})
+this.applyLang()
+},
+changeLang(code){
+this.lang=code;DB.lang=code;this.save();this.applyLang()
+},
+applyLang(){
+document.documentElement.lang=this.lang
+document.querySelectorAll("[data-i18n]").forEach(el=>{
+let key=el.getAttribute("data-i18n")
+if(i18n[this.lang]&&i18n[this.lang][key])el.innerText=i18n[this.lang][key]
+})
+document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{
+let key=el.getAttribute("data-i18n-placeholder")
+if(i18n[this.lang]&&i18n[this.lang][key])el.placeholder=i18n[this.lang][key]
+})
+},
+toggleTheme(){
+let current=document.documentElement.getAttribute("data-theme")
+let next=current==="light"?"dark":"light"
+document.documentElement.setAttribute("data-theme",next)
+DB.theme=next;this.save()
+themeBtn.innerText=next==="light"?"☀️":"🌙"
+},
+initTheme(){
+let theme=DB.theme
+if(theme==="system"){
+theme=window.matchMedia('(prefers-color-scheme: light)').matches?"light":"dark"
+}
+document.documentElement.setAttribute("data-theme",theme)
+themeBtn.innerText=theme==="light"?"☀️":"🌙"
+},
+toggleSidebar(){
+sidebar.classList.toggle("collapsed")
+},
+toggleSidebarPosition(){
+let wrapper=document.getElementById("appWrapper")
+wrapper.classList.toggle("sidebar-right")
+DB.sidebarPos=wrapper.classList.contains("sidebar-right")?"right":"left"
+this.save()
+},
 login(){
 this.user={role:role.value,name:role.value,church:church.value}
 localStorage.setItem("zion_user",JSON.stringify(this.user))
 auth.style.display="none";app.style.display="flex"
 user.innerText=`${this.user.name} - ${this.user.church}`
-this.audit("LOGIN","Usuário entrou")
 this.init()
 },
-logout(){this.audit("LOGOUT","Saiu");localStorage.clear();location.reload()},
+logout(){localStorage.clear();location.reload()},
 nav(id,el){
 document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"))
 document.getElementById(id).classList.add("active")
 document.querySelectorAll(".nav").forEach(n=>n.classList.remove("active"))
 el.classList.add("active")
-},
-tab(view,tab,el){
-document.querySelectorAll(`#${view}.tab`).forEach(t=>t.classList.remove("active"))
-el.classList.add("active")
+if(window.innerWidth<=1024)sidebar.classList.add("collapsed")
 },
 init(){
+this.initLang()
+this.initTheme()
+if(DB.sidebarPos==="right")appWrapper.classList.add("sidebar-right")
 this.renderAll()
+this.loadHymns()
+this.loadLessons()
 this.chart()
 },
 renderAll(){
-this.renderInbox();this.renderAuto();this.renderBookings();this.renderProducts()
-this.renderLeads();this.renderFinance();this.renderMembers();this.renderDepts()
-this.renderRequests();this.renderAudit();this.updateStats()
+this.renderFinance();this.renderMembers();this.renderFeed();this.updateStats()
 },
-sendMsg(){
-if(!msg.value)return
-DB.messages.unshift({text:msg.value,user:this.user.name,time:new Date().toLocaleString()})
-this.save();this.renderInbox();msg.value="";this.toast("Mensagem enviada")
+loadHymns(){
+hymnList.innerHTML=""
+DATA.hymns.forEach(h=>{
+hymnList.innerHTML+=`<div class="card clickable" onclick="App.openHymn(${h.id})"><h4>Hino ${h.id}</h4><p>${h.title}</p></div>`
+})
 },
-renderInbox(){
-inboxList.innerHTML=""
-DB.messages.forEach(m=>inboxList.innerHTML+=`<div class="card"><b>${m.user}</b> ${m.time}<br>${m.text}</div>`)
+openHymn(id){
+let h=DATA.hymns.find(x=>x.id===id)
+this.openModal(`Hino ${h.id} - ${h.title}`, `<div style="line-height:2;white-space:pre-line;font-size:16px">${h.lyrics}</div>`)
+DB.stats.hymns++;this.save();this.updateStats()
 },
-addAutomation(){
-if(!autoName.value)return
-DB.automations.push({name:autoName.value,trigger:autoTrigger.value,status:"Ativa",id:Date.now()})
-this.save();this.renderAuto();autoName.value="";this.toast("Automação criada")
+loadLessons(){
+lessonList.innerHTML=""
+DATA.lessons.forEach(l=>{
+lessonList.innerHTML+=`<div class="card clickable" onclick="App.openLesson(${l.id})"><h4>${l.title}</h4><p>${l.content.substring(0,80)}...</p></div>`
+})
 },
-renderAuto(){
-automationList.innerHTML=""
-DB.automations.forEach(a=>automationList.innerHTML+=`<div class="card">${a.name} - ${a.trigger} <span class="badge">${a.status}</span> <button class="danger" onclick="App.del('automations',${a.id})">Remover</button></div>`)
+openLesson(id){
+let l=DATA.lessons.find(x=>x.id===id)
+this.openModal(l.title, `<div style="line-height:1.9;font-size:16px">${l.content}</div>`)
+DB.stats.lessons++;this.save();this.updateStats()
 },
-askAI(){
-if(!aiPrompt.value)return
-const r=`Resposta demo: Baseado em "${aiPrompt.value}", recomendo consultar o manual da igreja e falar com o pastor.`
-aiResponse.innerText=r
-this.audit("AI_ASK",aiPrompt.value)
-aiPrompt.value=""
+createPost(){
+if(!postText.value)return
+DB.posts.unshift({text:postText.value,user:this.user.name,time:new Date().toLocaleString()})
+this.save();this.renderFeed();postText.value=""
 },
-addBooking(){
-if(!bookName.value)return
-DB.bookings.push({name:bookName.value,date:bookDate.value,id:Date.now()})
-this.save();this.renderBookings();bookName.value="";this.toast("Reserva criada")
-},
-renderBookings(){
-bookingList.innerHTML=""
-DB.bookings.forEach(b=>bookingList.innerHTML+=`<div class="card">${b.name} - ${b.date} <button class="danger" onclick="App.del('bookings',${b.id})">Cancelar</button></div>`)
-},
-addProduct(){
-if(!prodName.value)return
-DB.products.push({name:prodName.value,price:prodPrice.value,id:Date.now()})
-this.save();this.renderProducts();prodName.value="";prodPrice.value=""
-},
-renderProducts(){
-productList.innerHTML=""
-DB.products.forEach(p=>productList.innerHTML+=`<div class="card"><h4>${p.name}</h4><p>${p.price} Kz</p><button onclick="App.toast('Produto adicionado ao carrinho')">Comprar</button></div>`)
-},
-addLead(){
-if(!leadName.value)return
-DB.leads.push({name:leadName.value,phone:leadPhone.value,id:Date.now()})
-this.save();this.renderLeads();leadName.value="";leadPhone.value=""
-},
-renderLeads(){
-leadList.innerHTML=""
-DB.leads.forEach(l=>leadList.innerHTML+=`<div class="card">${l.name} - ${l.phone} <button class="danger" onclick="App.del('leads',${l.id})">Remover</button></div>`)
+renderFeed(){
+feed.innerHTML=""
+DB.posts.forEach((p,i)=>feed.innerHTML+=`<div class="card clickable" onclick="App.openModal('Post', '${p.text}')"><b>${p.user}</b> <span style="opacity:0.6">${p.time}</span><p style="margin-top:10px">${p.text}</p></div>`)
 },
 addFinance(){
 if(!fName.value||!fVal.value)return
 DB.finance.push({name:fName.value,type:fType.value,val:parseFloat(fVal.value),date:new Date().toLocaleString()})
-this.save();this.renderFinance();this.updateStats();fName.value="";fVal.value=""
+this.save();this.renderFinance();fName.value="";fVal.value=""
 },
 renderFinance(){
 financeList.innerHTML=""
-DB.finance.slice().reverse().forEach(f=>financeList.innerHTML+=`<div class="card">${f.date}<br><b>${f.name}</b> - ${f.val} Kz <span class="badge">${f.type}</span></div>`)
-},
-exportFinance(){
-const {jsPDF}=window.jspdf;const doc=new jsPDF()
-doc.text("Relatório Financeiro",10,10)
-DB.finance.forEach((f,i)=>doc.text(`${f.date} | ${f.name} | ${f.val} Kz | ${f.type}`,10,20+i*8))
-doc.save("financeiro.pdf")
+DB.finance.slice().reverse().forEach((f,i)=>financeList.innerHTML+=`<div class="card clickable" onclick="App.openModal('Lançamento', '${f.name} - ${f.val} Kz')">${f.date}<br><b>${f.name}</b> - ${f.val} Kz <span class="badge">${f.type}</span></div>`)
 },
 addMember(){
 if(!mName.value)return
 DB.members.push({name:mName.value,phone:mPhone.value,id:Date.now()})
-this.save();this.renderMembers();this.updateStats();mName.value="";mPhone.value=""
+this.save();this.renderMembers();mName.value="";mPhone.value=""
 },
 renderMembers(){
 memberList.innerHTML=""
-DB.members.forEach(m=>memberList.innerHTML+=`<tr><td>${m.name}</td><td>${m.phone}</td><td><button class="danger" onclick="App.del('members',${m.id})">Remover</button></td></tr>`)
+DB.members.forEach(m=>memberList.innerHTML+=`<div class="card clickable" onclick="App.openModal('Membro', '${m.name} - ${m.phone}')"><b>${m.name}</b> - ${m.phone}</div>`)
 },
-addDept(){
-if(!dName.value)return
-DB.depts.push({name:dName.value,members:[],id:Date.now()})
-this.save();this.renderDepts();dName.value=""
+openModal(title,body){
+modalTitle.innerText=title
+modalBody.innerHTML=body
+modal.classList.add("active")
 },
-renderDepts(){
-deptList.innerHTML=""
-DB.depts.forEach(d=>deptList.innerHTML+=`<div class="card"><h4>${d.name}</h4><p>${d.members.length} membros</p><button class="danger" onclick="App.del('depts',${d.id})">Remover</button></div>`)
+closeModal(){
+modal.classList.remove("active")
 },
-addRequest(){
-if(!rName.value)return
-DB.requests.push({type:rType.value,name:rName.value,note:rNote.value,status:"Pendente",date:new Date().toLocaleString()})
-this.save();this.renderRequests();this.updateStats();rName.value="";rNote.value=""
-},
-renderRequests(){
-requestList.innerHTML=""
-DB.requests.slice().reverse().forEach((r,i)=>requestList.innerHTML+=`<div class="card"><b>${r.type}</b> - ${r.name}<br>${r.note}<br><span class="badge">${r.status}</span> ${r.date}<br><button onclick="App.updateRequest(${i},'Aprovado')">Aprovar</button> <button class="danger" onclick="App.updateRequest(${i},'Rejeitado')">Rejeitar</button></div>`)
-},
-updateRequest(i,status){
-DB.requests[i].status=status
-this.save();this.renderRequests();this.updateStats()
-},
-genReport(){
-const {jsPDF}=window.jspdf;const doc=new jsPDF()
-doc.text("Relatório Geral Zion OS",10,10)
-doc.text(`Membros: ${DB.members.length}`,10,20)
-doc.text(`Receita: ${DB.finance.reduce((a,b)=>a+b.val,0)} Kz`,10,30)
-doc.save("relatorio_geral.pdf")
-},
-del(type,id){
-DB[type]=DB[type].filter(x=>x.id!==id)
-this.save();this.renderAll()
-},
+getMembersHTML(){return DB.members.map(m=>`<p>${m.name} - ${m.phone}</p>`).join("")||"Nenhum membro registado"}
+getFinanceHTML(){return DB.finance.map(f=>`<p>${f.date}: ${f.name} - ${f.val} Kz</p>`).join("")||"Nenhum lançamento"}
+getLessonsHTML(){return DATA.lessons.map(l=>`<p>${l.title}</p>`).join("")}
+getHymnsHTML(){return DATA.hymns.map(h=>`<p>Hino ${h.id}: ${h.title}</p>`).join("")}
+openProfile(){this.openModal('Perfil', `Usuário: ${this.user.name}<br>Igreja: ${this.user.church}<br>Role: ${this.user.role}`)}
 chart(){
 const ctx=document.getElementById("chart")
 if(!ctx)return
-new Chart(ctx,{type:'bar',data:{labels:["Jan","Fev","Mar"],datasets:[{label:"Receita",data:[0,0,0],backgroundColor:"#4f46e5"}]},options:{scales:{y:{beginAtZero:true}}}})
-},
-saveSettings(){
-localStorage.setItem("church_name",wsName.value)
-this.toast("Definições salvas")
-},
-audit(action,detail){
-DB.audit.unshift({action,detail,time:new Date().toLocaleString()})
-if(DB.audit.length>100)DB.audit.pop()
-this.save()
-},
-renderAudit(){
-auditList.innerHTML=""
-DB.audit.forEach(a=>auditList.innerHTML+=`<div class="card" style="font-size:13px">${a.time} | <b>${a.action}</b> | ${a.detail}</div>`)
+new Chart(ctx,{type:'line',data:{labels:["Sem 1","Sem 2","Sem 3","Sem 4"],datasets:[{label:"Atividade",data:[12,19,15,25],borderColor:"#6366f1",tension:0.4,fill:true,backgroundColor:"rgba(99,102,241,0.1)"}]},options:{plugins:{legend:{labels:{color:getComputedStyle(document.body).color}}}}})
 },
 updateStats(){
 statMembers.innerText=DB.members.length
 statFinance.innerText=DB.finance.reduce((a,b)=>a+b.val,0)+" Kz"
-statRequests.innerText=DB.requests.filter(r=>r.status=="Pendente").length
+statLessons.innerText=DB.stats.lessons
+statHymns.innerText=DB.stats.hymns
 },
 toast(msg){
 toast.innerText=msg;toast.style.display="block"
-setTimeout(()=>toast.style.display="none",2000)
+setTimeout(()=>toast.style.display="none",3000)
 },
-save(){localStorage.setItem("zion_db",JSON.stringify(DB))}
+save(){localStorage.setItem("zion_db",JSON.stringify(DB))},
+// ASSISTENTE INTELIGENTE
+toggleAssistant(){
+assistantPanel.classList.toggle("active")
+},
+askAssistant(){
+let q=assistantInput.value.toLowerCase().trim()
+if(!q)return
+this.addAssistantMsg(q,true)
+assistantInput.value=""
+let response=this.getAIResponse(q)
+setTimeout(()=>this.addAssistantMsg(response,false),600)
+},
+addAssistantMsg(msg,isUser){
+let div=document.createElement('div')
+div.className='assistant-msg'
+div.style.background=isUser?'var(--primary)':'var(--card)'
+div.style.color=isUser?'#fff':'var(--text)'
+div.style.marginLeft=isUser?'40px':'0'
+div.innerText=msg
+assistantBody.appendChild(div)
+assistantBody.scrollTop=assistantBody.scrollHeight
+},
+getAIResponse(q){
+if(q.includes('dashboard'))return 'O Dashboard mostra estatísticas em tempo real. Clica nos cards para ver detalhes completos.'
+if(q.includes('bíblia')||q.includes('bible'))return 'Vai em Bíblia, digita o versículo e clica buscar. Funciona offline e online.'
+if(q.includes('hinário')||q.includes('hino'))return 'No Hinário podes buscar hinos por número ou título. Clica num hino para ver a letra completa.'
+if(q.includes('lição')||q.includes('escola sabatina'))return 'As lições estão organizadas por semana. Clica numa lição para ler o conteúdo completo.'
+if(q.includes('membro')||q.includes('membros'))return 'Em Membros podes adicionar, ver e editar todos os membros da igreja.'
+if(q.includes('financeiro')||q.includes('dinheiro'))return 'A Tesouraria registra dízimos e ofertas. Gera relatórios PDF automaticamente.'
+if(q.includes('tema')||q.includes('dark')||q.includes('noite'))return 'Clica no ícone 🌓 no topo para alternar entre modo claro e escuro.'
+if(q.includes('língua')||q.includes('idioma'))return 'Usa o seletor no topo direito para mudar para Português, Inglês, Francês, Swahili, Umbundu, Kimbundu ou Oshiwambo.'
+if(q.includes('ajuda')||q.includes('help'))return 'Navega pelo menu lateral. Tudo é clicável. Se tiveres dúvida específica pergunta-me!'
+if(q.includes('obrigado')||q.includes('thanks'))return 'De nada! Estou aqui para ajudar sempre que precisares.'
+return 'Não entendi bem. Podes reformular? Podes perguntar sobre Dashboard, Bíblia, Hinário, Lições, Membros ou Tesouraria.'
 }
+}
+
 window.onload=()=>{
 let u=JSON.parse(localStorage.getItem("zion_user"))
-if(u){App.user=u;auth.style.display="none";app.style.display="flex";user.innerText=`${u.name} - ${u.church}`;App.init()}
-}
-if("serviceWorker" in navigator){
-const code=`self.addEventListener('fetch',e=>{e.respondWith(fetch(e.request).catch(()=>new Response("Offline")))})`
-navigator.serviceWorker.register(URL.createObjectURL(new Blob([code],{type:"text/javascript"})))
+if(u){App.user=u;auth.style.display="none";app.style.display="flex";user.innerText=`${u.name} - ${u.church}`}
+App.init()
 }
 </script>
 </body>
