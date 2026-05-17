@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNA Digital | IASD Angola Premium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --iasd-blue: #003366;
+            --iasd-gold: #FFB612;
+            --primary: #003366;
+            --accent: #FFB612;
+            --bg-light: #F8FAFC;
+            --bg-dark: #0F172A;
+            --card-light: #FFFFFF;
+            --card-dark: #1E293B;
+            --text-light: #1E293B;
+            --text-dark: #F1F5F9;
+            --sidebar-width: 280px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            transition: var(--transition);
+            overflow-x: hidden;
+        }
+
+        body.light-mode {
+            background-color: var(--bg-light);
+            color: var(--text-light);
+        }
+
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        /* Glassmorphism Effects */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dark-mode .glass {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Sidebar Styling */
+        #sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            z-index: 50;
+            transition: var(--transition);
+            box-shadow: 10px 0 30px rgba(0,0,0,0.05);
+        }
+
+        #sidebar.left { left: 0; border-right: 1px solid rgba(0,0,0,0.05); }
+        #sidebar.right { right: 0; border-left: 1px solid rgba(0,0,0,0.05); }
+        
+        .sidebar-item {
+            padding: 12px 20px;
+            margin: 4px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            transition: var(--transition);
+            color: inherit;
+            opacity: 0.7;
+        }
+
+        .sidebar-item:hover, .sidebar-item.active {
+            background: var(--iasd-blue);
+            color: white;
+            opacity: 1;
+            transform: translateX(5px);
+        }
+
+        .dark-mode .sidebar-item:hover, .dark-mode .sidebar-item.active {
+            background: var(--iasd-gold);
+            color: var(--iasd-blue);
+        }
+
+        /* Main Content Area */
+        #main-content {
+            transition: var(--transition);
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .sidebar-left #main-content { margin-left: var(--sidebar-width); }
+        .sidebar-right #main-content { margin-right: var(--sidebar-width); }
+
+        @media (max-width: 1024px) {
+            #sidebar { transform: translateX(-100%); }
+            #sidebar.right { transform: translateX(100%); }
+            #sidebar.open { transform: translateX(0); }
+            #main-content { margin: 0 !important; }
+        }
+
+        /* Ultra Modern Buttons */
+        .btn-premium {
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+            border-radius: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            cursor: pointer;
+        }
+
+        .btn-premium::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-premium:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary { background: var(--iasd-blue); color: white; }
+        .btn-gold { background: var(--iasd-gold); color: var(--iasd-blue); }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+        .dark-mode ::-webkit-scrollbar-thumb { background: #475569; }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade { animation: fadeIn 0.5s ease forwards; }
+
+        /* Login Screen */
+        #login-screen {
+            background: linear-gradient(135deg, #003366 0%, #001a33 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 40px;
+            color: white;
+        }
+
+        .input-premium {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 14px 18px;
+            width: 100%;
+            color: white;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .input-premium:focus {
+            border-color: var(--iasd-gold);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .input-premium {
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        /* Logo SVG Official Path */
+        .iasd-logo {
+            fill: currentColor;
+        }
+    </style>
+</head>
+<body class="light-mode sidebar-left">
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen">
+        <div class="login-card animate-fade">
+            <div class="flex flex-col items-center mb-8">
+                <div class="w-20 h-20 text-white mb-4">
+                    <svg viewBox="0 0 170 170" class="iasd-logo">
+                        <path d="m 128.7,161.7 c -11.5,-1.9 -17.7,3.5 -19.6,8.6 -0.2,0.5 -0.7,0.4 -0.7,0 v -1.6 c 0,-5.7 5.1,-10.9 11.1,-17 l 10,-10 26.6,4.6 c 0,0 7.6,7.6 14.1,14.1 12.5,-14.8 20.1,-34 20.1,-54.9 0,-46.9 -38,-84.9 -84.9,-84.9 -46.9,0 -84.9,38 -84.9,84.9 0,20.9 7.6,40.1 20.1,54.9 6.5,-6.5 14.1,-14.1 14.1,-14.1 l 30.2,-5.2 c 14,-2.4 17.5,0.7 17.5,5.4 0,0.2 -0.2,0.4 -0.4,0.4 h -8.5 c -0.2,0 -0.2,0.2 -0.2,0.4 v 5.2 c 0,0.2 -0.2,0.2 0,0.2 h 8.7 c 0.2,0 0.4,0.2 0.4,0.4 0,0 0,16.9 0,17.3 0,0.4 -0.5,0.5 -0.7,0.1 -1.9,-5.1 -8.1,-10.5 -19.6,-8.6 0,0 -19.9,3.4 -34.7,6 15.2,14.1 35.5,22.8 57.9,22.8 22.4,0 42.7,-8.6 57.9,-22.8 -14.6,-2.8 -34.5,-6.2 -34.5,-6.2 z m -19.5,0.2 c -0.1,0.5 -0.7,0.5 -0.7,0 V 153 c 0,-0.2 0.1,-0.4 0.3,-0.4 h 4.4 c -1.9,2.7 -3.2,5.3 -4,9.3 z m 31.5,-55.5 c 2.1,6.9 0.7,17.4 -9.2,27.4 l -12,11.8 c -0.3,0.3 -0.7,0.8 -1,0.8 h -8.2 c 2,-3 5.4,-6.8 9.2,-10.6 l 8.3,-8.3 C 138.3,117 140,112 140,106.2 c 0.1,-0.4 0.6,-0.4 0.7,0.2 z m -16.3,-6.5 c 6.8,-6.8 8.5,-14.7 3,-19.4 -0.5,-0.4 -0.2,-0.9 0.4,-0.6 6.8,3.1 12.1,14.3 0.5,25.9 l -8.8,8.8 c -6,6 -8.8,8.8 -10.3,16.1 -0.1,0.5 -0.7,0.5 -0.7,0 v -8.9 c 0,-5.7 5,-10.9 11.1,-17 z m -54.1,8 C 68.2,101 69.6,90.5 79.5,80.5 l 26.4,-26.4 c 6,-6 9.1,-8.9 10.6,-16.1 0.1,-0.5 1,-0.5 1,0 v 8.9 c 0,5.7 -5.3,10.9 -11.4,17 L 83.3,86.6 C 72.7,97.2 71,102.1 71,107.9 c 0,0.6 -0.5,0.6 -0.7,0 z m 4,15.7 c -5.9,-7.2 -3.9,-18.4 7.7,-30 l 23.9,-23.9 c 6,-6 9.1,-8.9 10.6,-16.2 0.1,-0.5 1,-0.5 1,0 v 9 c 0,5.7 -5.3,10.9 -11.4,17 l -21.2,21.1 c -4.4,4.4 -13.9,13.8 -10,22.6 0.3,0.6 -0.2,0.9 -0.6,0.4 z m 12.3,-9.2 c -6.8,6.8 -8.5,14.7 -3,19.4 0.5,0.4 0.2,0.9 -0.4,0.6 -6.8,-3.1 -12.1,-14.3 -0.5,-25.9 l 23.2,-23.2 c 6,-6 9.1,-8.8 10.6,-16.1 0.1,-0.5 1,-0.5 1,0 v 8.9 c 0,5.7 -5.3,10.9 -11.4,17 z m 21.9,23 c 0,-5.7 5,-10.9 11.1,-17 l 6.7,-6.7 c 4.4,-4.4 13.8,-13.8 9.9,-22.6 -0.3,-0.6 0.2,-0.9 0.6,-0.4 5.9,7.2 3.9,18.4 -7.7,30 l -9.5,9.5 c -6,6 -8.8,8.9 -10.3,16.2 -0.1,0.5 -0.7,0.5 -0.7,0 v -9 z" />
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-bold tracking-tight">UNA Digital</h1>
+                <p class="opacity-60 text-sm">IASD Angola • Sistema Unificado</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-semibold uppercase tracking-wider opacity-60 ml-1">Nível de Acesso</label>
+                    <select id="login-level" class="input-premium mt-1">
+                        <option value="Geral">Conferência Geral</option>
+                        <option value="Divisão">Divisão</option>
+                        <option value="União">União</option>
+                        <option value="Missão">Missão</option>
+                        <option value="Igreja" selected>Igreja Local</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold uppercase tracking-wider opacity-60 ml-1">Função</label>
+                    <select id="login-role" class="input-premium mt-1">
+                        <option value="Administrador">Administrador</option>
+                        <option value="Pastor">Pastor</option>
+                        <option value="Secretário">Secretário</option>
+                        <option value="Tesoureiro">Tesoureiro</option>
+                        <option value="Membro">Membro</option>
+                    </select>
+                </div>
+                <div id="church-field">
+                    <label class="text-xs font-semibold uppercase tracking-wider opacity-60 ml-1">Igreja / Instituição</label>
+                    <input type="text" id="login-church" class="input-premium mt-1" placeholder="Ex: Igreja Central de Luanda">
+                </div>
+                <button onclick="App.login()" class="btn-premium btn-gold w-full mt-6 text-lg">
+                    Entrar no Sistema
+                </button>
+            </div>
+            <p class="text-center text-xs mt-8 opacity-40">© 2026 IASD União Angolana • Versão Ultra Premium</p>
+        </div>
+    </div>
+
+    <!-- MAIN APP INTERFACE -->
+    <div id="app-interface" class="hidden">
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="glass">
+            <div class="p-6 flex items-center gap-3 border-b border-slate-200 dark:border-slate-700">
+                <div class="w-10 h-10 text-iasd-blue dark:text-iasd-gold">
+                    <svg viewBox="0 0 170 170" class="iasd-logo">
+                        <path d="m 128.7,161.7 c -11.5,-1.9 -17.7,3.5 -19.6,8.6 -0.2,0.5 -0.7,0.4 -0.7,0 v -1.6 c 0,-5.7 5.1,-10.9 11.1,-17 l 10,-10 26.6,4.6 c 0,0 7.6,7.6 14.1,14.1 12.5,-14.8 20.1,-34 20.1,-54.9 0,-46.9 -38,-84.9 -84.9,-84.9 -46.9,0 -84.9,38 -84.9,84.9 0,20.9 7.6,40.1 20.1,54.9 6.5,-6.5 14.1,-14.1 14.1,-14.1 l 30.2,-5.2 c 14,-2.4 17.5,0.7 17.5,5.4 0,0.2 -0.2,0.4 -0.4,0.4 h -8.5 c -0.2,0 -0.2,0.2 -0.2,0.4 v 5.2 c 0,0.2 -0.2,0.2 0,0.2 h 8.7 c 0.2,0 0.4,0.2 0.4,0.4 0,0 0,16.9 0,17.3 0,0.4 -0.5,0.5 -0.7,0.1 -1.9,-5.1 -8.1,-10.5 -19.6,-8.6 0,0 -19.9,3.4 -34.7,6 15.2,14.1 35.5,22.8 57.9,22.8 22.4,0 42.7,-8.6 57.9,-22.8 -14.6,-2.8 -34.5,-6.2 -34.5,-6.2 z m -19.5,0.2 c -0.1,0.5 -0.7,0.5 -0.7,0 V 153 c 0,-0.2 0.1,-0.4 0.3,-0.4 h 4.4 c -1.9,2.7 -3.2,5.3 -4,9.3 z m 31.5,-55.5 c 2.1,6.9 0.7,17.4 -9.2,27.4 l -12,11.8 c -0.3,0.3 -0.7,0.8 -1,0.8 h -8.2 c 2,-3 5.4,-6.8 9.2,-10.6 l 8.3,-8.3 C 138.3,117 140,112 140,106.2 c 0.1,-0.4 0.6,-0.4 0.7,0.2 z m -16.3,-6.5 c 6.8,-6.8 8.5,-14.7 3,-19.4 -0.5,-0.4 -0.2,-0.9 0.4,-0.6 6.8,3.1 12.1,14.3 0.5,25.9 l -8.8,8.8 c -6,6 -8.8,8.8 -10.3,16.1 -0.1,0.5 -0.7,0.5 -0.7,0 v -8.9 c 0,-5.7 5,-10.9 11.1,-17 z m -54.1,8 C 68.2,101 69.6,90.5 79.5,80.5 l 26.4,-26.4 c 6,-6 9.1,-8.9 10.6,-16.1 0.1,-0.5 1,-0.5 1,0 v 8.9 c 0,5.7 -5.3,10.9 -11.4,17 L 83.3,86.6 C 72.7,97.2 71,102.1 71,107.9 c 0,0.6 -0.5,0.6 -0.7,0 z m 4,15.7 c -5.9,-7.2 -3.9,-18.4 7.7,-30 l 23.9,-23.9 c 6,-6 9.1,-8.9 10.6,-16.2 0.1,-0.5 1,-0.5 1,0 v 9 c 0,5.7 -5.3,10.9 -11.4,17 l -21.2,21.1 c -4.4,4.4 -13.9,13.8 -10,22.6 0.3,0.6 -0.2,0.9 -0.6,0.4 z m 12.3,-9.2 c -6.8,6.8 -8.5,14.7 -3,19.4 0.5,0.4 0.2,0.9 -0.4,0.6 -6.8,-3.1 -12.1,-14.3 -0.5,-25.9 l 23.2,-23.2 c 6,-6 9.1,-8.8 10.6,-16.1 0.1,-0.5 1,-0.5 1,0 v 8.9 c 0,5.7 -5.3,10.9 -11.4,17 z m 21.9,23 c 0,-5.7 5,-10.9 11.1,-17 l 6.7,-6.7 c 4.4,-4.4 13.8,-13.8 9.9,-22.6 -0.3,-0.6 0.2,-0.9 0.6,-0.4 5.9,7.2 3.9,18.4 -7.7,30 l -9.5,9.5 c -6,6 -8.8,8.9 -10.3,16.2 -0.1,0.5 -0.7,0.5 -0.7,0 v -9 z" />
+                    </svg>
+                </div>
+                <span class="font-bold text-xl tracking-tight">UNA Digital</span>
+            </div>
+            
+            <nav class="mt-6">
+                <div class="sidebar-item active" onclick="App.nav('dashboard', this)">
+                    <span>📊</span> Dashboard
+                </div>
+                <div class="sidebar-item" onclick="App.nav('members', this)">
+                    <span>👥</span> Membros
+                </div>
+                <div class="sidebar-item" onclick="App.nav('finance', this)">
+                    <span>💰</span> Tesouraria
+                </div>
+                <div class="sidebar-item" onclick="App.nav('secretary', this)">
+                    <span>📋</span> Secretaria
+                </div>
+                <div class="sidebar-item" onclick="App.nav('departments', this)">
+                    <span>🏛️</span> Departamentos
+                </div>
+                <div class="sidebar-item" onclick="App.nav('spiritual', this)">
+                    <span>📖</span> Espiritual
+                </div>
+                <div class="sidebar-item" onclick="App.nav('ai-assistant', this)">
+                    <span>🤖</span> Assistente IA
+                </div>
+                <div class="sidebar-item" onclick="App.nav('settings', this)">
+                    <span>⚙️</span> Definições
+                </div>
+            </nav>
+
+            <div class="absolute bottom-0 w-full p-6 border-t border-slate-200 dark:border-slate-700">
+                <button onclick="App.logout()" class="flex items-center gap-2 text-red-500 font-semibold hover:opacity-70 transition-all">
+                    <span>🚪</span> Sair do Sistema
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main id="main-content">
+            <!-- TOP BAR -->
+            <header class="flex justify-between items-center mb-8 glass p-4 rounded-2xl shadow-sm">
+                <div class="flex items-center gap-4">
+                    <button onclick="App.toggleSidebar()" class="lg:hidden text-2xl">☰</button>
+                    <div>
+                        <h2 id="welcome-msg" class="text-xl font-bold">Olá, Usuário</h2>
+                        <p id="user-info" class="text-xs opacity-60">Nível: União • Função: Secretário</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <!-- Language Selector -->
+                    <div class="relative group">
+                        <button class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center gap-2">
+                            <span id="current-lang-flag">🇵🇹</span>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 glass rounded-xl shadow-xl hidden group-hover:block z-50 p-2">
+                            <div class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer" onclick="App.setLang('pt')">🇵🇹 Português</div>
+                            <div class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer" onclick="App.setLang('en')">🇺🇸 English</div>
+                            <div class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer" onclick="App.setLang('fr')">🇫🇷 Français</div>
+                            <div class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer" onclick="App.setLang('es')">🇪🇸 Español</div>
+                            <div class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer" onclick="App.setLang('um')">🇦🇴 Umbundo</div>
+                            <div class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer" onclick="App.setLang('ki')">🇦🇴 Kimbundo</div>
+                        </div>
+                    </div>
+
+                    <!-- Theme Toggle -->
+                    <button onclick="App.toggleTheme()" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" title="Alternar Tema">
+                        <span id="theme-icon">🌙</span>
+                    </button>
+
+                    <!-- Sidebar Position Toggle -->
+                    <button onclick="App.toggleSidebarPos()" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" title="Mudar Sidebar de Lado">
+                        <span>⇄</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- VIEWS -->
+            <div id="view-container">
+                <!-- DASHBOARD VIEW -->
+                <div id="dashboard" class="view active animate-fade">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="glass p-6 rounded-3xl shadow-sm border-t-4 border-iasd-blue">
+                            <p class="text-sm opacity-60 font-medium">Total de Membros</p>
+                            <h3 class="text-3xl font-bold mt-1" id="stat-members">1,240</h3>
+                            <p class="text-xs text-green-500 mt-2">↑ 12% este mês</p>
+                        </div>
+                        <div class="glass p-6 rounded-3xl shadow-sm border-t-4 border-iasd-gold">
+                            <p class="text-sm opacity-60 font-medium">Receita Mensal</p>
+                            <h3 class="text-3xl font-bold mt-1" id="stat-finance">4.2M Kz</h3>
+                            <p class="text-xs text-green-500 mt-2">↑ 5% vs anterior</p>
+                        </div>
+                        <div class="glass p-6 rounded-3xl shadow-sm border-t-4 border-blue-400">
+                            <p class="text-sm opacity-60 font-medium">Pedidos Pendentes</p>
+                            <h3 class="text-3xl font-bold mt-1">24</h3>
+                            <p class="text-xs text-orange-400 mt-2">8 urgentes</p>
+                        </div>
+                        <div class="glass p-6 rounded-3xl shadow-sm border-t-4 border-purple-400">
+                            <p class="text-sm opacity-60 font-medium">Fidelidade</p>
+                            <h3 class="text-3xl font-bold mt-1">88%</h3>
+                            <p class="text-xs text-blue-400 mt-2">Meta: 90%</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 glass p-8 rounded-3xl shadow-sm">
+                            <div class="flex justify-between items-center mb-6">
+                                <h4 class="text-xl font-bold">Crescimento e Fidelidade</h4>
+                                <select class="bg-transparent border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 text-sm">
+                                    <option>Últimos 6 meses</option>
+                                    <option>Este ano</option>
+                                </select>
+                            </div>
+                            <canvas id="mainChart" height="250"></canvas>
+                        </div>
+                        <div class="glass p-8 rounded-3xl shadow-sm">
+                            <h4 class="text-xl font-bold mb-6">Ações Rápidas</h4>
+                            <div class="space-y-3">
+                                <button class="btn-premium btn-primary w-full justify-start">
+                                    <span>➕</span> Novo Membro
+                                </button>
+                                <button class="btn-premium btn-gold w-full justify-start">
+                                    <span>💰</span> Registrar Dízimo
+                                </button>
+                                <button class="btn-premium w-full justify-start border border-slate-200 dark:border-slate-700">
+                                    <span>📄</span> Gerar Relatório
+                                </button>
+                                <button class="btn-premium w-full justify-start border border-slate-200 dark:border-slate-700">
+                                    <span>📢</span> Comunicado Geral
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MEMBERS VIEW -->
+                <div id="members" class="view hidden animate-fade">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">Gestão de Membros</h2>
+                        <button class="btn-premium btn-primary" onclick="App.openModal('memberModal')">
+                            + Adicionar Membro
+                        </button>
+                    </div>
+                    <div class="glass rounded-3xl overflow-hidden shadow-sm">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 dark:bg-slate-800/50">
+                                    <th class="p-4 font-bold opacity-60">Nome</th>
+                                    <th class="p-4 font-bold opacity-60">Igreja</th>
+                                    <th class="p-4 font-bold opacity-60">Função</th>
+                                    <th class="p-4 font-bold opacity-60">Estado</th>
+                                    <th class="p-4 font-bold opacity-60">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="member-list-body">
+                                <!-- Dynamic Content -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- AI ASSISTANT VIEW -->
+                <div id="ai-assistant" class="view hidden animate-fade">
+                    <div class="max-w-4xl mx-auto">
+                        <div class="glass p-8 rounded-3xl shadow-lg mb-6">
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-12 h-12 bg-iasd-blue rounded-2xl flex items-center justify-center text-2xl">🤖</div>
+                                <div>
+                                    <h2 class="text-2xl font-bold">Assistente UNA Inteligente</h2>
+                                    <p class="opacity-60">IA treinada em manuais da igreja e procedimentos administrativos.</p>
+                                </div>
+                            </div>
+                            
+                            <div id="chat-box" class="h-96 overflow-y-auto mb-6 space-y-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl">
+                                <div class="flex gap-3">
+                                    <div class="w-8 h-8 bg-iasd-blue rounded-full flex items-center justify-center text-xs">🤖</div>
+                                    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[80%]">
+                                        Olá! Sou o assistente da UNA Digital. Como posso ajudar na gestão da sua igreja hoje?
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3">
+                                <input type="text" id="ai-input" class="input-premium flex-1" placeholder="Pergunte sobre dízimos, transferências ou Bíblia...">
+                                <button onclick="App.askAI()" class="btn-premium btn-primary">Enviar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- OTHER VIEWS PLACEHOLDERS -->
+                <div id="finance" class="view hidden animate-fade">
+                    <h2 class="text-2xl font-bold mb-6">Tesouraria Inteligente</h2>
+                    <div class="glass p-12 rounded-3xl text-center">
+                        <p class="opacity-60">Módulo de Tesouraria em carregamento...</p>
+                    </div>
+                </div>
+                
+                <div id="secretary" class="view hidden animate-fade">
+                    <h2 class="text-2xl font-bold mb-6">Secretaria Digital</h2>
+                    <div class="glass p-12 rounded-3xl text-center">
+                        <p class="opacity-60">Módulo de Secretaria em carregamento...</p>
+                    </div>
+                </div>
+
+                <div id="spiritual" class="view hidden animate-fade">
+                    <h2 class="text-2xl font-bold mb-6">Módulo Espiritual</h2>
+                    <div class="glass p-12 rounded-3xl text-center">
+                        <p class="opacity-60">Bíblia, Hinário e Lição em carregamento...</p>
+                    </div>
+                </div>
+
+                <div id="settings" class="view hidden animate-fade">
+                    <h2 class="text-2xl font-bold mb-6">Definições do Sistema</h2>
+                    <div class="glass p-8 rounded-3xl">
+                        <div class="space-y-6">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-bold">Modo Noturno Automático</h4>
+                                    <p class="text-sm opacity-60">Sincronizar com o sistema operacional</p>
+                                </div>
+                                <input type="checkbox" class="w-6 h-6">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-bold">Notificações Push</h4>
+                                    <p class="text-sm opacity-60">Receber alertas de novos pedidos</p>
+                                </div>
+                                <input type="checkbox" checked class="w-6 h-6">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODALS -->
+    <div id="memberModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="glass w-full max-w-lg rounded-3xl p-8 animate-fade">
+            <h3 class="text-2xl font-bold mb-6">Novo Membro</h3>
+            <div class="space-y-4">
+                <input type="text" id="m-name" class="input-premium" placeholder="Nome Completo">
+                <input type="text" id="m-church" class="input-premium" placeholder="Igreja">
+                <select id="m-role" class="input-premium">
+                    <option>Membro</option>
+                    <option>Ancião</option>
+                    <option>Diácono</option>
+                    <option>Diaconisa</option>
+                </select>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="App.closeModal('memberModal')" class="btn-premium flex-1 border border-slate-200 dark:border-slate-700">Cancelar</button>
+                    <button onclick="App.addMember()" class="btn-premium btn-primary flex-1">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const App = {
+            state: {
+                user: null,
+                theme: 'light',
+                sidebarPos: 'left',
+                lang: 'pt',
+                members: [
+                    { name: 'João Manuel', church: 'Central Luanda', role: 'Ancião', status: 'Ativo' },
+                    { name: 'Maria Antónia', church: 'Central Luanda', role: 'Membro', status: 'Ativo' },
+                    { name: 'Pedro Kiala', church: 'Palanca', role: 'Diácono', status: 'Transferido' }
+                ]
+            },
+
+            init() {
+                this.renderMembers();
+                this.initChart();
+                this.applyTheme();
+                
+                // Check for saved user
+                const savedUser = localStorage.getItem('una_user');
+                if (savedUser) {
+                    this.state.user = JSON.parse(savedUser);
+                    this.showApp();
+                }
+            },
+
+            login() {
+                const level = document.getElementById('login-level').value;
+                const role = document.getElementById('login-role').value;
+                const church = document.getElementById('login-church').value || 'Instituição Geral';
+                
+                this.state.user = { level, role, church, name: role };
+                localStorage.setItem('una_user', JSON.stringify(this.state.user));
+                this.showApp();
+            },
+
+            logout() {
+                localStorage.removeItem('una_user');
+                location.reload();
+            },
+
+            showApp() {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app-interface').classList.remove('hidden');
+                document.getElementById('welcome-msg').innerText = `Olá, ${this.state.user.name}`;
+                document.getElementById('user-info').innerText = `Nível: ${this.state.user.level} • ${this.state.user.church}`;
+                this.initChart();
+            },
+
+            nav(viewId, el) {
+                document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+                document.getElementById(viewId).classList.remove('hidden');
+                
+                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                el.classList.add('active');
+
+                if (window.innerWidth < 1024) {
+                    this.toggleSidebar();
+                }
+            },
+
+            toggleTheme() {
+                this.state.theme = this.state.theme === 'light' ? 'dark' : 'light';
+                this.applyTheme();
+            },
+
+            applyTheme() {
+                const body = document.body;
+                const icon = document.getElementById('theme-icon');
+                if (this.state.theme === 'dark') {
+                    body.classList.remove('light-mode');
+                    body.classList.add('dark-mode');
+                    icon.innerText = '☀️';
+                } else {
+                    body.classList.remove('dark-mode');
+                    body.classList.add('light-mode');
+                    icon.innerText = '🌙';
+                }
+            },
+
+            toggleSidebarPos() {
+                const sidebar = document.getElementById('sidebar');
+                const body = document.body;
+                if (this.state.sidebarPos === 'left') {
+                    this.state.sidebarPos = 'right';
+                    sidebar.classList.remove('left');
+                    sidebar.classList.add('right');
+                    body.classList.remove('sidebar-left');
+                    body.classList.add('sidebar-right');
+                } else {
+                    this.state.sidebarPos = 'left';
+                    sidebar.classList.remove('right');
+                    sidebar.classList.add('left');
+                    body.classList.remove('sidebar-right');
+                    body.classList.add('sidebar-left');
+                }
+            },
+
+            toggleSidebar() {
+                document.getElementById('sidebar').classList.toggle('open');
+            },
+
+            setLang(lang) {
+                this.state.lang = lang;
+                const flags = { pt: '🇵🇹', en: '🇺🇸', fr: '🇫🇷', es: '🇪🇸', um: '🇦🇴', ki: '🇦🇴' };
+                document.getElementById('current-lang-flag').innerText = flags[lang];
+                // In a real app, we would update all text here
+                this.toast(`Língua alterada para ${lang.toUpperCase()}`);
+            },
+
+            renderMembers() {
+                const container = document.getElementById('member-list-body');
+                container.innerHTML = this.state.members.map(m => `
+                    <tr class="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-all">
+                        <td class="p-4 font-medium">${m.name}</td>
+                        <td class="p-4 opacity-70">${m.church}</td>
+                        <td class="p-4 opacity-70">${m.role}</td>
+                        <td class="p-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold ${m.status === 'Ativo' ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'}">
+                                ${m.status}
+                            </span>
+                        </td>
+                        <td class="p-4">
+                            <button class="text-iasd-blue dark:text-iasd-gold font-bold text-sm">Editar</button>
+                        </td>
+                    </tr>
+                `).join('');
+                document.getElementById('stat-members').innerText = this.state.members.length;
+            },
+
+            addMember() {
+                const name = document.getElementById('m-name').value;
+                const church = document.getElementById('m-church').value;
+                const role = document.getElementById('m-role').value;
+
+                if (!name || !church) return this.toast('Preencha todos os campos');
+
+                // Check for duplicates
+                const exists = this.state.members.find(m => m.name.toLowerCase() === name.toLowerCase() && m.church.toLowerCase() === church.toLowerCase());
+                if (exists) {
+                    return this.toast('Erro: Membro já registado nesta igreja!', 'error');
+                }
+
+                this.state.members.push({ name, church, role, status: 'Ativo' });
+                this.renderMembers();
+                this.closeModal('memberModal');
+                this.toast('Membro adicionado com sucesso!');
+                
+                // Clear inputs
+                document.getElementById('m-name').value = '';
+                document.getElementById('m-church').value = '';
+            },
+
+            askAI() {
+                const input = document.getElementById('ai-input');
+                const chat = document.getElementById('chat-box');
+                if (!input.value) return;
+
+                const userMsg = input.value;
+                input.value = '';
+
+                // Add user message
+                chat.innerHTML += `
+                    <div class="flex gap-3 justify-end">
+                        <div class="bg-iasd-blue text-white p-4 rounded-2xl rounded-tr-none shadow-sm max-w-[80%]">
+                            ${userMsg}
+                        </div>
+                    </div>
+                `;
+
+                // Fake AI response
+                setTimeout(() => {
+                    let response = "Como assistente inteligente da UNA Digital, recomendo verificar o Manual da Igreja (Edição 2022), capítulo 7, sobre este procedimento. Posso gerar um rascunho de relatório para si?";
+                    if (userMsg.toLowerCase().includes('bíblia')) response = "A Bíblia diz em Josué 1:9: 'Não to mandei eu? Esforça-te, e tem bom ânimo; não temas, nem te espantes; porque o Senhor teu Deus é contigo, por onde quer que andares.'";
+                    
+                    chat.innerHTML += `
+                        <div class="flex gap-3 animate-fade">
+                            <div class="w-8 h-8 bg-iasd-blue rounded-full flex items-center justify-center text-xs">🤖</div>
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[80%]">
+                                ${response}
+                            </div>
+                        </div>
+                    `;
+                    chat.scrollTop = chat.scrollHeight;
+                }, 1000);
+            },
+
+            initChart() {
+                const ctx = document.getElementById('mainChart');
+                if (!ctx) return;
+                
+                if (window.myChart) window.myChart.destroy();
+
+                window.myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                        datasets: [{
+                            label: 'Crescimento de Membros',
+                            data: [1100, 1150, 1180, 1210, 1230, 1240],
+                            borderColor: '#003366',
+                            tension: 0.4,
+                            fill: true,
+                            backgroundColor: 'rgba(0, 51, 102, 0.05)'
+                        }, {
+                            label: 'Fidelidade (%)',
+                            data: [82, 85, 84, 87, 88, 88],
+                            borderColor: '#FFB612',
+                            tension: 0.4,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: false, grid: { display: false } }, x: { grid: { display: false } } }
+                    }
+                });
+            },
+
+            openModal(id) { document.getElementById(id).classList.remove('hidden'); },
+            closeModal(id) { document.getElementById(id).classList.add('hidden'); },
+
+            toast(msg, type = 'success') {
+                const t = document.createElement('div');
+                t.className = `fixed bottom-8 right-8 px-6 py-3 rounded-2xl shadow-2xl z-[200] animate-fade ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white font-bold`;
+                t.innerText = msg;
+                document.body.appendChild(t);
+                setTimeout(() => t.remove(), 3000);
+            }
+        };
+
+        window.onload = () => App.init();
+    </script>
+</body>
+</html>
